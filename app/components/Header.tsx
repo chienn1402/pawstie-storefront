@@ -2,11 +2,20 @@ import {Suspense} from 'react';
 import {Await, NavLink, useAsyncValue} from 'react-router';
 import {
   type CartViewPayload,
+  Money,
   useAnalytics,
   useOptimisticCart,
 } from '@shopify/hydrogen';
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
+import {cn} from '~/lib/utils';
+import {
+  CartIcon,
+  MenuIcon,
+  PawIcon,
+  SearchIcon,
+  UserIcon,
+} from '~/components/icons';
 
 interface HeaderProps {
   header: HeaderQuery;
@@ -17,17 +26,35 @@ interface HeaderProps {
 
 type Viewport = 'desktop' | 'mobile';
 
-export function Header({
-  header,
-  isLoggedIn,
-  cart,
-  publicStoreDomain,
-}: HeaderProps) {
+const pillClass =
+  'inline-flex items-center justify-center rounded-full bg-[#eef7e9] text-[#1c4a25] transition-colors hover:bg-[#e2f0da]';
+
+function navLinkClass({
+  isActive,
+}: {
+  isActive: boolean;
+  isPending: boolean;
+}) {
+  return cn(
+    'font-medium text-[#1c4a25]/60 transition-colors hover:text-[#1c4a25]',
+    isActive && 'font-bold text-[#1c4a25]',
+  );
+}
+
+export function Header({header, cart, publicStoreDomain}: HeaderProps) {
   const {shop, menu} = header;
   return (
-    <header className="header">
-      <NavLink prefetch="intent" to="/" style={activeLinkStyle} end>
-        <strong>{shop.name}</strong>
+    <header className="flex items-center justify-between gap-4 bg-background px-4 py-3 sm:px-6 lg:px-10">
+      <NavLink
+        prefetch="intent"
+        to="/"
+        end
+        className="flex items-center gap-2"
+      >
+        <PawIcon className="size-8 text-primary" />
+        <span className="font-heading text-xl font-bold text-[#1c4a25]">
+          {shop.name}
+        </span>
       </NavLink>
       <HeaderMenu
         menu={menu}
@@ -35,7 +62,7 @@ export function Header({
         primaryDomainUrl={header.shop.primaryDomain.url}
         publicStoreDomain={publicStoreDomain}
       />
-      <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
+      <HeaderCtas cart={cart} />
     </header>
   );
 }
@@ -51,22 +78,23 @@ export function HeaderMenu({
   viewport: Viewport;
   publicStoreDomain: HeaderProps['publicStoreDomain'];
 }) {
-  const className = `header-menu-${viewport}`;
   const {close} = useAside();
+  const className =
+    viewport === 'desktop'
+      ? 'hidden items-center gap-7 md:flex'
+      : 'flex flex-col gap-4 p-6 text-lg';
 
   return (
     <nav className={className} role="navigation">
-      {viewport === 'mobile' && (
-        <NavLink
-          end
-          onClick={close}
-          prefetch="intent"
-          style={activeLinkStyle}
-          to="/"
-        >
-          Home
-        </NavLink>
-      )}
+      <NavLink
+        end
+        onClick={close}
+        prefetch="intent"
+        className={navLinkClass}
+        to="/"
+      >
+        Home
+      </NavLink>
       {(menu || FALLBACK_HEADER_MENU).items.map((item) => {
         if (!item.url) return null;
 
@@ -79,12 +107,11 @@ export function HeaderMenu({
             : item.url;
         return (
           <NavLink
-            className="header-menu-item"
+            className={navLinkClass}
             end
             key={item.id}
             onClick={close}
             prefetch="intent"
-            style={activeLinkStyle}
             to={url}
           >
             {item.title}
@@ -95,23 +122,27 @@ export function HeaderMenu({
   );
 }
 
-function HeaderCtas({
-  isLoggedIn,
-  cart,
-}: Pick<HeaderProps, 'isLoggedIn' | 'cart'>) {
+function HeaderCtas({cart}: Pick<HeaderProps, 'cart'>) {
   return (
-    <nav className="header-ctas" role="navigation">
-      <HeaderMenuMobileToggle />
-      <NavLink prefetch="intent" to="/account" style={activeLinkStyle}>
-        <Suspense fallback="Sign in">
-          <Await resolve={isLoggedIn} errorElement="Sign in">
-            {(isLoggedIn) => (isLoggedIn ? 'Account' : 'Sign in')}
-          </Await>
-        </Suspense>
-      </NavLink>
+    <nav className="flex items-center gap-2 md:gap-3" role="navigation">
       <SearchToggle />
       <CartToggle cart={cart} />
+      <AccountLink />
+      <HeaderMenuMobileToggle />
     </nav>
+  );
+}
+
+function AccountLink() {
+  return (
+    <NavLink
+      prefetch="intent"
+      to="/account"
+      className={cn(pillClass, 'size-11')}
+      aria-label="Account"
+    >
+      <UserIcon className="size-5" />
+    </NavLink>
   );
 }
 
@@ -119,10 +150,11 @@ function HeaderMenuMobileToggle() {
   const {open} = useAside();
   return (
     <button
-      className="header-menu-mobile-toggle reset"
+      className={cn(pillClass, 'size-11 md:hidden')}
       onClick={() => open('mobile')}
+      aria-label="Open menu"
     >
-      <h3>☰</h3>
+      <MenuIcon className="size-5" />
     </button>
   );
 }
@@ -130,13 +162,26 @@ function HeaderMenuMobileToggle() {
 function SearchToggle() {
   const {open} = useAside();
   return (
-    <button className="reset" onClick={() => open('search')}>
-      Search
+    <button
+      className={cn(pillClass, 'size-11')}
+      onClick={() => open('search')}
+      aria-label="Search"
+    >
+      <SearchIcon className="size-5" />
     </button>
   );
 }
 
-function CartBadge({count}: {count: number}) {
+function CartBadge({
+  count,
+  subtotal,
+}: {
+  count: number;
+  subtotal:
+    | Partial<CartApiQueryFragment['cost']['subtotalAmount']>
+    | null
+    | undefined;
+}) {
   const {open} = useAside();
   const {publish, shop, cart, prevCart} = useAnalytics();
 
@@ -153,15 +198,25 @@ function CartBadge({count}: {count: number}) {
           url: window.location.href || '',
         } as CartViewPayload);
       }}
+      className={cn(pillClass, 'h-11 gap-2 pl-2 pr-4')}
+      aria-label={`Cart, ${count} items`}
     >
-      Cart <span aria-label={`(items: ${count})`}>{count}</span>
+      <span className="relative grid size-8 place-items-center">
+        <CartIcon className="size-5" />
+        <span className="absolute -right-1 -top-1 grid size-4 min-w-4 place-items-center rounded-full bg-[#14421e] px-1 text-[10px] font-bold leading-none text-white">
+          {count}
+        </span>
+      </span>
+      {subtotal ? (
+        <Money data={subtotal} className="text-sm font-semibold" />
+      ) : null}
     </a>
   );
 }
 
 function CartToggle({cart}: Pick<HeaderProps, 'cart'>) {
   return (
-    <Suspense fallback={<CartBadge count={0} />}>
+    <Suspense fallback={<CartBadge count={0} subtotal={null} />}>
       <Await resolve={cart}>
         <CartBanner />
       </Await>
@@ -172,7 +227,12 @@ function CartToggle({cart}: Pick<HeaderProps, 'cart'>) {
 function CartBanner() {
   const originalCart = useAsyncValue() as CartApiQueryFragment | null;
   const cart = useOptimisticCart(originalCart);
-  return <CartBadge count={cart?.totalQuantity ?? 0} />;
+  return (
+    <CartBadge
+      count={cart?.totalQuantity ?? 0}
+      subtotal={cart?.cost?.subtotalAmount ?? null}
+    />
+  );
 }
 
 const FALLBACK_HEADER_MENU = {
@@ -216,16 +276,3 @@ const FALLBACK_HEADER_MENU = {
     },
   ],
 };
-
-function activeLinkStyle({
-  isActive,
-  isPending,
-}: {
-  isActive: boolean;
-  isPending: boolean;
-}) {
-  return {
-    fontWeight: isActive ? 'bold' : undefined,
-    color: isPending ? 'grey' : 'black',
-  };
-}
