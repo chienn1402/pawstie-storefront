@@ -53,7 +53,7 @@ function RatingStat() {
 function CtaContent() {
   return (
     <div>
-      <h2 className="font-heading text-2xl font-bold leading-tight text-white lg:text-3xl">
+      <h2 className="font-heading text-2xl! font-bold leading-tight text-white lg:text-3xl!">
         Best Products
         <br />
         for Your Pet
@@ -76,7 +76,7 @@ function HeroMobile() {
     <div className="lg:hidden">
       {/* Block 1 — Golden retriever */}
       <div>
-        <h1 className="text-center font-heading text-4xl font-extrabold leading-[0.95] tracking-tight text-[#1c4a25] sm:text-5xl">
+        <h1 className="text-center font-heading text-4xl! font-extrabold leading-[0.95] tracking-tight text-[#1c4a25] sm:text-5xl!">
           Everything
           <br />
           Your Pets Love
@@ -121,40 +121,40 @@ function HeroMobile() {
 function HeroDesktop() {
   return (
     <div className="relative hidden lg:block">
-      <h1 className="text-center font-heading text-[6.5rem] font-extrabold leading-[0.9] tracking-tight text-[#1c4a25] xl:text-[8rem]">
+      <h1 className="text-center font-heading text-[6.5rem]! font-extrabold leading-[0.9] tracking-tight text-[#1c4a25] xl:text-[8rem]!">
         Everything
         <br />
         Your Pets Love
       </h1>
 
       {/* Bottom band: three columns */}
-      <div className="mt-8 grid grid-cols-3 gap-5">
-        <div className="rounded-[2rem] bg-[#a6dd9d] px-8 pb-10 pt-44">
+      <div className="relative z-0 mt-4 grid grid-cols-3 gap-5">
+        <div className="flex min-h-[25rem] flex-col justify-end rounded-[2rem] bg-[#a6dd9d] px-8 pb-10">
           <ClientsStat />
         </div>
-        <div className="flex flex-col items-center rounded-[2rem] bg-[#14421e] px-8 pb-10 pt-52 text-center">
+        <div className="flex min-h-[25rem] flex-col items-center justify-end rounded-[2rem] bg-[#14421e] px-8 pb-10 text-center">
           <CtaContent />
         </div>
-        <div className="flex flex-col items-end rounded-[2rem] bg-[#a6dd9d] px-8 pb-10 pt-44 text-right">
+        <div className="flex min-h-[25rem] flex-col items-end justify-end rounded-[2rem] bg-[#a6dd9d] px-8 pb-10 text-right">
           <RatingStat />
         </div>
       </div>
 
-      {/* Animals overlapping the band (tune positions in Step 3) */}
+      {/* Animals peeking over the band */}
       <img
         src={dachshund}
         alt=""
-        className="pointer-events-none absolute bottom-40 left-0 z-10 w-[27%]"
+        className="pointer-events-none absolute left-8 top-[18rem] z-10 w-[25%]"
       />
       <img
         src={goldenRetriever}
         alt=""
-        className="pointer-events-none absolute bottom-20 left-1/2 z-20 w-[36%] -translate-x-1/2"
+        className="pointer-events-none absolute left-1/2 top-[11.5rem] z-20 w-[32%] -translate-x-1/2"
       />
       <img
         src={cat}
         alt=""
-        className="pointer-events-none absolute bottom-40 right-0 z-10 w-[24%]"
+        className="pointer-events-none absolute right-8 top-[16rem] z-10 w-[22%]"
       />
     </div>
   );
