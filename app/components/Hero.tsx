@@ -126,6 +126,36 @@ function HeroDesktop() {
         <br />
         Your Pets Love
       </h1>
+
+      {/* Bottom band: three columns */}
+      <div className="mt-8 grid grid-cols-3 gap-5">
+        <div className="rounded-[2rem] bg-[#a6dd9d] px-8 pb-10 pt-44">
+          <ClientsStat />
+        </div>
+        <div className="flex flex-col items-center rounded-[2rem] bg-[#14421e] px-8 pb-10 pt-52 text-center">
+          <CtaContent />
+        </div>
+        <div className="flex flex-col items-end rounded-[2rem] bg-[#a6dd9d] px-8 pb-10 pt-44 text-right">
+          <RatingStat />
+        </div>
+      </div>
+
+      {/* Animals overlapping the band (tune positions in Step 3) */}
+      <img
+        src={dachshund}
+        alt=""
+        className="pointer-events-none absolute bottom-40 left-0 z-10 w-[27%]"
+      />
+      <img
+        src={goldenRetriever}
+        alt=""
+        className="pointer-events-none absolute bottom-20 left-1/2 z-20 w-[36%] -translate-x-1/2"
+      />
+      <img
+        src={cat}
+        alt=""
+        className="pointer-events-none absolute bottom-40 right-0 z-10 w-[24%]"
+      />
     </div>
   );
 }
