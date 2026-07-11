@@ -84,7 +84,7 @@ function NewArrivals({
             </span>
             <h2
               id="new-arrivals-heading"
-              className="mb-0! mt-4! font-heading text-4xl font-semibold leading-[0.95] tracking-[-0.06em] text-[#004817] lg:text-6xl"
+              className="mb-0! mt-4! font-heading text-4xl! font-semibold! leading-[0.95]! tracking-[-0.06em] text-[#004817] lg:text-6xl!"
             >
               New Arrivals
             </h2>
