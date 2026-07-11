@@ -168,7 +168,7 @@ function HeroDesktop() {
 
 export function Hero() {
   return (
-    <section className="bg-[#14421e] p-3 sm:p-4 lg:p-6">
+    <section className="bg-[#14421e] p-3! sm:p-4! lg:p-6!">
       <div className="overflow-hidden rounded-[2.5rem] bg-[#e9f6e1] px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
         <HeroMobile />
         <HeroDesktop />
