@@ -120,42 +120,48 @@ function HeroMobile() {
 
 function HeroDesktop() {
   return (
-    <div className="relative hidden lg:block">
+    <div className="hidden lg:block">
       <h1 className="text-center font-heading text-[6.5rem]! font-extrabold leading-[0.9] tracking-tight text-[#1c4a25] xl:text-[8rem]!">
         Everything
         <br />
         Your Pets Love
       </h1>
 
-      {/* Bottom band: three columns */}
-      <div className="relative z-0 mt-4 grid grid-cols-3 gap-5">
-        <div className="flex min-h-[25rem] flex-col justify-end rounded-[2rem] bg-[#a6dd9d] px-8 pb-10">
-          <ClientsStat />
+      {/* Band + animals. Animals are anchored to the band's top edge so they
+          stay put when the headline grows at the xl breakpoint. The tall top
+          margin opens up the mint area the animals peek up into. */}
+      <div className="relative mt-40 xl:mt-48">
+        <div className="grid grid-cols-3 gap-5">
+          <div className="flex min-h-[25rem] flex-col justify-end rounded-[2rem] bg-[#a6dd9d] px-8 pb-10">
+            <ClientsStat />
+          </div>
+          <div className="flex min-h-[25rem] flex-col items-center justify-end rounded-[2rem] bg-[#14421e] px-8 pb-10 text-center">
+            <CtaContent />
+          </div>
+          <div className="flex min-h-[25rem] flex-col items-end justify-end rounded-[2rem] bg-[#a6dd9d] px-8 pb-10 text-right">
+            <RatingStat />
+          </div>
         </div>
-        <div className="flex min-h-[25rem] flex-col items-center justify-end rounded-[2rem] bg-[#14421e] px-8 pb-10 text-center">
-          <CtaContent />
-        </div>
-        <div className="flex min-h-[25rem] flex-col items-end justify-end rounded-[2rem] bg-[#a6dd9d] px-8 pb-10 text-right">
-          <RatingStat />
-        </div>
-      </div>
 
-      {/* Animals peeking over the band */}
-      <img
-        src={dachshund}
-        alt=""
-        className="pointer-events-none absolute left-8 top-[18rem] z-10 w-[25%]"
-      />
-      <img
-        src={goldenRetriever}
-        alt=""
-        className="pointer-events-none absolute left-1/2 top-[11.5rem] z-20 w-[32%] -translate-x-1/2"
-      />
-      <img
-        src={cat}
-        alt=""
-        className="pointer-events-none absolute right-8 top-[16rem] z-10 w-[22%]"
-      />
+        {/* Animals peeking over the top edge of the band. Each is centered
+            over its panel and capped with max-w so it doesn't overgrow (and
+            cover the CTA text) on ultra-wide screens. */}
+        <img
+          src={dachshund}
+          alt=""
+          className="pointer-events-none absolute -top-28 left-[16.5%] z-10 w-[26%] max-w-[22rem] -translate-x-1/2"
+        />
+        <img
+          src={goldenRetriever}
+          alt=""
+          className="pointer-events-none absolute -top-52 left-1/2 z-20 w-[36%] max-w-[30rem] -translate-x-1/2"
+        />
+        <img
+          src={cat}
+          alt=""
+          className="pointer-events-none absolute -top-24 left-[83.5%] z-10 w-[24%] max-w-[20rem] -translate-x-1/2"
+        />
+      </div>
     </div>
   );
 }
