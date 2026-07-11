@@ -1,5 +1,5 @@
 import {Suspense} from 'react';
-import {Await, NavLink, useAsyncValue} from 'react-router';
+import {Await, NavLink, useAsyncValue, useLocation} from 'react-router';
 import {
   type CartViewPayload,
   Money,
@@ -27,7 +27,7 @@ interface HeaderProps {
 type Viewport = 'desktop' | 'mobile';
 
 const pillClass =
-  'inline-flex items-center justify-center rounded-full bg-[#eef7e9] text-[#1c4a25] transition-colors hover:bg-[#e2f0da]';
+  'inline-flex min-block-size-11 min-inline-size-11 items-center justify-center rounded-full bg-white text-[#004817] transition-transform hover:scale-[1.04] hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#00521d]';
 
 function navLinkClass({
   isActive,
@@ -36,23 +36,34 @@ function navLinkClass({
   isPending: boolean;
 }) {
   return cn(
-    'font-medium text-[#1c4a25]/60 transition-colors hover:text-[#1c4a25]',
-    isActive && 'font-bold text-[#1c4a25]',
+    'text-lg font-normal text-[#143b20] transition-colors hover:text-[#004817] hover:no-underline!',
+    isActive && 'font-semibold text-[#004817]',
   );
 }
 
 export function Header({header, cart, publicStoreDomain}: HeaderProps) {
   const {shop, menu} = header;
+  const {pathname} = useLocation();
+  const isHome = pathname === '/';
+
   return (
-    <header className="flex items-center justify-between gap-4 bg-background px-4 py-3 sm:px-6 lg:px-10">
+    <header
+      className={cn(
+        'relative z-40 flex items-center justify-between gap-4 px-5',
+        isHome
+          ? 'min-h-20 bg-[#effce9] py-3 lg:min-h-24 lg:px-[3.5vw] lg:py-4'
+          : 'min-h-20 bg-background py-3 lg:px-[3.5vw]',
+      )}
+    >
+      <HeaderMenuMobileToggle />
       <NavLink
         prefetch="intent"
         to="/"
         end
-        className="flex items-center gap-2"
+        className="hidden items-center gap-3 hover:no-underline! lg:flex"
       >
-        <PawIcon className="size-8 text-primary" />
-        <span className="font-heading text-xl font-bold text-[#1c4a25]">
+        <PawIcon className="size-9 text-primary" />
+        <span className="font-heading text-[1.75rem] font-semibold tracking-[-0.04em] text-[#004817]">
           {shop.name}
         </span>
       </NavLink>
@@ -81,7 +92,7 @@ export function HeaderMenu({
   const {close} = useAside();
   const className =
     viewport === 'desktop'
-      ? 'hidden items-center gap-7 md:flex'
+      ? 'hidden items-center gap-[clamp(1.75rem,3vw,4.5rem)] lg:flex'
       : 'flex flex-col gap-4 p-6 text-lg';
 
   return (
@@ -106,7 +117,12 @@ export function HeaderMenu({
             ? new URL(item.url).pathname
             : item.url;
         // Skip a menu "Home" item — we always render an explicit Home link above.
-        if (url === '/') return null;
+        if (
+          url === '/' ||
+          url === '' ||
+          item.title.trim().toLowerCase() === 'home'
+        )
+          return null;
         return (
           <NavLink
             className={navLinkClass}
@@ -126,11 +142,10 @@ export function HeaderMenu({
 
 function HeaderCtas({cart}: Pick<HeaderProps, 'cart'>) {
   return (
-    <nav className="flex items-center gap-2 md:gap-3" role="navigation">
+    <nav className="flex items-center gap-2.5 lg:gap-3" aria-label="Account actions">
       <SearchToggle />
       <CartToggle cart={cart} />
       <AccountLink />
-      <HeaderMenuMobileToggle />
     </nav>
   );
 }
@@ -140,7 +155,7 @@ function AccountLink() {
     <NavLink
       prefetch="intent"
       to="/account"
-      className={cn(pillClass, 'size-11')}
+      className={cn(pillClass, 'size-12 lg:size-14')}
       aria-label="Account"
     >
       <UserIcon className="size-5" />
@@ -152,11 +167,12 @@ function HeaderMenuMobileToggle() {
   const {open} = useAside();
   return (
     <button
-      className={cn(pillClass, 'size-11 md:hidden')}
+      type="button"
+      className={cn(pillClass, 'size-12 lg:hidden')}
       onClick={() => open('mobile')}
       aria-label="Open menu"
     >
-      <MenuIcon className="size-5" />
+      <MenuIcon className="size-6" />
     </button>
   );
 }
@@ -165,11 +181,12 @@ function SearchToggle() {
   const {open} = useAside();
   return (
     <button
-      className={cn(pillClass, 'size-11')}
+      type="button"
+      className={cn(pillClass, 'hidden size-14 lg:inline-flex')}
       onClick={() => open('search')}
       aria-label="Search"
     >
-      <SearchIcon className="size-5" />
+      <SearchIcon className="size-6" />
     </button>
   );
 }
@@ -200,19 +217,25 @@ function CartBadge({
           url: window.location.href || '',
         } as CartViewPayload);
       }}
-      className={cn(pillClass, 'h-11 gap-2 pl-2 pr-4')}
+      className={cn(
+        pillClass,
+        'h-12 gap-1.5 px-3 lg:h-14 lg:gap-2 lg:pl-3 lg:pr-5',
+      )}
       aria-label={`Cart, ${count} item${count === 1 ? '' : 's'}`}
     >
-      <span className="relative grid size-8 place-items-center">
-        <CartIcon className="size-5" />
+      <span className="relative grid size-7 place-items-center lg:size-8">
+        <CartIcon className="size-5 lg:size-6" />
         {count > 0 ? (
-          <span className="absolute -right-1 -top-1 grid size-4 min-w-4 place-items-center rounded-full bg-[#14421e] px-1 text-[10px] font-bold leading-none text-white">
+          <span className="absolute -right-1.5 -top-1.5 grid size-4 min-w-4 place-items-center rounded-full bg-[#00521d] px-1 text-[10px] font-bold leading-none text-white lg:size-5 lg:min-w-5 lg:text-xs">
             {count}
           </span>
         ) : null}
       </span>
       {subtotal?.amount ? (
-        <Money data={subtotal} className="text-sm font-semibold" />
+        <Money
+          data={subtotal}
+          className="hidden text-base font-medium sm:inline lg:text-lg"
+        />
       ) : null}
     </a>
   );
