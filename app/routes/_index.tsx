@@ -71,7 +71,7 @@ function NewArrivals({
   return (
     <section
       aria-labelledby="new-arrivals-heading"
-      className="-mx-4 w-[calc(100%+2rem)] overflow-hidden bg-[#effce9] px-6 py-14 lg:px-[7vw] lg:py-20"
+      className="-mx-4 w-[calc(100%+2rem)] overflow-hidden bg-[#effce9] px-6! py-14! lg:px-[7vw]! lg:py-20!"
     >
       <div className="mx-auto max-w-[80rem]">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
