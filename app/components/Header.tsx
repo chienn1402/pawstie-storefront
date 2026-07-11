@@ -201,15 +201,17 @@ function CartBadge({
         } as CartViewPayload);
       }}
       className={cn(pillClass, 'h-11 gap-2 pl-2 pr-4')}
-      aria-label={`Cart, ${count} items`}
+      aria-label={`Cart, ${count} item${count === 1 ? '' : 's'}`}
     >
       <span className="relative grid size-8 place-items-center">
         <CartIcon className="size-5" />
-        <span className="absolute -right-1 -top-1 grid size-4 min-w-4 place-items-center rounded-full bg-[#14421e] px-1 text-[10px] font-bold leading-none text-white">
-          {count}
-        </span>
+        {count > 0 ? (
+          <span className="absolute -right-1 -top-1 grid size-4 min-w-4 place-items-center rounded-full bg-[#14421e] px-1 text-[10px] font-bold leading-none text-white">
+            {count}
+          </span>
+        ) : null}
       </span>
-      {subtotal ? (
+      {subtotal?.amount ? (
         <Money data={subtotal} className="text-sm font-semibold" />
       ) : null}
     </a>
