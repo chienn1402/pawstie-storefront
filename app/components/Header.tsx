@@ -105,6 +105,8 @@ export function HeaderMenu({
           item.url.includes(primaryDomainUrl)
             ? new URL(item.url).pathname
             : item.url;
+        // Skip a menu "Home" item — we always render an explicit Home link above.
+        if (url === '/') return null;
         return (
           <NavLink
             className={navLinkClass}
