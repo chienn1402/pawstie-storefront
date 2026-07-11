@@ -74,8 +74,8 @@ function CtaContent() {
 function HeroMobile() {
   return (
     <div className="lg:hidden">
-      <div className="relative min-h-[calc(100svh-5rem)] overflow-hidden">
-        <h1 className="absolute inset-x-5 top-[7%] z-10 m-0! text-center font-heading text-[clamp(3.5rem,16vw,5.4rem)]! font-normal leading-[0.9] tracking-[-0.07em] text-[#004817]">
+      <div className="relative min-h-[100svh] overflow-hidden">
+        <h1 className="absolute inset-x-5 top-28 z-10 m-0! text-center font-heading text-[clamp(3.5rem,16vw,5.4rem)]! font-normal leading-[0.9] tracking-[-0.07em] text-[#004817]">
           Everything
           <br />
           Your Pets Love
@@ -87,6 +87,10 @@ function HeroMobile() {
           height="1399"
           fetchPriority="high"
           className="pointer-events-none absolute left-1/2 top-[calc(100%-18rem)] z-30 w-[112%] max-w-[39rem] -translate-x-1/2 -translate-y-[75.4%] rounded-none! drop-shadow-[0_22px_18px_rgba(1,51,18,.2)]"
+        />
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-[calc(100%-18rem)] z-40 h-1 w-[56%] max-w-[19.5rem] -translate-x-1/2 -translate-y-[2px] bg-[#00521d]"
         />
         <div className="absolute inset-x-0 bottom-0 z-20 h-72 bg-[#00521d] px-6 pb-7 pt-14">
           <div className="flex h-full items-end justify-center">
@@ -128,8 +132,8 @@ function HeroMobile() {
 
 function HeroDesktop() {
   return (
-    <div className="relative hidden h-[calc(100svh-6rem)] min-h-[48rem] overflow-hidden [--hero-panel-height:clamp(15rem,25vh,20rem)] lg:block">
-      <h1 className="absolute inset-x-0 top-[4.5%] z-10 m-0! text-center font-heading text-[clamp(6.7rem,8.25vw,9.6rem)]! font-normal leading-[0.88] tracking-[-0.07em] text-[#004817]">
+    <div className="relative hidden h-[100svh] min-h-[48rem] overflow-hidden [--hero-panel-height:clamp(15rem,25vh,20rem)] lg:block">
+      <h1 className="absolute inset-x-0 top-[clamp(7.5rem,15vh,9.5rem)] z-10 m-0! text-center font-heading text-[clamp(6.7rem,8.25vw,9.6rem)]! font-normal leading-[0.88] tracking-[-0.07em] text-[#004817]">
         Everything
         <br />
         Your Pets Love
@@ -165,6 +169,10 @@ function HeroDesktop() {
         height="1399"
         fetchPriority="high"
         className="pointer-events-none absolute left-1/2 top-[calc(100%-var(--hero-panel-height))] z-40 w-[min(40vw,54vh)] max-w-[48rem] -translate-x-1/2 -translate-y-[75.4%] rounded-none! drop-shadow-[0_22px_18px_rgba(1,51,18,.2)]"
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-[calc(100%-var(--hero-panel-height))] z-50 h-1 w-[min(20vw,27vh)] -translate-x-1/2 -translate-y-[2px] bg-[#00521d]"
       />
       <img
         src={cat}

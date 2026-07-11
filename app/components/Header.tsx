@@ -27,7 +27,7 @@ interface HeaderProps {
 type Viewport = 'desktop' | 'mobile';
 
 const pillClass =
-  'inline-flex min-block-size-11 min-inline-size-11 items-center justify-center rounded-full bg-white text-[#004817] transition-transform hover:scale-[1.04] hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#00521d]';
+  'inline-flex min-block-size-11 min-inline-size-11 items-center justify-center rounded-full bg-[#effce9] text-[#004817] transition-[transform,background-color,color] motion-safe:hover:scale-[1.04] hover:bg-[#e2f8dd] hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#00521d]';
 
 function navLinkClass({
   isActive,
@@ -49,10 +49,10 @@ export function Header({header, cart, publicStoreDomain}: HeaderProps) {
   return (
     <header
       className={cn(
-        'relative z-40 flex items-center justify-between gap-4 px-5',
+        'liquid-glass-header sticky top-3 z-50 mx-auto mt-3 flex w-[calc(100%-1.5rem)] max-w-[90rem] items-center justify-between gap-2.5 p-2.5 lg:top-4 lg:mt-4 lg:w-[calc(100%-2rem)] lg:gap-4 lg:px-4',
         isHome
-          ? 'min-h-20 bg-[#effce9] py-3 lg:min-h-24 lg:px-[3.5vw] lg:py-4'
-          : 'min-h-20 bg-background py-3 lg:px-[3.5vw]',
+          ? '-mb-20 lg:-mb-[5.75rem]'
+          : 'mb-3 lg:mb-4',
       )}
     >
       <HeaderMenuMobileToggle />
@@ -60,10 +60,11 @@ export function Header({header, cart, publicStoreDomain}: HeaderProps) {
         prefetch="intent"
         to="/"
         end
-        className="hidden items-center gap-3 hover:no-underline! lg:flex"
+        aria-label={`${shop.name} home`}
+        className="flex shrink-0 items-center gap-3 rounded-full px-1 hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#00521d] lg:px-0"
       >
-        <PawIcon className="size-9 text-primary" />
-        <span className="font-heading text-[1.75rem] font-semibold tracking-[-0.04em] text-[#004817]">
+        <PawIcon className="size-8 text-primary lg:size-9" />
+        <span className="hidden font-heading text-[1.75rem] font-semibold tracking-[-0.04em] text-[#004817] lg:inline">
           {shop.name}
         </span>
       </NavLink>
@@ -96,7 +97,7 @@ export function HeaderMenu({
       : 'flex flex-col gap-4 p-6 text-lg';
 
   return (
-    <nav className={className} role="navigation">
+    <nav className={className} aria-label="Primary">
       <NavLink
         end
         onClick={close}
@@ -142,7 +143,10 @@ export function HeaderMenu({
 
 function HeaderCtas({cart}: Pick<HeaderProps, 'cart'>) {
   return (
-    <nav className="flex items-center gap-2.5 lg:gap-3" aria-label="Account actions">
+    <nav
+      className="flex items-center gap-2 lg:gap-2.5"
+      aria-label="Account actions"
+    >
       <SearchToggle />
       <CartToggle cart={cart} />
       <AccountLink />
@@ -155,10 +159,14 @@ function AccountLink() {
     <NavLink
       prefetch="intent"
       to="/account"
-      className={cn(pillClass, 'size-12 lg:size-14')}
+      className={cn(
+        pillClass,
+        'size-12 bg-[#00521d] text-white hover:bg-[#006523] lg:h-14 lg:w-auto lg:gap-2 lg:px-5',
+      )}
       aria-label="Account"
     >
       <UserIcon className="size-5" />
+      <span className="hidden text-base font-semibold xl:inline">Account</span>
     </NavLink>
   );
 }
@@ -203,6 +211,8 @@ function CartBadge({
 }) {
   const {open} = useAside();
   const {publish, shop, cart, prevCart} = useAnalytics();
+  const subtotalData = subtotal?.amount ? subtotal : null;
+  const hasSubtotal = subtotalData !== null;
 
   return (
     <a
@@ -219,7 +229,9 @@ function CartBadge({
       }}
       className={cn(
         pillClass,
-        'h-12 gap-1.5 px-3 lg:h-14 lg:gap-2 lg:pl-3 lg:pr-5',
+        hasSubtotal
+          ? 'h-12 gap-1.5 px-3 lg:h-14 lg:gap-2 lg:pl-3 lg:pr-5'
+          : 'size-12 p-0 lg:size-14',
       )}
       aria-label={`Cart, ${count} item${count === 1 ? '' : 's'}`}
     >
@@ -231,9 +243,9 @@ function CartBadge({
           </span>
         ) : null}
       </span>
-      {subtotal?.amount ? (
+      {subtotalData ? (
         <Money
-          data={subtotal}
+          data={subtotalData}
           className="hidden text-base font-medium sm:inline lg:text-lg"
         />
       ) : null}
