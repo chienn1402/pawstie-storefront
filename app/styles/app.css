@@ -582,11 +582,6 @@ button.reset:hover:not(:has(> *)) {
   margin-bottom: 2rem;
 }
 
-.product-item img {
-  height: auto;
-  width: 100%;
-}
-
 /*
 * --------------------------------------------------
 * routes/products.$handle.tsx
