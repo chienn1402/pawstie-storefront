@@ -45,6 +45,64 @@ const ROUTINES: readonly Routine[] = [
   },
 ];
 
+const AUTOPLAY_MS = 4500;
+
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+
+  useEffect(() => {
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReduced(query.matches);
+
+    const onChange = (event: MediaQueryListEvent) => setReduced(event.matches);
+    query.addEventListener('change', onChange);
+    return () => query.removeEventListener('change', onChange);
+  }, []);
+
+  return reduced;
+}
+
+/**
+ * Fills over `durationMs` whenever `resetKey` changes. Uses a transition rather
+ * than a keyframe animation because keyframes would need a @keyframes block in
+ * tailwind.css, which this project does not allow us to touch.
+ */
+function AutoplayProgress({
+  durationMs,
+  resetKey,
+}: {
+  durationMs: number;
+  resetKey: number;
+}) {
+  const [filled, setFilled] = useState(false);
+
+  useEffect(() => {
+    setFilled(false);
+    // Two frames: the first lets the browser paint the scaleX(0) state, the
+    // second flips it — a single frame would coalesce both and skip the fill.
+    let inner = 0;
+    const outer = requestAnimationFrame(() => {
+      inner = requestAnimationFrame(() => setFilled(true));
+    });
+    return () => {
+      cancelAnimationFrame(outer);
+      cancelAnimationFrame(inner);
+    };
+  }, [resetKey]);
+
+  return (
+    <span className="absolute inset-x-0 bottom-0 block h-[3px] overflow-hidden rounded-full">
+      <span
+        className="block h-full origin-left rounded-full bg-white/80 transition-transform ease-linear"
+        style={{
+          transform: `scaleX(${filled ? 1 : 0})`,
+          transitionDuration: `${durationMs}ms`,
+        }}
+      />
+    </span>
+  );
+}
+
 export function ShopByRoutine() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [prevIndex, setPrevIndex] = useState<number | null>(null);
@@ -54,6 +112,14 @@ export function ShopByRoutine() {
   const listRef = useRef<HTMLDivElement>(null);
   const [pill, setPill] = useState({x: 0, y: 0, w: 0, h: 0});
   const [pillReady, setPillReady] = useState(false);
+  const [interacted, setInteracted] = useState(false);
+  const [inView, setInView] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+  const reducedMotion = usePrefersReducedMotion();
+
+  const autoplaying = inView && !interacted && !reducedMotion;
+
+  const stopAutoplay = useCallback(() => setInteracted(true), []);
 
   const active = ROUTINES[activeIndex];
 
@@ -128,9 +194,56 @@ export function ShopByRoutine() {
     return () => observer.disconnect();
   }, [activeIndex]);
 
+  // Only cycle while the section is actually on screen.
+  useEffect(() => {
+    const element = sectionRef.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      {threshold: 0.35},
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!autoplaying) return;
+
+    let timer: ReturnType<typeof setInterval> | undefined;
+
+    const start = () => {
+      timer = setInterval(() => {
+        goTo((activeIndexRef.current + 1) % ROUTINES.length);
+      }, AUTOPLAY_MS);
+    };
+
+    const stop = () => {
+      if (timer) clearInterval(timer);
+      timer = undefined;
+    };
+
+    const onVisibilityChange = () => {
+      stop();
+      if (!document.hidden) start();
+    };
+
+    if (!document.hidden) start();
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    return () => {
+      stop();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, [autoplaying, goTo]);
+
   return (
     <section
+      ref={sectionRef}
       aria-labelledby="shop-routine-heading"
+      onMouseEnter={stopAutoplay}
+      onFocusCapture={stopAutoplay}
+      onPointerDown={stopAutoplay}
       className="-mx-4 w-[calc(100%+2rem)] overflow-hidden bg-[#a4e8aa] px-4! py-4! lg:px-6! lg:py-6!"
     >
       <div className="relative mx-auto max-w-[92rem] overflow-hidden rounded-[2.25rem] bg-[#00521d] px-6 py-14 lg:rounded-[3rem] lg:px-[5vw] lg:py-20">
@@ -170,6 +283,22 @@ export function ShopByRoutine() {
                   height: `${pill.h}px`,
                 }}
               />
+              {autoplaying && pillReady ? (
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute left-0 top-0 z-20"
+                  style={{
+                    transform: `translate3d(${pill.x}px, ${pill.y}px, 0)`,
+                    width: `${pill.w}px`,
+                    height: `${pill.h}px`,
+                  }}
+                >
+                  <AutoplayProgress
+                    durationMs={AUTOPLAY_MS}
+                    resetKey={activeIndex}
+                  />
+                </span>
+              ) : null}
               {ROUTINES.map((routine, index) => {
                 const selected = index === activeIndex;
                 return (
