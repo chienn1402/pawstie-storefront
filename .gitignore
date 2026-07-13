@@ -9,3 +9,6 @@ node_modules
 .react-router
 tsconfig.tsbuildinfo
 .playwright-cli
+
+# Playwright MCP scratch output
+.playwright-mcp/
