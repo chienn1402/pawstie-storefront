@@ -268,7 +268,7 @@ export function ShopByRoutine() {
               ref={listRef}
               role="tablist"
               aria-label="Shop by pet routine"
-              className="relative mt-10 flex gap-1 overflow-x-auto lg:mt-12 lg:flex-col lg:items-start lg:overflow-visible"
+              className="relative mt-10 flex flex-wrap gap-1 lg:mt-12 lg:flex-col lg:flex-nowrap lg:items-start lg:overflow-visible"
             >
               <span
                 aria-hidden="true"
@@ -316,7 +316,7 @@ export function ShopByRoutine() {
                     onClick={() => goTo(index)}
                     onMouseEnter={() => goTo(index)}
                     onKeyDown={onKeyDown}
-                    className={`relative z-10 shrink-0 cursor-pointer rounded-2xl px-5 py-3 text-left font-heading text-2xl font-semibold tracking-[-0.04em] transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white lg:px-6 lg:py-3 lg:text-4xl ${
+                    className={`relative z-10 shrink-0 cursor-pointer rounded-2xl px-2 py-2 text-left font-heading text-base font-semibold tracking-[-0.04em] transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:px-4 sm:py-2.5 sm:text-xl lg:px-6 lg:py-3 lg:text-4xl ${
                       selected
                         ? 'text-white'
                         : 'text-white/45 hover:text-white/80'
