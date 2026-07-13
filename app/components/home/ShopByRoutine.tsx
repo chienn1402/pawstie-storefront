@@ -253,7 +253,7 @@ export function ShopByRoutine() {
         />
 
         <div className="relative z-20 grid gap-12 lg:grid-cols-[1fr_minmax(20rem,32rem)] lg:items-center lg:gap-16">
-          <div>
+          <div className="min-w-0">
             <p className="font-heading text-sm! font-bold uppercase tracking-[0.16em] text-[#a4e8aa]">
               Shop their routine
             </p>
@@ -338,7 +338,7 @@ export function ShopByRoutine() {
             id={`${baseId}-panel`}
             role="tabpanel"
             aria-labelledby={`${baseId}-tab-${active.id}`}
-            className="relative isolate"
+            className="relative isolate min-w-0"
           >
             <span
               key={active.id}
