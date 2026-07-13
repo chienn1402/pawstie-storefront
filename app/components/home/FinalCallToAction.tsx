@@ -1,47 +1,53 @@
 import {Link} from 'react-router';
-import cat from '~/assets/img-cat.png';
-import {ArrowRightIcon, PawIcon} from '~/components/icons';
+import ctaPets from '~/assets/cta-pets.jpg';
+import {ArrowRightIcon} from '~/components/icons';
 
 export function FinalCallToAction() {
   return (
-    <section className="-mx-4 w-[calc(100%+2rem)] overflow-hidden bg-[#effce9] px-6! pb-20! pt-20! lg:px-[7vw]! lg:pb-28! lg:pt-28!">
-      <div className="mx-auto grid max-w-[80rem] items-center gap-8 lg:grid-cols-[1fr_0.8fr]">
-        <div className="relative min-h-[24rem] overflow-hidden rounded-[2rem] bg-[#a4e8aa] lg:min-h-[32rem] lg:rounded-[2.75rem]">
-          <span
-            aria-hidden="true"
-            className="absolute -left-16 -top-20 size-64 rounded-full border-[3rem] border-white/50"
-          />
+    <section
+      aria-labelledby="final-cta-heading"
+      className="-mx-4 w-[calc(100%+2rem)] overflow-hidden bg-[#effce9] px-6! pb-20! pt-20! lg:px-[7vw]! lg:pb-28! lg:pt-28!"
+    >
+      <div className="mx-auto grid max-w-[80rem] items-center gap-12 lg:grid-cols-[minmax(18rem,27rem)_1fr] lg:gap-20">
+        {/* The light counterpart of the deep-green stage in Shop By Routine:
+            same photo panel and corner badge, no frame around it. */}
+        <div className="relative overflow-hidden rounded-[2rem] bg-[#a4e8aa] lg:rounded-[2.75rem]">
           <img
-            src={cat}
-            alt=""
-            width="1773"
-            height="1316"
+            src={ctaPets}
+            alt="A tabby cat and a cream-coloured dog sitting together in a meadow of daisies."
+            width="1000"
+            height="1250"
             loading="lazy"
-            className="pointer-events-none absolute -bottom-6 left-1/2 w-[95%] max-w-[38rem] -translate-x-1/2 rounded-none! drop-shadow-[0_24px_16px_rgba(1,51,18,.18)]"
+            decoding="async"
+            className="aspect-[4/5] size-full rounded-none! object-cover"
           />
-          <span className="absolute bottom-5 left-5 rounded-full bg-white px-4 py-2 font-heading text-sm font-bold text-[#00521d] shadow-sm lg:bottom-7 lg:left-7">
-            Cat-approved comfort
+          <span className="absolute bottom-5 left-5 rounded-full bg-white px-5 py-3 font-heading text-base font-semibold text-[#00521d] shadow-sm lg:bottom-6 lg:left-6 lg:text-lg">
+            Even the cat approves
           </span>
         </div>
 
-        <div className="px-1 py-8 lg:pl-14">
-          <span className="grid size-12 place-items-center rounded-full bg-white text-primary ring-2 ring-[#a4e8aa]">
-            <PawIcon className="size-5" />
-          </span>
-          <h2 className="mb-0! mt-6! max-w-[11ch] font-heading text-5xl! font-semibold! leading-[0.92]! tracking-[-0.065em] text-[#004817] lg:text-7xl!">
+        <div className="min-w-0">
+          <p className="font-heading text-sm! font-bold uppercase tracking-[0.16em] text-[#347345]">
+            The whole collection
+          </p>
+          <h2
+            id="final-cta-heading"
+            className="mb-0! mt-4! max-w-[13ch] font-heading text-5xl! font-semibold! leading-[0.9]! tracking-[-0.065em] text-[#004817] sm:text-6xl! lg:text-7xl!"
+          >
             Their next favorite thing is waiting.
           </h2>
-          <p className="mt-6 max-w-[33rem] text-lg leading-relaxed text-[#347345] lg:text-xl">
+          <p className="mt-8! max-w-[31rem] text-lg! leading-relaxed! text-[#347345]">
             Browse every toy, cozy corner, and everyday essential in the Pawstie
             collection.
           </p>
           <Link
             to="/collections/all"
-            className="mt-8 inline-flex min-h-14 items-center gap-5 rounded-full bg-primary py-2 pl-7 pr-2 text-lg font-semibold text-primary-foreground transition-transform hover:scale-[1.02] hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#00521d]"
+            className="group mt-10 inline-flex min-h-16 items-center gap-5 rounded-full bg-primary py-2 pl-8 pr-2 font-heading text-lg font-semibold text-white! shadow-[0_12px_28px_-10px_rgba(169,83,14,0.5)] transition-[transform,box-shadow,background-color] duration-300 hover:-translate-y-0.5 hover:bg-[#8f440b] hover:no-underline! hover:shadow-[0_20px_38px_-12px_rgba(169,83,14,0.65)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#00521d] motion-reduce:transition-none motion-reduce:hover:translate-y-0 lg:text-xl"
           >
             Shop all products
-            <span className="grid size-11 place-items-center rounded-full bg-[#effce9] text-primary">
-              <ArrowRightIcon className="size-5" />
+            <span className="relative grid size-12 place-items-center overflow-hidden rounded-full bg-white text-primary">
+              <ArrowRightIcon className="size-5 transition-transform duration-300 motion-safe:group-hover:translate-x-[220%]" />
+              <ArrowRightIcon className="absolute size-5 -translate-x-[220%] transition-transform duration-300 motion-safe:group-hover:translate-x-0" />
             </span>
           </Link>
         </div>
