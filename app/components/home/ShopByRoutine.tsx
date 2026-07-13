@@ -1,4 +1,4 @@
-import {useCallback, useId, useRef, useState} from 'react';
+import {useCallback, useEffect, useId, useRef, useState} from 'react';
 import {Link} from 'react-router';
 import routinePlay from '~/assets/routine-play.jpg';
 import routineSnooze from '~/assets/routine-snooze.jpg';
@@ -51,6 +51,9 @@ export function ShopByRoutine() {
   const activeIndexRef = useRef(0);
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const baseId = useId();
+  const listRef = useRef<HTMLDivElement>(null);
+  const [pill, setPill] = useState({x: 0, y: 0, w: 0, h: 0});
+  const [pillReady, setPillReady] = useState(false);
 
   const active = ROUTINES[activeIndex];
 
@@ -98,6 +101,33 @@ export function ShopByRoutine() {
     [goTo],
   );
 
+  // Measure the active tab and park the pill on it. offsetLeft/offsetTop are
+  // relative to the offsetParent, which is the `relative` tablist.
+  useEffect(() => {
+    const tab = tabRefs.current[activeIndex];
+    const list = listRef.current;
+    if (!tab || !list) return;
+
+    const update = () => {
+      setPill({
+        x: tab.offsetLeft,
+        y: tab.offsetTop,
+        w: tab.offsetWidth,
+        h: tab.offsetHeight,
+      });
+      setPillReady(true);
+    };
+
+    update();
+
+    // The rail flips axis at the lg breakpoint and the words rewrap, so the
+    // pill has to re-measure on resize, not just on selection.
+    const observer = new ResizeObserver(update);
+    observer.observe(list);
+    observer.observe(tab);
+    return () => observer.disconnect();
+  }, [activeIndex]);
+
   return (
     <section
       aria-labelledby="shop-routine-heading"
@@ -111,7 +141,7 @@ export function ShopByRoutine() {
 
         <div className="relative z-20 grid gap-12 lg:grid-cols-[1fr_minmax(20rem,32rem)] lg:items-center lg:gap-16">
           <div>
-            <p className="font-heading text-sm font-bold uppercase tracking-[0.16em] text-[#a4e8aa]">
+            <p className="font-heading text-sm! font-bold uppercase tracking-[0.16em] text-[#a4e8aa]">
               Shop their routine
             </p>
             <h2
@@ -122,10 +152,24 @@ export function ShopByRoutine() {
             </h2>
 
             <div
+              ref={listRef}
               role="tablist"
               aria-label="Shop by pet routine"
               className="relative mt-10 flex gap-1 overflow-x-auto lg:mt-12 lg:flex-col lg:items-start lg:overflow-visible"
             >
+              <span
+                aria-hidden="true"
+                className={`pointer-events-none absolute left-0 top-0 z-0 rounded-2xl bg-primary ${
+                  pillReady
+                    ? 'transition-[transform,width,height] duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] motion-reduce:transition-none'
+                    : 'opacity-0'
+                }`}
+                style={{
+                  transform: `translate3d(${pill.x}px, ${pill.y}px, 0)`,
+                  width: `${pill.w}px`,
+                  height: `${pill.h}px`,
+                }}
+              />
               {ROUTINES.map((routine, index) => {
                 const selected = index === activeIndex;
                 return (
@@ -155,7 +199,7 @@ export function ShopByRoutine() {
               })}
             </div>
 
-            <p className="mt-8 max-w-[31rem] text-lg leading-relaxed text-[#d9f7d5]">
+            <p className="mt-8 max-w-[31rem] text-lg! leading-relaxed! text-[#d9f7d5]">
               Find the useful little things that make walks easier, playtime
               longer, and the best nap spot even better.
             </p>
@@ -167,21 +211,36 @@ export function ShopByRoutine() {
             aria-labelledby={`${baseId}-tab-${active.id}`}
             className="relative isolate"
           >
+            <span
+              key={active.id}
+              aria-hidden="true"
+              className="pointer-events-none absolute -top-8 right-2 z-0 select-none font-heading text-[6rem] font-semibold uppercase leading-none tracking-[-0.06em] text-white/[0.07] animate-in fade-in slide-in-from-bottom-6 duration-700 motion-reduce:animate-none lg:-top-14 lg:text-[9rem]"
+            >
+              {active.label}
+            </span>
+
             <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[2rem] bg-[#003d15] lg:rounded-[2.5rem]">
               {ROUTINES.map((routine, index) => {
                 const selected = index === activeIndex;
                 const leaving = index === prevIndex && !selected;
+
+                const layerClass = selected
+                  ? 'z-20 opacity-100 [clip-path:inset(0_0_0_0%)] transition-[clip-path,opacity] duration-700 [transition-timing-function:cubic-bezier(0.65,0,0.35,1)] motion-reduce:transition-[opacity] motion-reduce:duration-150'
+                  : leaving
+                    ? 'z-10 opacity-0 [clip-path:inset(0_0_0_0%)] transition-opacity duration-500 motion-reduce:duration-150'
+                    : 'z-0 opacity-0 [clip-path:inset(0_0_0_100%)]';
+
+                const imageClass = selected
+                  ? 'scale-100 transition-transform duration-700 ease-out motion-reduce:transition-none'
+                  : leaving
+                    ? 'scale-[1.06] transition-transform duration-700 ease-out motion-reduce:transition-none'
+                    : 'scale-[1.12]';
+
                 return (
                   <div
                     key={routine.id}
                     aria-hidden={!selected}
-                    className={`absolute inset-0 overflow-hidden ${
-                      selected
-                        ? 'z-20 opacity-100'
-                        : leaving
-                          ? 'z-10 opacity-0'
-                          : 'z-0 opacity-0'
-                    }`}
+                    className={`absolute inset-0 overflow-hidden ${layerClass}`}
                   >
                     <img
                       src={routine.image}
@@ -190,7 +249,7 @@ export function ShopByRoutine() {
                       height="1250"
                       loading="lazy"
                       decoding="async"
-                      className="size-full rounded-none! object-cover"
+                      className={`size-full rounded-none! object-cover ${imageClass}`}
                     />
                   </div>
                 );
