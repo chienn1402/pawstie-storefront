@@ -328,7 +328,7 @@ export function ShopByRoutine() {
               })}
             </div>
 
-            <p className="mt-8 max-w-[31rem] text-lg! leading-relaxed! text-[#d9f7d5]">
+            <p className="mt-8! max-w-[31rem] text-lg! leading-relaxed! text-[#d9f7d5]">
               Find the useful little things that make walks easier, playtime
               longer, and the best nap spot even better.
             </p>
