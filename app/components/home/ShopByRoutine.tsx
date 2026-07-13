@@ -357,7 +357,7 @@ export function ShopByRoutine() {
                   ? 'z-20 opacity-100 [clip-path:inset(0_0_0_0%)] transition-[clip-path,opacity] duration-700 [transition-timing-function:cubic-bezier(0.65,0,0.35,1)] motion-reduce:transition-[opacity] motion-reduce:duration-150'
                   : leaving
                     ? 'z-10 opacity-0 [clip-path:inset(0_0_0_0%)] transition-opacity duration-500 motion-reduce:duration-150'
-                    : 'z-0 opacity-0 [clip-path:inset(0_0_0_100%)]';
+                    : 'z-0 opacity-0 [clip-path:inset(0_0_0_100%)] [transition-property:clip-path,opacity] [transition-duration:0ms,500ms] [transition-delay:500ms,0ms]';
 
                 const imageClass = selected
                   ? 'scale-100 transition-transform duration-700 ease-out motion-reduce:transition-none'
