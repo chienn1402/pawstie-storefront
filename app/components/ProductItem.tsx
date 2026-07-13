@@ -13,9 +13,7 @@ export function ProductItem({
   isNew = false,
 }: {
   product:
-    | CollectionItemFragment
-    | ProductItemFragment
-    | RecommendedProductFragment;
+    CollectionItemFragment | ProductItemFragment | RecommendedProductFragment;
   loading?: 'eager' | 'lazy';
   isNew?: boolean;
 }) {
@@ -45,9 +43,9 @@ export function ProductItem({
           />
         )}
       </div>
-      <h4 className="mb-1! mt-3! font-heading text-base font-semibold leading-snug text-[#004817]">
+      <h3 className="mb-1! mt-3! font-heading text-base font-semibold leading-snug text-[#004817]">
         {product.title}
-      </h4>
+      </h3>
       <small className="font-heading text-sm font-semibold text-[#347345]">
         <Money data={product.priceRange.minVariantPrice} />
       </small>

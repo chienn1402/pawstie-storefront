@@ -2,18 +2,14 @@ import {Link} from 'react-router';
 import goldenRetriever from '~/assets/img-golden-retriever.png';
 import dachshund from '~/assets/img-dachshund.png';
 import cat from '~/assets/img-cat.png';
-import {
-  ArrowRightIcon,
-  PawIcon,
-  PlusIcon,
-  StarIcon,
-} from '~/components/icons';
+import {ArrowRightIcon, PawIcon, PlusIcon, StarIcon} from '~/components/icons';
 
 const CTA_HREF = '/collections/all';
+const HERO_IMAGE_PRIORITY = {fetchpriority: 'high'} as const;
 
 function ClientsStat() {
   return (
-    <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+    <div className="flex flex-col items-center text-center">
       <div className="flex items-center gap-4">
         <strong className="font-heading text-5xl font-semibold tracking-[-0.06em] text-[#064a1c] lg:text-6xl">
           98K+
@@ -53,17 +49,17 @@ function RatingStat() {
 function CtaContent() {
   return (
     <div className="flex flex-col items-center text-center">
-      <h2 className="m-0! font-heading text-3xl! font-normal leading-[1.05] text-white lg:text-[2.15rem]!">
+      <h2 className="m-0! font-heading text-3xl! font-normal! leading-[1.05] text-white lg:text-[2.15rem]!">
         Best Products
         <br />
         for Your Pet
       </h2>
       <Link
         to={CTA_HREF}
-        className="mt-7 inline-flex min-h-14 items-center gap-5 rounded-full bg-primary py-2 pl-7 pr-2 text-lg font-semibold text-primary-foreground transition-transform hover:scale-[1.02] hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+        className="mt-7 inline-flex min-h-14 items-center gap-5 rounded-full bg-primary py-2 pl-7 pr-2 text-lg font-semibold text-white! transition-transform hover:scale-[1.02] hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
       >
         Explore Products
-        <span className="grid size-11 place-items-center rounded-full bg-[#effce9] text-primary">
+        <span className="grid size-11 place-items-center rounded-full bg-white text-primary">
           <ArrowRightIcon className="size-5" />
         </span>
       </Link>
@@ -74,8 +70,8 @@ function CtaContent() {
 function HeroMobile() {
   return (
     <div className="lg:hidden">
-      <div className="relative min-h-[100svh] overflow-hidden">
-        <h1 className="absolute inset-x-5 top-28 z-10 m-0! text-center font-heading text-[clamp(3.5rem,16vw,5.4rem)]! font-normal leading-[0.9] tracking-[-0.07em] text-[#004817]">
+      <div className="relative min-h-[max(100svh,48rem)] overflow-hidden">
+        <h1 className="absolute inset-x-4 top-48 z-10 m-0! text-center font-heading text-[clamp(2.75rem,14vw,5.25rem)]! font-normal! leading-none! tracking-[-0.07em] text-[#004817]">
           Everything
           <br />
           Your Pets Love
@@ -85,44 +81,44 @@ function HeroMobile() {
           alt=""
           width="1531"
           height="1399"
-          fetchPriority="high"
-          className="pointer-events-none absolute left-1/2 top-[calc(100%-18rem)] z-30 w-[112%] max-w-[39rem] -translate-x-1/2 -translate-y-[75.4%] rounded-none! drop-shadow-[0_22px_18px_rgba(1,51,18,.2)]"
+          {...HERO_IMAGE_PRIORITY}
+          className="pointer-events-none absolute left-1/2 top-[calc(100%-15rem)] z-30 w-[112%] max-w-[39rem] -translate-x-1/2 -translate-y-[75.4%] rounded-none! drop-shadow-[0_22px_18px_rgba(1,51,18,.2)]"
         />
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-[calc(100%-18rem)] z-40 h-1 w-[56%] max-w-[19.5rem] -translate-x-1/2 -translate-y-[2px] bg-[#00521d]"
+          className="pointer-events-none absolute left-1/2 top-[calc(100%-15rem)] z-40 h-1 w-[56%] max-w-[19.5rem] -translate-x-1/2 -translate-y-[2px] bg-[#00521d]"
         />
-        <div className="absolute inset-x-0 bottom-0 z-20 h-72 bg-[#00521d] px-6 pb-7 pt-14">
-          <div className="flex h-full items-end justify-center">
+        <div className="absolute inset-x-0 bottom-0 z-20 h-60 bg-[#00521d] px-6">
+          <div className="grid h-full place-items-center">
             <CtaContent />
           </div>
         </div>
       </div>
 
-      <div className="relative h-[38rem] overflow-hidden bg-[#effce9]">
+      <div className="relative h-[33rem] overflow-hidden bg-[#effce9]">
         <img
           src={dachshund}
           alt=""
           width="1823"
           height="942"
           loading="lazy"
-          className="pointer-events-none absolute left-1/2 top-[calc(100%-20rem)] z-20 w-[94%] max-w-[34rem] -translate-x-1/2 -translate-y-[87%] rounded-none! drop-shadow-[0_18px_12px_rgba(1,51,18,.18)]"
+          className="pointer-events-none absolute left-1/2 top-[calc(100%-15rem)] z-20 w-[94%] max-w-[34rem] -translate-x-1/2 -translate-y-[87%] rounded-none! drop-shadow-[0_18px_12px_rgba(1,51,18,.18)]"
         />
-        <div className="absolute inset-x-0 bottom-0 h-80 bg-[#a4e8aa] px-8 pt-16">
+        <div className="absolute inset-x-0 bottom-0 grid h-60 place-items-center bg-[#a4e8aa] px-8">
           <ClientsStat />
         </div>
       </div>
 
-      <div className="relative h-[38rem] overflow-hidden bg-[#effce9]">
+      <div className="relative h-[33rem] overflow-hidden bg-[#effce9]">
         <img
           src={cat}
           alt=""
           width="1773"
           height="1316"
           loading="lazy"
-          className="pointer-events-none absolute left-1/2 top-[calc(100%-20rem)] z-20 w-[90%] max-w-[32rem] -translate-x-1/2 -translate-y-[83.4%] rounded-none! drop-shadow-[0_18px_12px_rgba(1,51,18,.18)]"
+          className="pointer-events-none absolute left-1/2 top-[calc(100%-15rem)] z-20 w-[90%] max-w-[32rem] -translate-x-1/2 -translate-y-[83.4%] rounded-none! drop-shadow-[0_18px_12px_rgba(1,51,18,.18)]"
         />
-        <div className="absolute inset-x-0 bottom-0 h-80 bg-[#a4e8aa] px-8 pt-16">
+        <div className="absolute inset-x-0 bottom-0 grid h-60 place-items-center bg-[#a4e8aa] px-8">
           <RatingStat />
         </div>
       </div>
@@ -132,15 +128,15 @@ function HeroMobile() {
 
 function HeroDesktop() {
   return (
-    <div className="relative hidden h-[100svh] min-h-[48rem] overflow-hidden [--hero-panel-height:clamp(15rem,25vh,20rem)] lg:block">
-      <h1 className="absolute inset-x-0 top-[clamp(7.5rem,15vh,9.5rem)] z-10 m-0! text-center font-heading text-[clamp(6.7rem,8.25vw,9.6rem)]! font-normal leading-[0.88] tracking-[-0.07em] text-[#004817]">
+    <div className="relative hidden h-[100svh] min-h-[56rem] overflow-hidden [--hero-panel-height:clamp(15rem,25vh,20rem)] lg:block">
+      <h1 className="absolute inset-x-0 top-[clamp(6.5rem,15vh,9.5rem)] z-10 m-0! text-center font-heading text-[clamp(6.7rem,min(8.25vw,12.5vh),9.6rem)]! font-normal! leading-none! tracking-[-0.07em] text-[#004817]">
         Everything
         <br />
         Your Pets Love
       </h1>
 
-      <div className="absolute bottom-0 left-0 z-10 h-[var(--hero-panel-height)] w-[30.5%] bg-[#a4e8aa] px-[7vw] pb-10">
-        <div className="flex h-full items-end justify-start">
+      <div className="absolute bottom-0 left-0 z-10 h-[var(--hero-panel-height)] w-[30.5%] bg-[#a4e8aa] px-10 pb-10">
+        <div className="flex h-full items-end justify-center">
           <ClientsStat />
         </div>
       </div>
@@ -167,7 +163,7 @@ function HeroDesktop() {
         alt=""
         width="1531"
         height="1399"
-        fetchPriority="high"
+        {...HERO_IMAGE_PRIORITY}
         className="pointer-events-none absolute left-1/2 top-[calc(100%-var(--hero-panel-height))] z-40 w-[min(40vw,54vh)] max-w-[48rem] -translate-x-1/2 -translate-y-[75.4%] rounded-none! drop-shadow-[0_22px_18px_rgba(1,51,18,.2)]"
       />
       <span
@@ -187,7 +183,7 @@ function HeroDesktop() {
 
 export function Hero() {
   return (
-    <section className="-mx-4 w-[calc(100%+2rem)] overflow-hidden bg-[#effce9] p-0!">
+    <section className="isolate -mx-4 w-[calc(100%+2rem)] overflow-hidden bg-[#effce9] p-0!">
       <HeroMobile />
       <HeroDesktop />
     </section>

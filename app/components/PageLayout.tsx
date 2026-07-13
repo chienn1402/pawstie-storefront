@@ -34,6 +34,12 @@ export function PageLayout({
 }: PageLayoutProps) {
   return (
     <Aside.Provider>
+      <a
+        href="#main-content"
+        className="absolute left-[-9999px] top-auto z-[100] rounded-full bg-[#00521d] px-5 py-3 font-semibold text-white shadow-lg focus:left-4 focus:top-4 focus:outline-2 focus:outline-offset-3 focus:outline-primary"
+      >
+        Skip to content
+      </a>
       <CartAside cart={cart} />
       <SearchAside />
       <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} />
@@ -45,7 +51,9 @@ export function PageLayout({
           publicStoreDomain={publicStoreDomain}
         />
       )}
-      <main>{children}</main>
+      <main id="main-content" tabIndex={-1}>
+        {children}
+      </main>
       <Footer
         footer={footer}
         header={header}

@@ -7,15 +7,10 @@ import {
   useOptimisticCart,
 } from '@shopify/hydrogen';
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
+import logo from '~/assets/img-logo.png';
 import {useAside} from '~/components/Aside';
 import {cn} from '~/lib/utils';
-import {
-  CartIcon,
-  MenuIcon,
-  PawIcon,
-  SearchIcon,
-  UserIcon,
-} from '~/components/icons';
+import {CartIcon, MenuIcon, SearchIcon, UserIcon} from '~/components/icons';
 
 interface HeaderProps {
   header: HeaderQuery;
@@ -27,17 +22,12 @@ interface HeaderProps {
 type Viewport = 'desktop' | 'mobile';
 
 const pillClass =
-  'inline-flex min-block-size-11 min-inline-size-11 items-center justify-center rounded-full bg-[#effce9] text-[#004817] transition-[transform,background-color,color] motion-safe:hover:scale-[1.04] hover:bg-[#e2f8dd] hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#00521d]';
+  'inline-flex min-block-size-11 min-inline-size-11 items-center justify-center rounded-full bg-[#effce9] text-[#004817] transition-[background-color,color,box-shadow,scale,translate] duration-300 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:hover:scale-[1.03] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.98] hover:bg-[#e2f8dd] hover:shadow-sm hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#00521d] motion-reduce:transition-none';
 
-function navLinkClass({
-  isActive,
-}: {
-  isActive: boolean;
-  isPending: boolean;
-}) {
+function navLinkClass({isActive}: {isActive: boolean; isPending: boolean}) {
   return cn(
-    'text-lg font-normal text-[#143b20] transition-colors hover:text-[#004817] hover:no-underline!',
-    isActive && 'font-semibold text-[#004817]',
+    'text-base! font-normal text-[#00521d]! transition-colors duration-300 ease-out hover:text-[#00752d]! hover:no-underline! motion-reduce:transition-none',
+    isActive && 'font-semibold',
   );
 }
 
@@ -49,10 +39,8 @@ export function Header({header, cart, publicStoreDomain}: HeaderProps) {
   return (
     <header
       className={cn(
-        'liquid-glass-header sticky top-3 z-50 mx-auto mt-3 flex w-[calc(100%-1.5rem)] max-w-[90rem] items-center justify-between gap-2.5 p-2.5 lg:top-4 lg:mt-4 lg:w-[calc(100%-2rem)] lg:gap-4 lg:px-4',
-        isHome
-          ? '-mb-20 lg:-mb-[5.75rem]'
-          : 'mb-3 lg:mb-4',
+        'liquid-glass-header sticky top-3 z-50 mx-auto mt-3 grid w-[calc(100%-1.5rem)] max-w-[90rem] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2.5 p-2.5 lg:top-4 lg:mt-4 lg:w-[calc(100%-2rem)] lg:gap-4 lg:p-2 lg:px-3',
+        isHome ? '-mb-20' : 'mb-3 lg:mb-4',
       )}
     >
       <HeaderMenuMobileToggle />
@@ -61,10 +49,16 @@ export function Header({header, cart, publicStoreDomain}: HeaderProps) {
         to="/"
         end
         aria-label={`${shop.name} home`}
-        className="flex shrink-0 items-center gap-3 rounded-full px-1 hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#00521d] lg:px-0"
+        className="flex shrink-0 items-center gap-1! rounded-full px-1 transition-[color,scale] duration-300 ease-out motion-safe:hover:scale-[1.02] motion-safe:active:scale-[0.98] hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#00521d] motion-reduce:transition-none lg:justify-self-start lg:gap-2 lg:px-0"
       >
-        <PawIcon className="size-8 text-primary lg:size-9" />
-        <span className="hidden font-heading text-[1.75rem] font-semibold tracking-[-0.04em] text-[#004817] lg:inline">
+        <img
+          src={logo}
+          alt=""
+          width="164"
+          height="179"
+          className="h-8 w-auto shrink-0 scale-80 -rotate-20 rounded-none! lg:h-9 hidden md:inline-block"
+        />
+        <span className="font-heading text-xl! font-normal tracking-[-0.04em] text-[#004817]">
           {shop.name}
         </span>
       </NavLink>
@@ -144,7 +138,7 @@ export function HeaderMenu({
 function HeaderCtas({cart}: Pick<HeaderProps, 'cart'>) {
   return (
     <nav
-      className="flex items-center gap-2 lg:gap-2.5"
+      className="flex items-center justify-self-end gap-2 lg:gap-2.5"
       aria-label="Account actions"
     >
       <SearchToggle />
@@ -161,12 +155,11 @@ function AccountLink() {
       to="/account"
       className={cn(
         pillClass,
-        'size-12 bg-[#00521d] text-white hover:bg-[#006523] lg:h-14 lg:w-auto lg:gap-2 lg:px-5',
+        'size-12 bg-[#00521d] text-white! hover:bg-[#006523]',
       )}
       aria-label="Account"
     >
       <UserIcon className="size-5" />
-      <span className="hidden text-base font-semibold xl:inline">Account</span>
     </NavLink>
   );
 }
@@ -176,7 +169,7 @@ function HeaderMenuMobileToggle() {
   return (
     <button
       type="button"
-      className={cn(pillClass, 'size-12 lg:hidden')}
+      className={cn(pillClass, 'size-12 justify-self-start lg:hidden')}
       onClick={() => open('mobile')}
       aria-label="Open menu"
     >
@@ -190,7 +183,7 @@ function SearchToggle() {
   return (
     <button
       type="button"
-      className={cn(pillClass, 'hidden size-14 lg:inline-flex')}
+      className={cn(pillClass, 'hidden size-12 lg:inline-flex')}
       onClick={() => open('search')}
       aria-label="Search"
     >
@@ -205,9 +198,7 @@ function CartBadge({
 }: {
   count: number;
   subtotal:
-    | Partial<CartApiQueryFragment['cost']['subtotalAmount']>
-    | null
-    | undefined;
+    Partial<CartApiQueryFragment['cost']['subtotalAmount']> | null | undefined;
 }) {
   const {open} = useAside();
   const {publish, shop, cart, prevCart} = useAnalytics();
@@ -230,8 +221,8 @@ function CartBadge({
       className={cn(
         pillClass,
         hasSubtotal
-          ? 'h-12 gap-1.5 px-3 lg:h-14 lg:gap-2 lg:pl-3 lg:pr-5'
-          : 'size-12 p-0 lg:size-14',
+          ? 'h-12 gap-1.5 px-3 lg:gap-2 lg:pr-4'
+          : 'size-12 p-0',
       )}
       aria-label={`Cart, ${count} item${count === 1 ? '' : 's'}`}
     >
