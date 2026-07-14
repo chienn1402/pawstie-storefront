@@ -1,5 +1,5 @@
 import {useOptimisticCart} from '@shopify/hydrogen';
-import {useId} from 'react';
+import {useEffect, useId, useRef} from 'react';
 import {Link} from 'react-router';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
@@ -90,13 +90,22 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
 
 function CartEmpty() {
   const {close} = useAside();
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    headingRef.current?.focus();
+  }, []);
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center px-8 pb-16 text-center">
       <div className="grid size-20 place-items-center rounded-full bg-[#a4e8aa]">
         <PawIcon className="size-9 text-[#00521d]" />
       </div>
-      <h3 className="mt-5 font-heading text-lg font-extrabold tracking-[-0.02em] text-[#004817]">
+      <h3
+        className="mt-5 font-heading text-lg font-extrabold tracking-[-0.02em] text-[#004817]"
+        ref={headingRef}
+        tabIndex={-1}
+      >
         Your cart is empty
       </h3>
       <p className="mt-1.5 text-sm text-[#5c7060]">
