@@ -76,6 +76,11 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
     id
     title
     handle
+    options {
+      optionValues {
+        name
+      }
+    }
     priceRange {
       minVariantPrice {
         amount
@@ -88,6 +93,33 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
       altText
       width
       height
+    }
+    selectedOrFirstAvailableVariant(
+      selectedOptions: []
+      ignoreUnknownOptions: true
+      caseInsensitiveMatch: true
+    ) {
+      id
+      availableForSale
+      price {
+        amount
+        currencyCode
+      }
+      image {
+        id
+        url
+        altText
+        width
+        height
+      }
+      product {
+        handle
+        title
+      }
+      selectedOptions {
+        name
+        value
+      }
     }
   }
   query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
