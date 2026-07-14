@@ -80,7 +80,7 @@ export function ProductCardActions({
   if (!variant || !variant.availableForSale) {
     return (
       <div className={CLUSTER}>
-        <span className={`${PILL} text-[#347345]`}>Sold out</span>
+        <span className={`${PILL} text-[#347345] pointer-events-none`}>Sold out</span>
       </div>
     );
   }
