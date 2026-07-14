@@ -286,20 +286,6 @@ button.reset:hover:not(:has(> *)) {
 * components/Cart
 * --------------------------------------------------
 */
-.cart-line {
-  padding: 0.75rem 0;
-}
-
-.cart-line-inner {
-  display: flex;
-}
-
-.cart-line img {
-  height: 100%;
-  display: block;
-  margin-right: 0.75rem;
-}
-
 .cart-summary-page {
   position: relative;
 }
@@ -311,15 +297,6 @@ button.reset:hover:not(:has(> *)) {
   padding-top: 0.75rem;
   position: absolute;
   width: calc(var(--aside-width) - 40px);
-}
-
-.cart-line-quantity {
-  display: flex;
-}
-
-/* Child line components (warranties, gift wrapping, etc.) */
-.cart-line-children {
-  padding-left: 2rem;
 }
 
 .cart-discount {

@@ -1,14 +1,16 @@
 import type {CartLineUpdateInput} from '@shopify/hydrogen/storefront-api-types';
 import type {CartLayout, LineItemChildrenMap} from '~/components/CartMain';
-import {CartForm, Image, type OptimisticCartLine} from '@shopify/hydrogen';
+import {
+  CartForm,
+  Image,
+  Money,
+  type OptimisticCartLine,
+} from '@shopify/hydrogen';
 import {useVariantUrl} from '~/lib/variants';
 import {Link} from 'react-router';
-import {ProductPrice} from './ProductPrice';
 import {useAside} from './Aside';
-import type {
-  CartApiQueryFragment,
-  CartLineFragment,
-} from 'storefrontapi.generated';
+import {cn} from '~/lib/utils';
+import type {CartApiQueryFragment} from 'storefrontapi.generated';
 
 export type CartLine = OptimisticCartLine<CartApiQueryFragment>;
 
@@ -27,67 +29,90 @@ export function CartLineItem({
   line: CartLine;
   childrenMap: LineItemChildrenMap;
 }) {
-  const {id, merchandise} = line;
+  const {id, merchandise, isOptimistic} = line;
   const {product, title, image, selectedOptions} = merchandise;
   const lineItemUrl = useVariantUrl(product.handle, selectedOptions);
   const {close} = useAside();
   const lineItemChildren = childrenMap[id];
   const childrenLabelId = `cart-line-children-${id}`;
 
+  // Shopify emits {name: 'Title', value: 'Default Title'} for every product that
+  // has no real variants. It is not an option the customer chose — never show it.
+  const options = selectedOptions.filter(
+    (option) => option.value !== 'Default Title',
+  );
+
   return (
-    <li key={id} className="cart-line">
-      <div className="cart-line-inner">
+    <li
+      className={cn(
+        'list-none transition-opacity',
+        isOptimistic && 'pointer-events-none opacity-60',
+      )}
+      key={id}
+    >
+      <div className="flex gap-3 rounded-[1.25rem] rounded-br-[2.5rem] bg-[#eaf7ea] p-3">
         {image && (
           <Image
             alt={title}
             aspectRatio="1/1"
+            className="size-[62px] flex-none rounded-xl! bg-[#a4e8aa] object-cover"
             data={image}
-            height={100}
+            height={124}
             loading="lazy"
-            width={100}
+            sizes="62px"
+            width={124}
           />
         )}
 
-        <div>
+        <div className="min-w-0 flex-1">
           <Link
-            prefetch="intent"
-            to={lineItemUrl}
+            className="font-heading text-sm font-bold leading-snug tracking-[-0.01em] text-[#004817] hover:text-[#00752d] hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00521d]"
             onClick={() => {
               if (layout === 'aside') {
                 close();
               }
             }}
+            prefetch="intent"
+            to={lineItemUrl}
           >
-            <p>
-              <strong>{product.title}</strong>
-            </p>
+            {product.title}
           </Link>
-          <ProductPrice price={line?.cost?.totalAmount} />
-          <ul>
-            {selectedOptions.map((option) => (
-              <li key={option.name}>
-                <small>
+
+          {options.length > 0 && (
+            <ul className="mt-1 flex list-none flex-wrap gap-x-2">
+              {options.map((option) => (
+                <li className="text-xs text-[#5c7060]" key={option.name}>
                   {option.name}: {option.value}
-                </small>
-              </li>
-            ))}
-          </ul>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {line?.cost?.totalAmount && (
+            <p className="mt-1 font-heading text-sm font-extrabold text-primary">
+              <Money as="span" data={line.cost.totalAmount} />
+            </p>
+          )}
+
           <CartLineQuantity line={line} />
         </div>
       </div>
 
       {lineItemChildren ? (
         <div>
-          <p id={childrenLabelId} className="sr-only">
+          <p className="sr-only" id={childrenLabelId}>
             Line items with {product.title}
           </p>
-          <ul aria-labelledby={childrenLabelId} className="cart-line-children">
+          <ul
+            aria-labelledby={childrenLabelId}
+            className="mt-2 flex list-none flex-col gap-2 pl-6"
+          >
             {lineItemChildren.map((childLine) => (
               <CartLineItem
                 childrenMap={childrenMap}
                 key={childLine.id}
-                line={childLine}
                 layout={layout}
+                line={childLine}
               />
             ))}
           </ul>
@@ -109,34 +134,46 @@ function CartLineQuantity({line}: {line: CartLine}) {
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
   return (
-    <div className="cart-line-quantity">
-      <small>Quantity: {quantity} &nbsp;&nbsp;</small>
-      <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
-        <button
-          aria-label="Decrease quantity"
-          disabled={quantity <= 1 || !!isOptimistic}
-          name="decrease-quantity"
-          value={prevQuantity}
-        >
-          <span>&#8722; </span>
-        </button>
-      </CartLineUpdateButton>
-      &nbsp;
-      <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
-        <button
-          aria-label="Increase quantity"
-          name="increase-quantity"
-          value={nextQuantity}
-          disabled={!!isOptimistic}
-        >
-          <span>&#43;</span>
-        </button>
-      </CartLineUpdateButton>
-      &nbsp;
-      <CartLineRemoveButton lineIds={[lineId]} disabled={!!isOptimistic} />
+    <div className="mt-2.5 flex items-center gap-3">
+      {/* CartForm renders a <form> around each button, so the forms are the flex
+          items here — not the buttons. */}
+      <div className="inline-flex items-center rounded-full border border-[#cbe0ce] bg-white">
+        <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
+          <button
+            aria-label="Decrease quantity"
+            className={STEPPER_BUTTON}
+            disabled={quantity <= 1 || !!isOptimistic}
+            name="decrease-quantity"
+            value={prevQuantity}
+          >
+            <span aria-hidden>&#8722;</span>
+          </button>
+        </CartLineUpdateButton>
+
+        <span className="w-6 text-center font-heading text-xs font-extrabold text-[#004817]">
+          {quantity}
+        </span>
+
+        <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
+          <button
+            aria-label="Increase quantity"
+            className={STEPPER_BUTTON}
+            disabled={!!isOptimistic}
+            name="increase-quantity"
+            value={nextQuantity}
+          >
+            <span aria-hidden>&#43;</span>
+          </button>
+        </CartLineUpdateButton>
+      </div>
+
+      <CartLineRemoveButton disabled={!!isOptimistic} lineIds={[lineId]} />
     </div>
   );
 }
+
+const STEPPER_BUTTON =
+  'grid size-7 place-items-center rounded-full text-base font-bold leading-none text-[#00521d] transition-colors hover:bg-[#eaf7ea] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#00521d] disabled:opacity-35 disabled:hover:bg-transparent';
 
 /**
  * A button that removes a line item from the cart. It is disabled
@@ -152,12 +189,16 @@ function CartLineRemoveButton({
 }) {
   return (
     <CartForm
-      fetcherKey={getUpdateKey(lineIds)}
-      route="/cart"
       action={CartForm.ACTIONS.LinesRemove}
+      fetcherKey={getUpdateKey(lineIds)}
       inputs={{lineIds}}
+      route="/cart"
     >
-      <button disabled={disabled} type="submit">
+      <button
+        className="text-xs font-semibold text-[#6d8070] underline underline-offset-2 transition-colors hover:text-[#00521d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00521d] disabled:opacity-40"
+        disabled={disabled}
+        type="submit"
+      >
         Remove
       </button>
     </CartForm>
@@ -175,10 +216,10 @@ function CartLineUpdateButton({
 
   return (
     <CartForm
-      fetcherKey={getUpdateKey(lineIds)}
-      route="/cart"
       action={CartForm.ACTIONS.LinesUpdate}
+      fetcherKey={getUpdateKey(lineIds)}
       inputs={{lines}}
+      route="/cart"
     >
       {children}
     </CartForm>
