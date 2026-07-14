@@ -18,8 +18,11 @@ type AsideContextValue = {
   close: () => void;
 };
 
+// Exclude hidden inputs: Hydrogen's CartForm injects them, and if one ends up
+// last in DOM order, it breaks the forward Tab-wrap since hidden inputs can
+// never become document.activeElement.
 const FOCUSABLE =
-  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 /**
  * A slide-in drawer with an overlay. Shared by the cart and the mobile menu.
