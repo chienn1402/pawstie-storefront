@@ -56,7 +56,7 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   return (
     <section
       aria-label={isAside ? 'Cart drawer' : 'Cart page'}
-      className={cn(isAside && 'flex min-h-0 flex-1 flex-col')}
+      className={cn(isAside && 'flex min-h-0 flex-1 flex-col p-0')}
     >
       <p className="sr-only" id={linesId}>
         Line items
