@@ -125,3 +125,11 @@ export function MenuIcon(props: IconProps) {
     </svg>
   );
 }
+
+export function BoltIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
+      <path d="M13.4 2 4.6 13.2a.7.7 0 0 0 .55 1.13h4.62l-1.3 7.3a.7.7 0 0 0 1.25.54l8.8-11.2a.7.7 0 0 0-.55-1.13h-4.62l1.3-7.3A.7.7 0 0 0 13.4 2Z" />
+    </svg>
+  );
+}

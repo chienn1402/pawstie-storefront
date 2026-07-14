@@ -2,7 +2,7 @@ import {Suspense} from 'react';
 import {Await, Link} from 'react-router';
 import type {RecommendedProductsQuery} from 'storefrontapi.generated';
 import {ArrowRightIcon} from '~/components/icons';
-import {ProductItem} from '~/components/ProductItem';
+import {ProductCard} from '~/components/ProductCard';
 
 const CTA_HREF = '/collections/all';
 
@@ -56,7 +56,7 @@ export function NewArrivals({products}: NewArrivalsProps) {
               <div className="mt-12 grid grid-cols-2 gap-5 lg:mt-16 lg:grid-cols-4 lg:gap-6">
                 {response
                   ? response.products.nodes.map((product) => (
-                      <ProductItem key={product.id} product={product} isNew />
+                      <ProductCard key={product.id} product={product} isNew />
                     ))
                   : null}
               </div>
