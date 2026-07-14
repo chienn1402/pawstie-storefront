@@ -1,7 +1,7 @@
 import {Suspense} from 'react';
 import {Await, Link, NavLink} from 'react-router';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
-import {ArrowRightIcon, PawIcon} from '~/components/icons';
+import logo from '~/assets/img-logo.png';
 
 interface FooterProps {
   footer: Promise<FooterQuery | null>;
@@ -9,56 +9,78 @@ interface FooterProps {
   publicStoreDomain: string;
 }
 
+type FooterLink = {id: string; title: string; url: string};
+
+/** Structural shape shared by the Storefront header/footer menus and the fallback below. */
+type MenuLike =
+  | {items: Array<{id: string; title: string; url?: string | null}>}
+  | null
+  | undefined;
+
+const linkClass =
+  'text-sm font-medium text-[#c3edc0] underline-offset-4 transition-colors duration-300 ease-out hover:text-white hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#a4e8aa] motion-reduce:transition-none';
+
 export function Footer({
   footer: footerPromise,
   header,
   publicStoreDomain,
 }: FooterProps) {
+  const shopName = header.shop.name;
+  const primaryDomainUrl = header.shop.primaryDomain?.url;
+
   return (
     <Suspense>
       <Await resolve={footerPromise}>
         {(footer) => (
           <footer className="bg-[#003e15] px-6 pb-8 pt-14 text-white lg:px-[7vw] lg:pb-10 lg:pt-20">
             <div className="mx-auto max-w-[80rem]">
-              <div className="grid gap-12 border-b border-white/20 pb-14 lg:grid-cols-[1.2fr_0.8fr] lg:items-end lg:pb-20">
-                <div>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-12 pb-12 lg:grid-cols-[1.4fr_0.8fr_0.8fr] lg:gap-16 lg:pb-16">
+                <div className="col-span-2 lg:col-span-1">
                   <Link
                     to="/"
-                    className="inline-flex items-center gap-3 rounded-full text-white hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-                    aria-label={`${header.shop.name} home`}
+                    prefetch="intent"
+                    className="inline-flex items-center gap-2 rounded-full transition-transform duration-300 ease-out hover:no-underline motion-safe:hover:scale-[1.02] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#a4e8aa] motion-reduce:transition-none"
+                    aria-label={`${shopName} home`}
                   >
-                    <span className="grid size-12 place-items-center rounded-full bg-primary text-primary-foreground">
-                      <PawIcon className="size-6" />
-                    </span>
-                    <span className="font-heading text-3xl font-semibold tracking-[-0.04em]">
-                      {header.shop.name}
+                    <img
+                      src={logo}
+                      alt=""
+                      width="164"
+                      height="179"
+                      className="h-10 w-auto shrink-0 -rotate-20 scale-80 rounded-none!"
+                    />
+                    <span className="font-heading text-2xl font-normal tracking-[-0.04em] text-white">
+                      {shopName}
                     </span>
                   </Link>
-                  <p className="mt-7 max-w-[16ch] font-heading text-4xl font-semibold leading-[0.98] tracking-[-0.055em] text-[#d9f7d5] lg:text-6xl">
+                  <p className="mt-6 max-w-[13ch] font-heading text-4xl font-semibold leading-[1.02] tracking-[-0.05em] text-balance text-[#d9f7d5] lg:text-5xl">
                     Happier days start with a wag.
                   </p>
                 </div>
 
-                <Link
-                  to="/collections/all"
-                  className="group inline-flex min-h-14 w-fit items-center gap-5 rounded-full bg-white py-2 pl-7 pr-2 text-lg font-semibold text-[#00521d] transition-transform hover:scale-[1.02] hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white lg:justify-self-end"
-                >
-                  Shop all products
-                  <span className="grid size-11 place-items-center rounded-full bg-primary text-primary-foreground">
-                    <ArrowRightIcon className="size-5 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </Link>
+                <FooterMenu
+                  heading="Explore"
+                  links={exploreLinks(
+                    header.menu,
+                    primaryDomainUrl,
+                    publicStoreDomain,
+                  )}
+                />
+                <FooterMenu
+                  heading="Support"
+                  links={menuLinks(
+                    footer?.menu ?? FALLBACK_FOOTER_MENU,
+                    primaryDomainUrl,
+                    publicStoreDomain,
+                  )}
+                />
               </div>
 
-              <div className="flex flex-col gap-8 pt-8 sm:flex-row sm:items-end sm:justify-between">
-                {footer?.menu && header.shop.primaryDomain?.url ? (
-                  <FooterMenu
-                    menu={footer.menu}
-                    primaryDomainUrl={header.shop.primaryDomain.url}
-                    publicStoreDomain={publicStoreDomain}
-                  />
-                ) : null}
-                <p className="text-sm text-[#a4e8aa]">
+              <div className="flex flex-col gap-2 border-t border-white/15 pt-6 text-sm sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-[#a4e8aa]">
+                  © {new Date().getFullYear()} {shopName}. All rights reserved.
+                </p>
+                <p className="text-[#a4e8aa]">
                   Made for pets. Chosen by their people.
                 </p>
               </div>
@@ -71,53 +93,74 @@ export function Footer({
 }
 
 function FooterMenu({
-  menu,
-  primaryDomainUrl,
-  publicStoreDomain,
+  heading,
+  links,
 }: {
-  menu: FooterQuery['menu'];
-  primaryDomainUrl: FooterProps['header']['shop']['primaryDomain']['url'];
-  publicStoreDomain: string;
+  heading: string;
+  links: FooterLink[];
 }) {
+  if (!links.length) return null;
+
   return (
-    <nav
-      className="flex flex-wrap gap-x-6 gap-y-3 text-sm"
-      aria-label="Policies"
-    >
-      {(menu || FALLBACK_FOOTER_MENU).items.map((item) => {
-        if (!item.url) return null;
-        // if the url is internal, we strip the domain
-        const url =
-          item.url.includes('myshopify.com') ||
-          item.url.includes(publicStoreDomain) ||
-          item.url.includes(primaryDomainUrl)
-            ? new URL(item.url).pathname
-            : item.url;
-        const isExternal = !url.startsWith('/');
-        return isExternal ? (
-          <a
-            className="text-white/80 transition-colors hover:text-white"
-            href={url}
-            key={item.id}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            {item.title}
-          </a>
-        ) : (
-          <NavLink
-            className="text-white/80 transition-colors hover:text-white"
-            end
-            key={item.id}
-            prefetch="intent"
-            to={url}
-          >
-            {item.title}
-          </NavLink>
-        );
-      })}
+    <nav aria-label={heading}>
+      <h2 className="font-heading text-sm font-bold uppercase tracking-[0.16em] text-[#a4e8aa]">
+        {heading}
+      </h2>
+      <ul className="mt-5 flex flex-col gap-3.5">
+        {links.map(({id, title, url}) => (
+          <li key={id}>
+            {url.startsWith('/') ? (
+              <NavLink className={linkClass} end prefetch="intent" to={url}>
+                {title}
+              </NavLink>
+            ) : (
+              <a
+                className={linkClass}
+                href={url}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                {title}
+              </a>
+            )}
+          </li>
+        ))}
+      </ul>
     </nav>
   );
+}
+
+/** Shopify menu items keep their absolute URLs; strip the domain off our own. */
+function menuLinks(
+  menu: MenuLike,
+  primaryDomainUrl: string | undefined,
+  publicStoreDomain: string,
+): FooterLink[] {
+  return (menu?.items ?? []).flatMap((item) => {
+    if (!item.url) return [];
+    const isInternal =
+      item.url.includes('myshopify.com') ||
+      item.url.includes(publicStoreDomain) ||
+      (!!primaryDomainUrl && item.url.includes(primaryDomainUrl));
+    const url = isInternal ? new URL(item.url).pathname : item.url;
+    return [{id: item.id, title: item.title, url}];
+  });
+}
+
+/** The store nav, minus its own Home entry — we always lead with ours. */
+function exploreLinks(
+  menu: MenuLike,
+  primaryDomainUrl: string | undefined,
+  publicStoreDomain: string,
+): FooterLink[] {
+  const items = menuLinks(menu, primaryDomainUrl, publicStoreDomain).filter(
+    ({title, url}) => url !== '/' && title.trim().toLowerCase() !== 'home',
+  );
+
+  return [
+    {id: 'footer-home', title: 'Home', url: '/'},
+    ...items,
+  ];
 }
 
 const FALLBACK_FOOTER_MENU = {
