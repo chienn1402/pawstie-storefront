@@ -124,6 +124,16 @@ function CartDiscounts({
   discountCodeInputId: string;
 }) {
   const codes: string[] = appliedDiscounts.map(({code}) => code);
+  const discountCodeInput = useRef<HTMLInputElement>(null);
+  const discountAddFetcher = useFetcher({key: 'discount-add'});
+
+  useEffect(() => {
+    if (discountAddFetcher.data) {
+      if (discountCodeInput.current !== null) {
+        discountCodeInput.current.value = '';
+      }
+    }
+  }, [discountAddFetcher.data]);
 
   return (
     <section aria-label="Discounts">
@@ -149,7 +159,7 @@ function CartDiscounts({
         </dl>
       )}
 
-      <UpdateDiscountForm discountCodes={codes}>
+      <UpdateDiscountForm discountCodes={codes} fetcherKey="discount-add">
         <div className="flex gap-2">
           <label className="sr-only" htmlFor={discountCodeInputId}>
             Discount code
@@ -159,6 +169,7 @@ function CartDiscounts({
             id={discountCodeInputId}
             name="discountCode"
             placeholder="Discount code"
+            ref={discountCodeInput}
             type="text"
           />
           <button aria-label="Apply discount code" className={APPLY_BUTTON} type="submit">
@@ -172,14 +183,17 @@ function CartDiscounts({
 
 function UpdateDiscountForm({
   discountCodes,
+  fetcherKey,
   children,
 }: {
   discountCodes?: string[];
+  fetcherKey?: string;
   children: React.ReactNode;
 }) {
   return (
     <CartForm
       action={CartForm.ACTIONS.DiscountCodesUpdate}
+      fetcherKey={fetcherKey}
       inputs={{discountCodes: discountCodes || []}}
       route="/cart"
     >
