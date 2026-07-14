@@ -1,20 +1,12 @@
-import {Suspense} from 'react';
-import {Await, NavLink, useAsyncValue, useLocation} from 'react-router';
-import {
-  type CartViewPayload,
-  Money,
-  useAnalytics,
-  useOptimisticCart,
-} from '@shopify/hydrogen';
-import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
+import {NavLink, useLocation} from 'react-router';
+import type {HeaderQuery} from 'storefrontapi.generated';
 import logo from '~/assets/img-logo.png';
 import {useAside} from '~/components/Aside';
 import {cn} from '~/lib/utils';
-import {CartIcon, MenuIcon, SearchIcon, UserIcon} from '~/components/icons';
+import {MenuIcon, UserIcon} from '~/components/icons';
 
 interface HeaderProps {
   header: HeaderQuery;
-  cart: Promise<CartApiQueryFragment | null>;
   isLoggedIn: Promise<boolean>;
   publicStoreDomain: string;
 }
@@ -31,7 +23,7 @@ function navLinkClass({isActive}: {isActive: boolean; isPending: boolean}) {
   );
 }
 
-export function Header({header, cart, publicStoreDomain}: HeaderProps) {
+export function Header({header, publicStoreDomain}: HeaderProps) {
   const {shop, menu} = header;
   const {pathname} = useLocation();
   const isHome = pathname === '/';
@@ -68,7 +60,7 @@ export function Header({header, cart, publicStoreDomain}: HeaderProps) {
         primaryDomainUrl={header.shop.primaryDomain.url}
         publicStoreDomain={publicStoreDomain}
       />
-      <HeaderCtas cart={cart} />
+      <HeaderCtas />
     </header>
   );
 }
@@ -135,14 +127,12 @@ export function HeaderMenu({
   );
 }
 
-function HeaderCtas({cart}: Pick<HeaderProps, 'cart'>) {
+function HeaderCtas() {
   return (
     <nav
       className="flex items-center justify-self-end gap-2 lg:gap-2.5"
       aria-label="Account actions"
     >
-      <SearchToggle />
-      <CartToggle cart={cart} />
       <AccountLink />
     </nav>
   );
@@ -175,93 +165,6 @@ function HeaderMenuMobileToggle() {
     >
       <MenuIcon className="size-6" />
     </button>
-  );
-}
-
-function SearchToggle() {
-  const {open} = useAside();
-  return (
-    <button
-      type="button"
-      className={cn(pillClass, 'hidden size-12 lg:inline-flex')}
-      onClick={() => open('search')}
-      aria-label="Search"
-    >
-      <SearchIcon className="size-6" />
-    </button>
-  );
-}
-
-function CartBadge({
-  count,
-  subtotal,
-}: {
-  count: number;
-  subtotal:
-    Partial<CartApiQueryFragment['cost']['subtotalAmount']> | null | undefined;
-}) {
-  const {open} = useAside();
-  const {publish, shop, cart, prevCart} = useAnalytics();
-  const subtotalData = subtotal?.amount ? subtotal : null;
-  const hasSubtotal = subtotalData !== null;
-
-  return (
-    <a
-      href="/cart"
-      onClick={(e) => {
-        e.preventDefault();
-        open('cart');
-        publish('cart_viewed', {
-          cart,
-          prevCart,
-          shop,
-          url: window.location.href || '',
-        } as CartViewPayload);
-      }}
-      className={cn(
-        pillClass,
-        hasSubtotal
-          ? 'h-12 gap-1.5 px-3 lg:gap-2 lg:pr-4'
-          : 'size-12 p-0',
-      )}
-      aria-label={`Cart, ${count} item${count === 1 ? '' : 's'}`}
-    >
-      <span className="relative grid size-7 place-items-center lg:size-8">
-        <CartIcon className="size-5 lg:size-6" />
-        {count > 0 ? (
-          <span className="absolute -right-1.5 -top-1.5 grid size-4 min-w-4 place-items-center rounded-full bg-[#00521d] px-1 text-[10px] font-bold leading-none text-white lg:size-5 lg:min-w-5 lg:text-xs">
-            {count}
-          </span>
-        ) : null}
-      </span>
-      {subtotalData ? (
-        <Money
-          data={subtotalData}
-          className="hidden text-base font-medium sm:inline lg:text-lg"
-        />
-      ) : null}
-    </a>
-  );
-}
-
-function CartToggle({cart}: Pick<HeaderProps, 'cart'>) {
-  return (
-    <Suspense fallback={<CartBadge count={0} subtotal={null} />}>
-      <Await resolve={cart}>
-        <CartBanner />
-      </Await>
-    </Suspense>
-  );
-}
-
-function CartBanner() {
-  const originalCart = useAsyncValue() as CartApiQueryFragment | null;
-  const cart = useOptimisticCart(originalCart);
-  return (
-    <CartBadge
-      count={cart?.totalQuantity ?? 0}
-      subtotal={cart?.cost?.subtotalAmount ?? null}
-    />
   );
 }
 
