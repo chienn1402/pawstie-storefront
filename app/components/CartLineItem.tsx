@@ -30,7 +30,7 @@ export function CartLineItem({
   childrenMap: LineItemChildrenMap;
 }) {
   const {id, merchandise, isOptimistic} = line;
-  const {product, title, image, selectedOptions} = merchandise;
+  const {product, image, selectedOptions} = merchandise;
   const lineItemUrl = useVariantUrl(product.handle, selectedOptions);
   const {close} = useAside();
   const lineItemChildren = childrenMap[id];
@@ -39,7 +39,7 @@ export function CartLineItem({
   // Shopify emits {name: 'Title', value: 'Default Title'} for every product that
   // has no real variants. It is not an option the customer chose — never show it.
   const options = selectedOptions.filter(
-    (option) => option.value !== 'Default Title',
+    (option) => option.name !== 'Title' || option.value !== 'Default Title',
   );
 
   return (
@@ -48,12 +48,11 @@ export function CartLineItem({
         'list-none transition-opacity',
         isOptimistic && 'pointer-events-none opacity-60',
       )}
-      key={id}
     >
       <div className="flex gap-3 rounded-[1.25rem] rounded-br-[2.5rem] bg-[#eaf7ea] p-3">
         {image && (
           <Image
-            alt={title}
+            alt={product.title}
             aspectRatio="1/1"
             className="size-[62px] flex-none rounded-xl! bg-[#a4e8aa] object-cover"
             data={image}
@@ -150,7 +149,10 @@ function CartLineQuantity({line}: {line: CartLine}) {
           </button>
         </CartLineUpdateButton>
 
-        <span className="w-6 text-center font-heading text-xs font-extrabold text-[#004817]">
+        <span
+          aria-live="polite"
+          className="w-6 text-center font-heading text-xs font-extrabold text-[#004817]"
+        >
           {quantity}
         </span>
 
@@ -167,7 +169,11 @@ function CartLineQuantity({line}: {line: CartLine}) {
         </CartLineUpdateButton>
       </div>
 
-      <CartLineRemoveButton disabled={!!isOptimistic} lineIds={[lineId]} />
+      <CartLineRemoveButton
+        disabled={!!isOptimistic}
+        lineIds={[lineId]}
+        productTitle={line.merchandise.product.title}
+      />
     </div>
   );
 }
@@ -183,9 +189,11 @@ const STEPPER_BUTTON =
 function CartLineRemoveButton({
   lineIds,
   disabled,
+  productTitle,
 }: {
   lineIds: string[];
   disabled: boolean;
+  productTitle: string;
 }) {
   return (
     <CartForm
@@ -195,6 +203,7 @@ function CartLineRemoveButton({
       route="/cart"
     >
       <button
+        aria-label={`Remove ${productTitle}`}
         className="text-xs font-semibold text-[#6d8070] underline underline-offset-2 transition-colors hover:text-[#00521d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00521d] disabled:opacity-40"
         disabled={disabled}
         type="submit"
