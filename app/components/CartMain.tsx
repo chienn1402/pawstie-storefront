@@ -1,8 +1,11 @@
 import {useOptimisticCart} from '@shopify/hydrogen';
+import {useId} from 'react';
 import {Link} from 'react-router';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
 import {CartLineItem, type CartLine} from '~/components/CartLineItem';
+import {PawIcon} from '~/components/icons';
+import {cn} from '~/lib/utils';
 import {CartSummary} from './CartSummary';
 
 export type CartLayout = 'page' | 'aside';
@@ -40,69 +43,72 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   // The useOptimisticCart hook applies pending actions to the cart
   // so the user immediately sees feedback when they modify the cart.
   const cart = useOptimisticCart(originalCart);
+  const linesId = useId();
+  const isAside = layout === 'aside';
 
-  const linesCount = Boolean(cart?.lines?.nodes?.length || 0);
-  const withDiscount =
-    cart &&
-    Boolean(cart?.discountCodes?.filter((code) => code.applicable)?.length);
-  const className = `cart-main ${withDiscount ? 'with-discount' : ''}`;
-  const cartHasItems = cart?.totalQuantity ? cart.totalQuantity > 0 : false;
-  const childrenMap = getLineItemChildrenMap(cart?.lines?.nodes ?? []);
+  const lines = cart?.lines?.nodes ?? [];
+  const childrenMap = getLineItemChildrenMap(lines);
+
+  if (lines.length === 0) {
+    return <CartEmpty />;
+  }
 
   return (
     <section
-      className={className}
-      aria-label={layout === 'page' ? 'Cart page' : 'Cart drawer'}
+      aria-label={isAside ? 'Cart drawer' : 'Cart page'}
+      className={cn(isAside && 'flex min-h-0 flex-1 flex-col')}
     >
-      <CartEmpty hidden={linesCount} layout={layout} />
-      <div className="cart-details">
-        <p id="cart-lines" className="sr-only">
-          Line items
-        </p>
-        <div>
-          <ul aria-labelledby="cart-lines">
-            {(cart?.lines?.nodes ?? []).map((line) => {
-              // we do not render non-parent lines at the root of the cart
-              if (
-                'parentRelationship' in line &&
-                line.parentRelationship?.parent
-              ) {
-                return null;
-              }
-              return (
-                <CartLineItem
-                  key={line.id}
-                  line={line}
-                  layout={layout}
-                  childrenMap={childrenMap}
-                />
-              );
-            })}
-          </ul>
-        </div>
-        {cartHasItems && <CartSummary cart={cart} layout={layout} />}
-      </div>
+      <p className="sr-only" id={linesId}>
+        Line items
+      </p>
+      <ul
+        aria-labelledby={linesId}
+        className={cn(
+          'flex list-none flex-col gap-3',
+          isAside && 'min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-2',
+        )}
+      >
+        {lines.map((line) => {
+          // we do not render non-parent lines at the root of the cart
+          if ('parentRelationship' in line && line.parentRelationship?.parent) {
+            return null;
+          }
+          return (
+            <CartLineItem
+              childrenMap={childrenMap}
+              key={line.id}
+              layout={layout}
+              line={line}
+            />
+          );
+        })}
+      </ul>
+      <CartSummary cart={cart} layout={layout} />
     </section>
   );
 }
 
-function CartEmpty({
-  hidden = false,
-}: {
-  hidden: boolean;
-  layout?: CartMainProps['layout'];
-}) {
+function CartEmpty() {
   const {close} = useAside();
+
   return (
-    <div hidden={hidden}>
-      <br />
-      <p>
-        Looks like you haven&rsquo;t added anything yet, let&rsquo;s get you
-        started!
+    <div className="flex flex-1 flex-col items-center justify-center px-8 pb-16 text-center">
+      <div className="grid size-20 place-items-center rounded-full bg-[#a4e8aa]">
+        <PawIcon className="size-9 text-[#00521d]" />
+      </div>
+      <h3 className="mt-5 font-heading text-lg font-extrabold tracking-[-0.02em] text-[#004817]">
+        Your cart is empty
+      </h3>
+      <p className="mt-1.5 text-sm text-[#5c7060]">
+        Nothing here yet — let&rsquo;s find something your pet will love.
       </p>
-      <br />
-      <Link to="/collections" onClick={close} prefetch="viewport">
-        Continue shopping →
+      <Link
+        className="mt-6 rounded-full bg-primary px-6 py-3 font-heading text-sm font-extrabold text-primary-foreground no-underline transition-colors hover:bg-primary/90 hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00521d]"
+        onClick={close}
+        prefetch="viewport"
+        to="/collections"
+      >
+        Start shopping
       </Link>
     </div>
   );
