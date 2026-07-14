@@ -79,6 +79,18 @@ export function Aside({
         const last = focusables[focusables.length - 1];
         const active = document.activeElement;
 
+        // Guard: if focus is outside the panel (e.g., from an unmounted button),
+        // trap it back inside to prevent Tab from escaping the drawer.
+        if (active && !panel.contains(active)) {
+          event.preventDefault();
+          if (event.shiftKey) {
+            last.focus();
+          } else {
+            first.focus();
+          }
+          return;
+        }
+
         if (event.shiftKey && (active === first || active === panel)) {
           event.preventDefault();
           last.focus();
