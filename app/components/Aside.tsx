@@ -134,7 +134,7 @@ export function Aside({
         aria-labelledby={id}
         aria-modal="true"
         className={cn(
-          'absolute right-0 top-0 flex h-dvh w-full flex-col bg-white shadow-[0_0_60px_rgba(0,0,0,0.25)] outline-none',
+          'absolute right-0 top-0 flex h-dvh w-full flex-col overflow-hidden bg-white shadow-[0_0_60px_rgba(0,0,0,0.25)] outline-none',
           'transition-transform duration-300 ease-out motion-reduce:transition-none',
           'sm:w-[28rem] sm:rounded-l-[1.75rem]',
           expanded ? 'translate-x-0' : 'translate-x-full',
