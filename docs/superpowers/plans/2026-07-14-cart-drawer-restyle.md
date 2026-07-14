@@ -125,6 +125,12 @@ export function Aside({
     const abortController = new AbortController();
     const panel = panelRef.current;
 
+    // Lock the page behind the drawer. This replaces the deleted
+    // `html:has(.overlay.expanded) { overflow: hidden }` rule — which only
+    // locked below 45em. Locking at every width is the behaviour we want.
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
     panel?.focus();
 
     document.addEventListener(
@@ -161,14 +167,17 @@ export function Aside({
       {signal: abortController.signal},
     );
 
-    return () => abortController.abort();
+    return () => {
+      abortController.abort();
+      document.body.style.overflow = previousOverflow;
+    };
   }, [close, expanded]);
 
   return (
     <div
       aria-hidden={!expanded}
       className={cn(
-        'fixed inset-0 z-60 bg-black/30 transition-opacity duration-300 ease-out',
+        'fixed inset-0 z-[60] bg-black/30 transition-opacity duration-300 ease-out',
         expanded
           ? 'visible opacity-100'
           : 'invisible opacity-0 pointer-events-none',
@@ -263,7 +272,7 @@ export function useAside() {
 Delete **three non-contiguous** things. **Do NOT delete `.sr-only`** — it sits *between* the two aside ranges and is used across the app.
 
 1. `--aside-width: 400px;` (line 2) from the `:root` block.
-2. The whole `aside { … }` group — from `aside {` through the `aside li { … }` rule (lines ~87-142). Also delete the `@media (max-width: 45em) { html:has(.overlay.expanded) { overflow: hidden; } }` block above it (lines ~81-85).
+2. The whole `aside { … }` group — from `aside {` through the `aside li { … }` rule (lines ~87-142). Also delete the `@media (max-width: 45em) { html:has(.overlay.expanded) { overflow: hidden; } }` block above it (lines ~81-85) — **the effect in Step 2 replaces it.** That rule keyed off the `.overlay` class, which no longer exists in the new markup, so it would be dead code either way; the `document.body.style.overflow` lock is its replacement and applies at every width, not just below 45em.
 3. The whole `.overlay { … }` group — from `.overlay {` through `.overlay.expanded aside { … }` (lines ~156-201).
 
 Keep `button.reset` (~line 203) — it is used elsewhere.
@@ -279,6 +288,7 @@ Then `npm run dev` and look at it:
 - Cart drawer opens with the new white rounded panel, circular × button.
 - **The mobile menu drawer** (narrow the viewport, tap the hamburger) — it uses the same shell. It must look right, not broken.
 - Escape closes. Click outside closes.
+- **The page behind does not scroll while the drawer is open**, and scrolling is restored after it closes (scroll the page, open the drawer, try to scroll, close it, scroll again).
 - Open the cart with the keyboard: focus lands in the panel, Tab cycles inside it and does not escape to the page behind, Escape returns focus to the button you opened it from.
 
 - [ ] **Step 5: Commit**
@@ -1258,6 +1268,7 @@ Work the list top to bottom and actually observe each one:
 8. **Keyboard only:** Tab to the cart button, Enter to open, focus enters the panel, Tab cycles without escaping to the page behind, Escape closes, focus returns to the cart button.
 9. **Narrow viewport:** drawer is full-width; footer clears the home indicator; **the mobile menu drawer still looks right** — it shares the shell.
 10. **`/cart` page:** renders, is not broken, summary is the green card.
+11. **Body scroll lock:** page behind cannot scroll while the drawer is open, and scrolls normally again after closing. Same for the mobile menu.
 
 - [ ] **Step 4: Commit any fixes**
 
