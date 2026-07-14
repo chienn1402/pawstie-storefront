@@ -1,9 +1,10 @@
+import {useEffect, useRef} from 'react';
 import {Link} from 'react-router';
 import {CartForm, type OptimisticCartLineInput} from '@shopify/hydrogen';
 import type {FetcherWithComponents} from 'react-router';
 import type {RecommendedProductFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
-import {CartIcon} from '~/components/icons';
+import {BoltIcon, CartIcon} from '~/components/icons';
 import {useVariantUrl} from '~/lib/variants';
 
 type CardVariant = NonNullable<
@@ -52,6 +53,63 @@ function QuickAddButton({
   );
 }
 
+function QuickBuyControl({
+  fetcher,
+  title,
+}: {
+  fetcher: FetcherWithComponents<any>;
+  title: string;
+}) {
+  // Set on submit so a `fetcher.data` left over from an earlier render can
+  // never fire a redirect the shopper did not ask for.
+  const awaitingCheckout = useRef(false);
+
+  useEffect(() => {
+    if (fetcher.state === 'submitting') {
+      awaitingCheckout.current = true;
+      return;
+    }
+    if (fetcher.state !== 'idle' || !awaitingCheckout.current) return;
+
+    awaitingCheckout.current = false;
+    const checkoutUrl = fetcher.data?.cart?.checkoutUrl;
+    if (checkoutUrl) {
+      window.location.href = checkoutUrl;
+    }
+  }, [fetcher.state, fetcher.data]);
+
+  return (
+    <button
+      type="submit"
+      disabled={fetcher.state !== 'idle'}
+      aria-label={`Buy ${title} now`}
+      className={`${ICON_BUTTON} bg-primary text-white hover:bg-[#8f440b]`}
+    >
+      <BoltIcon className="size-5" />
+    </button>
+  );
+}
+
+function QuickBuyButton({
+  variant,
+  title,
+}: {
+  variant: CardVariant;
+  title: string;
+}) {
+  return (
+    <CartForm
+      route="/cart"
+      inputs={{lines: cartLines(variant)}}
+      action={CartForm.ACTIONS.LinesAdd}
+    >
+      {(fetcher: FetcherWithComponents<any>) => (
+        <QuickBuyControl fetcher={fetcher} title={title} />
+      )}
+    </CartForm>
+  );
+}
+
 export function ProductCardActions({
   product,
 }: {
@@ -88,6 +146,7 @@ export function ProductCardActions({
   return (
     <div className={CLUSTER}>
       <QuickAddButton variant={variant} title={product.title} />
+      <QuickBuyButton variant={variant} title={product.title} />
     </div>
   );
 }
