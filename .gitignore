@@ -12,3 +12,6 @@ tsconfig.tsbuildinfo
 
 # Playwright MCP scratch output
 .playwright-mcp/
+
+# Superpowers brainstorming scratch
+.superpowers/
