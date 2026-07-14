@@ -136,7 +136,7 @@ function CartDiscounts({
   }, [discountAddFetcher.data]);
 
   return (
-    <section aria-label="Discounts">
+    <section aria-label="Discounts" className="p-0">
       {codes.length > 0 && (
         <dl className="m-0 mb-2">
           <dt className="text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-[#8fc99a]" id={discountsHeadingId}>
@@ -258,7 +258,7 @@ function CartGiftCard({
   };
 
   return (
-    <section aria-label="Gift cards">
+    <section aria-label="Gift cards" className="p-0">
       {giftCardCodes && giftCardCodes.length > 0 && (
         <dl className="m-0 mb-2">
           <dt className="text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-[#8fc99a]" id={giftCardHeadingId}>
