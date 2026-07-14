@@ -17,10 +17,10 @@ export function ProductCard({
   const image = product.featuredImage;
 
   return (
-    <div className="group relative flex flex-col rounded-[1.75rem] bg-white p-3 shadow-[0_18px_30px_-20px_rgba(1,51,18,0.35)] ring-1 ring-[#d6f3d0] transition duration-200 hover:-translate-y-1 hover:shadow-[0_26px_42px_-20px_rgba(1,51,18,0.45)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 lg:rounded-[2rem]">
-      <div className="relative overflow-hidden rounded-[1.25rem] bg-[#a4e8aa] lg:rounded-[1.5rem]">
+    <article className="group relative flex min-w-0 flex-col">
+      <div className="relative overflow-hidden rounded-[1.5rem] rounded-br-[3.75rem] bg-[#a4e8aa] lg:rounded-[2rem] lg:rounded-br-[4.75rem]">
         {isNew ? (
-          <span className="pointer-events-none absolute left-3 top-3 z-10 rounded-full bg-white px-3 py-1.5 font-heading text-xs font-semibold uppercase tracking-[0.12em] text-[#00521d] shadow-sm">
+          <span className="pointer-events-none absolute left-4 top-0 z-10 rounded-b-xl bg-[#00521d] px-3 pb-2.5 pt-3.5 font-heading text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-white sm:pb-3 sm:pt-4 sm:text-xs">
             New
           </span>
         ) : null}
@@ -31,17 +31,16 @@ export function ProductCard({
             data={image}
             loading={loading}
             sizes="(min-width: 64em) 20vw, 45vw"
-            className="size-full rounded-none! object-cover transition-transform duration-500 group-hover:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+            className="size-full rounded-none! object-cover transition-transform duration-500 ease-out motion-safe:group-hover:scale-[1.025] motion-reduce:transition-none"
           />
         ) : (
           <div className="aspect-[4/5] w-full" />
         )}
-        <ProductCardActions product={product} />
       </div>
 
-      <h3 className="mb-0 mt-4 font-heading text-lg font-semibold leading-snug tracking-[-0.02em] text-[#004817]">
+      <h3 className="mb-0 mt-5 font-heading text-base font-semibold leading-[1.25] tracking-[-0.025em] text-[#004817] sm:text-lg">
         <Link
-          className="rounded-sm text-[#004817] after:absolute after:inset-0 after:content-[''] hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00521d]"
+          className="rounded-sm text-[#004817] after:absolute after:inset-0 after:content-[''] hover:text-[#00752d] hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#00521d]"
           prefetch="intent"
           to={variantUrl}
         >
@@ -49,9 +48,11 @@ export function ProductCard({
         </Link>
       </h3>
 
-      <p className="mt-1 font-heading text-base font-semibold text-[#347345]">
+      <p className="mt-1.5 font-heading text-sm font-bold text-primary sm:text-base">
         <Money as="span" data={product.priceRange.minVariantPrice} />
       </p>
-    </div>
+
+      <ProductCardActions product={product} />
+    </article>
   );
 }
