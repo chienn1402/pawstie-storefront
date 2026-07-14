@@ -50,7 +50,7 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   const childrenMap = getLineItemChildrenMap(lines);
 
   if (lines.length === 0) {
-    return <CartEmpty />;
+    return <CartEmpty layout={layout} />;
   }
 
   return (
@@ -88,13 +88,15 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   );
 }
 
-function CartEmpty() {
+function CartEmpty({layout}: {layout: CartLayout}) {
   const {close} = useAside();
   const headingRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
-    headingRef.current?.focus();
-  }, []);
+    if (layout === 'aside') {
+      headingRef.current?.focus();
+    }
+  }, [layout]);
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center px-8 pb-16 text-center">
