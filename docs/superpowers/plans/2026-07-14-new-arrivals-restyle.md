@@ -16,7 +16,8 @@
 - **Never edit `app/styles/tailwind.css`.** The user owns the theme.
 - **Never hand-edit `*.generated.d.ts`.** They are codegen artifacts. Run `npm run codegen`.
 - Greens are arbitrary values: `#effce9` (section bg), `#a4e8aa` (mid), `#00521d` (deep), `#004817` (headings), `#347345` (body). Orange is the `primary` token — never a hex.
-- `reset.css` lives in `@layer base`, so Tailwind utilities already beat it. **Do not add `!` to fight the reset.** The one exception is `img { border-radius: 4px }` in `app/styles/app.css:11`, which is unlayered and does still win — any `<img>`/`<Image>` needs `rounded-none!`.
+- `reset.css` lives in `@layer base` (`app/styles/reset.css:11`), so Tailwind utilities already beat it. **Do not add `!` to any class in new code.** The sibling files (`FinalCallToAction`, `ShopByRoutine`, `EverydayPromises`, `Hero`) are full of `!` because they predate that fix — do not copy their idiom. Their marks are redundant and are being left alone for now, not imitated.
+- **The one exception:** `app/styles/app.css` is *not* layered, so its `img { border-radius: 4px }` (`app.css:11`) still beats utilities. Any `<img>`/`<Image>` needs `rounded-none!`. This is the only `!` that may appear in new code.
 - Import routing from `react-router`. Never `@remix-run/*`, never `react-router-dom`.
 - Path alias `~/*` → `app/*`.
 - Approved copy, verbatim: eyebrow **"New this week"**, headline **"Just landed. Already loved."**, pill **"Shop all new"**.
@@ -164,21 +165,21 @@ export function NewArrivals({products}: NewArrivalsProps) {
   return (
     <section
       aria-labelledby="new-arrivals-heading"
-      className="-mx-4 w-[calc(100%+2rem)] overflow-hidden bg-[#effce9] px-6! py-20! lg:px-[7vw]! lg:py-28!"
+      className="-mx-4 w-[calc(100%+2rem)] overflow-hidden bg-[#effce9] px-6 py-20 lg:px-[7vw] lg:py-28"
     >
       <div className="mx-auto max-w-[80rem]">
         <div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-16">
           <div className="min-w-0">
-            <p className="font-heading text-sm! font-bold uppercase tracking-[0.16em] text-primary">
+            <p className="font-heading text-sm font-bold uppercase tracking-[0.16em] text-primary">
               New this week
             </p>
             <h2
               id="new-arrivals-heading"
-              className="mb-0! mt-4! max-w-[13ch] font-heading text-5xl! font-semibold! leading-[0.9]! tracking-[-0.065em] text-[#004817] sm:text-6xl! lg:text-7xl!"
+              className="mb-0 mt-4 max-w-[13ch] font-heading text-5xl font-semibold leading-[0.9] tracking-[-0.065em] text-[#004817] sm:text-6xl lg:text-7xl"
             >
               Just landed. Already loved.
             </h2>
-            <p className="mt-8! max-w-[31rem] text-lg! leading-relaxed! text-[#347345]">
+            <p className="mt-8 max-w-[31rem] text-lg leading-relaxed text-[#347345]">
               The newest toys, beds, and treats to reach the shelf — picked the
               moment they arrived.
             </p>
@@ -186,7 +187,7 @@ export function NewArrivals({products}: NewArrivalsProps) {
 
           <Link
             to={CTA_HREF}
-            className="group inline-flex min-h-16 shrink-0 items-center gap-5 self-start rounded-full bg-primary py-2 pl-8 pr-2 font-heading text-lg font-semibold text-white! shadow-[0_12px_28px_-10px_rgba(169,83,14,0.5)] transition-[transform,box-shadow,background-color] duration-300 hover:-translate-y-0.5 hover:bg-[#8f440b] hover:no-underline! hover:shadow-[0_20px_38px_-12px_rgba(169,83,14,0.65)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#00521d] motion-reduce:transition-none motion-reduce:hover:translate-y-0 lg:self-auto lg:text-xl"
+            className="group inline-flex min-h-16 shrink-0 items-center gap-5 self-start rounded-full bg-primary py-2 pl-8 pr-2 font-heading text-lg font-semibold text-white shadow-[0_12px_28px_-10px_rgba(169,83,14,0.5)] transition-[transform,box-shadow,background-color] duration-300 hover:-translate-y-0.5 hover:bg-[#8f440b] hover:no-underline hover:shadow-[0_20px_38px_-12px_rgba(169,83,14,0.65)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#00521d] motion-reduce:transition-none motion-reduce:hover:translate-y-0 lg:self-auto lg:text-xl"
           >
             Shop all new
             <span className="relative grid size-12 place-items-center overflow-hidden rounded-full bg-white text-primary">
@@ -317,9 +318,9 @@ export function ProductCard({
         )}
       </div>
 
-      <h3 className="mb-0! mt-4! font-heading text-lg font-semibold leading-snug tracking-[-0.02em] text-[#004817]">
+      <h3 className="mb-0 mt-4 font-heading text-lg font-semibold leading-snug tracking-[-0.02em] text-[#004817]">
         <Link
-          className="rounded-sm text-[#004817]! after:absolute after:inset-0 after:content-[''] hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00521d]"
+          className="rounded-sm text-[#004817] after:absolute after:inset-0 after:content-[''] hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00521d]"
           prefetch="intent"
           to={variantUrl}
         >
@@ -327,7 +328,7 @@ export function ProductCard({
         </Link>
       </h3>
 
-      <p className="mt-1! font-heading text-base font-semibold text-[#347345]">
+      <p className="mt-1 font-heading text-base font-semibold text-[#347345]">
         <Money as="span" data={product.priceRange.minVariantPrice} />
       </p>
     </div>
@@ -470,7 +471,7 @@ export function ProductCardActions({
         <Link
           to={variantUrl}
           prefetch="intent"
-          className={`${PILL} transition-transform duration-200 hover:scale-105 hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none motion-reduce:hover:scale-100`}
+          className={`${PILL} transition-transform duration-200 hover:scale-105 hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none motion-reduce:hover:scale-100`}
         >
           Choose options
         </Link>
