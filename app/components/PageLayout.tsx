@@ -1,5 +1,6 @@
-import {Await} from 'react-router';
+import {Await, useAsyncValue} from 'react-router';
 import {Suspense} from 'react';
+import {useOptimisticCart} from '@shopify/hydrogen';
 import type {
   CartApiQueryFragment,
   FooterQuery,
@@ -60,15 +61,40 @@ export function PageLayout({
 
 function CartAside({cart}: {cart: PageLayoutProps['cart']}) {
   return (
-    <Aside type="cart" heading="CART">
-      <Suspense fallback={<p>Loading cart ...</p>}>
+    <Aside heading={<CartHeading cart={cart} />} type="cart">
+      <Suspense fallback={<p className="px-5 text-sm text-[#5c7060]">Loading cart …</p>}>
         <Await resolve={cart}>
-          {(cart) => {
-            return <CartMain cart={cart} layout="aside" />;
-          }}
+          {(cart) => <CartMain cart={cart} layout="aside" />}
         </Await>
       </Suspense>
     </Aside>
+  );
+}
+
+function CartHeading({cart}: {cart: PageLayoutProps['cart']}) {
+  return (
+    <span className="block">
+      Your cart
+      <Suspense fallback={null}>
+        {/* A rejected cart must not take the heading down — just show no count. */}
+        <Await errorElement={<></>} resolve={cart}>
+          <CartHeadingCount />
+        </Await>
+      </Suspense>
+    </span>
+  );
+}
+
+function CartHeadingCount() {
+  const cart = useOptimisticCart(useAsyncValue() as CartApiQueryFragment | null);
+  const count = cart?.totalQuantity ?? 0;
+
+  if (count === 0) return null;
+
+  return (
+    <span className="mt-0.5 block font-sans text-xs font-bold text-[#4a6b4f]">
+      {count} item{count === 1 ? '' : 's'}
+    </span>
   );
 }
 
