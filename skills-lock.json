@@ -7,6 +7,12 @@
       "skillPath": "skills/frontend-design/SKILL.md",
       "computedHash": "4eabc66183767153e404b39d1b839b1c37f2d82d86f0a0d7e880a579d8d62336"
     },
+    "handoff": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/handoff/SKILL.md",
+      "computedHash": "ad03e8d4ea3cbbff66420eb7ba3cc375b5cbe1821a2449b53e863256cf5b5cde"
+    },
     "modern-web-guidance": {
       "source": "GoogleChrome/modern-web-guidance",
       "sourceType": "github",
