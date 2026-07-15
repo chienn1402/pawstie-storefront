@@ -3,6 +3,7 @@ import {Link, useLoaderData} from 'react-router';
 import {getPaginationVariables} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {ProductCard} from '~/components/ProductCard';
+import {ShopControls} from '~/components/shop/ShopControls';
 import {RECOMMENDED_PRODUCT_FRAGMENT} from '~/lib/fragments';
 import {resolveCategory, resolveSort} from '~/lib/shop';
 import type {
@@ -62,7 +63,7 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
 }
 
 export default function Shop() {
-  const {products} = useLoaderData<typeof loader>();
+  const {products, category, sort} = useLoaderData<typeof loader>();
   const count = products.nodes.length;
 
   return (
@@ -81,6 +82,8 @@ export default function Shop() {
           </p>
         </div>
       </section>
+
+      <ShopControls activeCategory={category} activeSort={sort} count={count} />
 
       <div className="mt-6 px-6 lg:px-[7vw]">
         <div className="mx-auto max-w-[80rem]">
