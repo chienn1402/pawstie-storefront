@@ -93,6 +93,15 @@ export function HeaderMenu({
       >
         Home
       </NavLink>
+      <NavLink
+        end
+        onClick={close}
+        prefetch="intent"
+        className={navLinkClass}
+        to="/shop"
+      >
+        Shop
+      </NavLink>
       {(menu || FALLBACK_HEADER_MENU).items.map((item) => {
         if (!item.url) return null;
 
@@ -103,11 +112,14 @@ export function HeaderMenu({
           item.url.includes(primaryDomainUrl)
             ? new URL(item.url).pathname
             : item.url;
-        // Skip a menu "Home" item — we always render an explicit Home link above.
+        // Skip menu items we already render explicitly above (Home, Shop).
+        const menuTitle = item.title.trim().toLowerCase();
         if (
           url === '/' ||
           url === '' ||
-          item.title.trim().toLowerCase() === 'home'
+          url === '/shop' ||
+          menuTitle === 'home' ||
+          menuTitle === 'shop'
         )
           return null;
         return (
