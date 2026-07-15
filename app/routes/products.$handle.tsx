@@ -12,8 +12,7 @@ import {ProductPrice} from '~/components/ProductPrice';
 import {ProductGallery} from '~/components/ProductGallery';
 import {ProductForm} from '~/components/ProductForm';
 import {ProductBreadcrumb} from '~/components/ProductBreadcrumb';
-import {ProductPromises} from '~/components/ProductPromises';
-import {ProductDetails} from '~/components/ProductDetails';
+import {ProductInfoTabs} from '~/components/ProductInfoTabs';
 import {RelatedProducts} from '~/components/RelatedProducts';
 import {PawIcon} from '~/components/icons';
 import {RECOMMENDED_PRODUCT_FRAGMENT} from '~/lib/fragments';
@@ -89,10 +88,14 @@ export default function Product() {
               </div>
               <ProductPrice price={selectedVariant?.price} compareAtPrice={selectedVariant?.compareAtPrice} availableForSale={selectedVariant?.availableForSale} />
               <ProductForm productOptions={productOptions} selectedVariant={selectedVariant} />
-              <ProductPromises />
-              <ProductDetails descriptionHtml={descriptionHtml} />
             </div>
           </div>
+          <ProductInfoTabs
+            descriptionHtml={descriptionHtml}
+            selectedOptions={selectedVariant?.selectedOptions ?? []}
+            sku={selectedVariant?.sku}
+            title={title}
+          />
         </div>
       </div>
       <RelatedProducts products={recommended} />
