@@ -6,14 +6,19 @@ import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
 export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Hydrogen | ${data?.blog.title ?? ''} blog`}];
+  return [
+    {title: `Pawstie | ${data?.blog.title ?? 'Journal'}`},
+    {
+      name: 'description',
+      content:
+        data?.blog.seo?.description ??
+        'Stories, tips, and pet-care notes from the Pawstie team.',
+    },
+  ];
 };
 
 export async function loader(args: Route.LoaderArgs) {
-  // Start fetching non-critical data without blocking time to first byte
   const deferredData = loadDeferredData(args);
-
-  // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
 
   return {...deferredData, ...criticalData};
@@ -25,7 +30,7 @@ export async function loader(args: Route.LoaderArgs) {
  */
 async function loadCriticalData({context, request, params}: Route.LoaderArgs) {
   const paginationVariables = getPaginationVariables(request, {
-    pageBy: 4,
+    pageBy: 6,
   });
 
   if (!params.blogHandle) {
@@ -63,20 +68,52 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 export default function Blog() {
   const {blog} = useLoaderData<typeof loader>();
   const {articles} = blog;
+  const hasArticles = articles.nodes.length > 0;
 
   return (
-    <div className="blog">
-      <h1>{blog.title}</h1>
-      <div className="blog-grid">
-        <PaginatedResourceSection<ArticleItemFragment> connection={articles}>
-          {({node: article, index}) => (
-            <ArticleItem
-              article={article}
-              key={article.id}
-              loading={index < 2 ? 'eager' : 'lazy'}
-            />
+    <div className="pb-20 lg:pb-28">
+      <section className="px-6 pt-10 pb-6 lg:px-[7vw] lg:pt-14">
+        <div className="mx-auto max-w-[80rem]">
+          <p className="font-heading text-sm font-bold uppercase tracking-[0.16em] text-primary">
+            The Pawstie journal
+          </p>
+          <h1 className="mb-0 mt-3 font-heading text-5xl font-semibold leading-[0.95] tracking-[-0.05em] text-[#004817] sm:text-6xl">
+            {blog.title}
+          </h1>
+          <p className="mt-5 max-w-[34rem] text-lg leading-relaxed text-[#347345]">
+            Stories, tips, and pet-care notes to help every day with your pets
+            go a little smoother.
+          </p>
+        </div>
+      </section>
+
+      <div className="mt-6 px-6 lg:px-[7vw]">
+        <div className="mx-auto max-w-[80rem]">
+          {hasArticles ? (
+            <PaginatedResourceSection<ArticleItemFragment>
+              connection={articles}
+              ariaLabel="Articles"
+              resourcesClassName="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3"
+            >
+              {({node: article, index}) => (
+                <ArticleItem
+                  article={article}
+                  key={article.id}
+                  loading={index < 3 ? 'eager' : 'lazy'}
+                />
+              )}
+            </PaginatedResourceSection>
+          ) : (
+            <div className="rounded-[2rem] bg-[#effce9] px-6 py-16 text-center">
+              <h2 className="mb-0 font-heading text-2xl font-semibold text-[#004817]">
+                No stories yet
+              </h2>
+              <p className="mt-3 text-[#347345]">
+                We&rsquo;re working on the first ones. Check back soon.
+              </p>
+            </div>
           )}
-        </PaginatedResourceSection>
+        </div>
       </div>
     </div>
   );
@@ -94,24 +131,47 @@ function ArticleItem({
     month: 'long',
     day: 'numeric',
   }).format(new Date(article.publishedAt!));
+
   return (
-    <div className="blog-article" key={article.id}>
-      <Link to={`/blogs/${article.blog.handle}/${article.handle}`}>
-        {article.image && (
-          <div className="blog-article-image">
-            <Image
-              alt={article.image.altText || article.title}
-              aspectRatio="3/2"
-              data={article.image}
-              loading={loading}
-              sizes="(min-width: 768px) 50vw, 100vw"
-            />
-          </div>
+    <article className="group relative flex min-w-0 flex-col">
+      <div className="relative overflow-hidden rounded-[1.5rem] rounded-br-[3.75rem] bg-[#a4e8aa] lg:rounded-[2rem] lg:rounded-br-[4.75rem]">
+        {article.image ? (
+          <Image
+            alt={article.image.altText || article.title}
+            aspectRatio="3/2"
+            data={article.image}
+            loading={loading}
+            sizes="(min-width: 64em) 30vw, (min-width: 40em) 45vw, 100vw"
+            className="size-full rounded-none! object-cover transition-transform duration-500 ease-out motion-safe:group-hover:scale-[1.025] motion-reduce:transition-none"
+          />
+        ) : (
+          <div className="aspect-[3/2] w-full" />
         )}
-        <h3>{article.title}</h3>
-        <small>{publishedAt}</small>
-      </Link>
-    </div>
+      </div>
+
+      <p className="mt-5 font-heading text-xs font-bold uppercase tracking-[0.14em] text-primary">
+        <time dateTime={article.publishedAt}>{publishedAt}</time>
+        {article.author?.name ? (
+          <span className="text-[#347345]"> · {article.author.name}</span>
+        ) : null}
+      </p>
+
+      <h2 className="mb-0 mt-2 font-heading text-xl font-semibold leading-[1.2] tracking-[-0.025em] text-[#004817]">
+        <Link
+          className="rounded-sm text-[#004817] after:absolute after:inset-0 after:content-[''] hover:text-[#00752d] hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#00521d]"
+          prefetch="intent"
+          to={`/blogs/${article.blog.handle}/${article.handle}`}
+        >
+          {article.title}
+        </Link>
+      </h2>
+
+      {article.excerpt ? (
+        <p className="mt-2 line-clamp-3 leading-relaxed text-[#347345]">
+          {article.excerpt}
+        </p>
+      ) : null}
+    </article>
   );
 }
 
@@ -144,11 +204,9 @@ const BLOGS_QUERY = `#graphql
         pageInfo {
           hasPreviousPage
           hasNextPage
-          hasNextPage
           endCursor
           startCursor
         }
-
       }
     }
   }
@@ -157,6 +215,7 @@ const BLOGS_QUERY = `#graphql
       name
     }
     contentHtml
+    excerpt
     handle
     id
     image {
