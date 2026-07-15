@@ -80,17 +80,18 @@ export default function Product() {
         <div className="mx-auto max-w-[80rem]">
           <ProductBreadcrumb title={title} />
           <div className="mt-8 grid gap-10 lg:mt-12 lg:grid-cols-2 lg:gap-16">
-            <ProductGallery images={product.images.nodes} selectedImage={heroImage} title={title} />
+            <ProductGallery key={product.id} images={product.images.nodes} selectedImage={heroImage} title={title} />
             <div className="flex flex-col gap-7">
               <div>
                 <p className="inline-flex items-center gap-2 font-heading text-sm font-bold uppercase tracking-[0.16em] text-[#347345]"><PawIcon className="size-4 text-[#00752d]" />{vendor}</p>
                 <h1 className="mb-0 mt-3 font-heading text-4xl font-semibold leading-[0.95] tracking-[-0.05em] text-[#004817] sm:text-5xl">{title}</h1>
               </div>
               <ProductPrice price={selectedVariant?.price} compareAtPrice={selectedVariant?.compareAtPrice} availableForSale={selectedVariant?.availableForSale} />
-              <ProductForm productOptions={productOptions} selectedVariant={selectedVariant} />
+              <ProductForm key={product.id} productOptions={productOptions} selectedVariant={selectedVariant} />
             </div>
           </div>
           <ProductInfoTabs
+            key={product.id}
             descriptionHtml={descriptionHtml}
             selectedOptions={selectedVariant?.selectedOptions ?? []}
             sku={selectedVariant?.sku}

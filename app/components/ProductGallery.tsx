@@ -19,10 +19,11 @@ export function ProductGallery({
     () => selectedImage?.id ?? images[0]?.id ?? null,
   );
   const selectedImageId = selectedImage?.id ?? null;
+  const fallbackImageId = images[0]?.id ?? null;
 
   useEffect(() => {
-    setActiveImageId(selectedImageId ?? images[0]?.id ?? null);
-  }, [selectedImageId]);
+    setActiveImageId(selectedImageId ?? fallbackImageId);
+  }, [fallbackImageId, selectedImageId]);
 
   const activeImage =
     images.find((image) => image.id === activeImageId) ??
