@@ -133,11 +133,12 @@ rather than 500-ing — matching the deferred-data pattern used elsewhere.
 
 The Storefront `products` connection returns **no total count**, and there is no
 cheap way to get one for a filtered connection. So the count reflects the number
-of products **currently loaded**, labeled plainly (e.g. `8 products`). With
-`pageBy: 12` and only ~8 storefront-visible products, the demo catalog is a
-single page, so this reads as the true total today; it grows if "Load more" is
-pressed on a larger catalog. We do **not** issue a second query or over-fetch to
-fabricate a total.
+of products on the **current loader page**, labeled plainly (e.g. `8 products`).
+With `pageBy: 12` and only ~8 storefront-visible products, the demo catalog is a
+single page, so this equals the true selection total today. Accumulating the
+count across "Load more" presses is not implemented, so on a larger, paginated
+catalog the count would show the latest page's size rather than a running
+total. We do **not** issue a second query or over-fetch to fabricate a total.
 
 ### Layout
 

@@ -64,6 +64,10 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
 
 export default function Shop() {
   const {products, category, sort} = useLoaderData<typeof loader>();
+  // Count reflects the current page (Storefront gives no cheap total). With the
+  // catalog fitting one page (pageBy 12) this equals the selection total; on a
+  // larger, paginated catalog it would show the latest page's size, not the
+  // accumulated running total.
   const count = products.nodes.length;
 
   return (
@@ -89,9 +93,9 @@ export default function Shop() {
         <div className="mx-auto max-w-[80rem]">
           {count === 0 ? (
             <div className="rounded-[2rem] bg-[#effce9] px-6 py-16 text-center">
-              <p className="mb-0 font-heading text-2xl font-semibold text-[#004817]">
+              <h2 className="mb-0 font-heading text-2xl font-semibold text-[#004817]">
                 No products here yet
-              </p>
+              </h2>
               <p className="mt-3 text-[#347345]">
                 Try another category to keep browsing.
               </p>

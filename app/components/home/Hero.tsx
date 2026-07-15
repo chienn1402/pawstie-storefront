@@ -4,7 +4,7 @@ import dachshund from '~/assets/img-dachshund.png';
 import cat from '~/assets/img-cat.png';
 import {ArrowRightIcon, PawIcon, PlusIcon, StarIcon} from '~/components/icons';
 
-const CTA_HREF = '/collections/all';
+const CTA_HREF = '/shop';
 const HERO_IMAGE_PRIORITY = {fetchpriority: 'high'} as const;
 
 function ClientsStat() {

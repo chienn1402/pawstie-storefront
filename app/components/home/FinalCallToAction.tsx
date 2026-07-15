@@ -41,7 +41,7 @@ export function FinalCallToAction() {
             collection.
           </p>
           <Link
-            to="/collections/all"
+            to="/shop"
             className="group mt-10 inline-flex min-h-16 items-center gap-5 rounded-full bg-primary py-2 pl-8 pr-2 font-heading text-lg font-semibold text-white! shadow-[0_12px_28px_-10px_rgba(169,83,14,0.5)] transition-[transform,box-shadow,background-color] duration-300 hover:-translate-y-0.5 hover:bg-[#8f440b] hover:no-underline! hover:shadow-[0_20px_38px_-12px_rgba(169,83,14,0.65)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#00521d] motion-reduce:transition-none motion-reduce:hover:translate-y-0 lg:text-xl"
           >
             Shop all products

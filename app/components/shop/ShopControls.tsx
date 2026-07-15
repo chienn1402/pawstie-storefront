@@ -74,7 +74,7 @@ export function ShopControls({
               <select
                 id="shop-sort"
                 name="sort"
-                defaultValue={activeSort}
+                value={activeSort}
                 onChange={(event) => void submit(event.currentTarget.form)}
                 className="min-h-11 appearance-none rounded-full border border-[#cdeccb] bg-white py-2 pl-4 pr-10 font-heading text-sm font-semibold text-[#00521d] transition-colors hover:border-[#00521d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00521d]"
               >
