@@ -34,3 +34,13 @@ The commands emit existing `envFile` deprecation and React Router future-flag wa
 ## Concerns
 
 - No automated test runner is configured in this repository, so verification follows the task brief’s codegen/typecheck requirements.
+
+## Review Fix
+
+- Synchronized `ProductGallery`'s active image state when `selectedImage?.id` changes, so selecting a variant updates the primary image.
+- Preserved manual thumbnail selection between variant changes by keeping the synchronization effect dependent only on the selected image ID.
+
+## Review Fix Verification
+
+- `npm run typecheck` — passed with no TypeScript errors (exit code 0).
+- Existing `envFile` deprecation and React Router future-flag warnings were emitted; they do not fail verification.

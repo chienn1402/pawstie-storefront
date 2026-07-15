@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {Image} from '@shopify/hydrogen';
 import type {
   ProductFragment,
@@ -18,6 +18,12 @@ export function ProductGallery({
   const [activeImageId, setActiveImageId] = useState<string | null>(
     () => selectedImage?.id ?? images[0]?.id ?? null,
   );
+  const selectedImageId = selectedImage?.id ?? null;
+
+  useEffect(() => {
+    setActiveImageId(selectedImageId ?? images[0]?.id ?? null);
+  }, [selectedImageId]);
+
   const activeImage =
     images.find((image) => image.id === activeImageId) ??
     selectedImage ??
