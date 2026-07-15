@@ -31,8 +31,8 @@ export function ProductGallery({
     images[0];
 
   return (
-    <div className="flex min-w-0 flex-col gap-4">
-      <div className="relative overflow-hidden rounded-[2rem] rounded-br-[4.75rem] bg-[#a4e8aa]">
+    <div className="flex min-w-0 flex-col gap-5">
+      <div className="relative overflow-hidden rounded-[2rem] rounded-br-[4.75rem] bg-[#f1efe8] shadow-[0_18px_45px_rgba(0,72,23,0.08)]">
         {activeImage ? (
           <Image
             alt={activeImage.altText || title || 'Product image'}
@@ -47,10 +47,19 @@ export function ProductGallery({
             <PawIcon className="size-16" />
           </div>
         )}
+
+        {activeImage ? (
+          <span className="absolute bottom-4 left-4 rounded-full bg-white/85 px-3 py-1 font-heading text-[0.65rem] font-bold uppercase tracking-[0.18em] text-[#347345] shadow-sm backdrop-blur-sm">
+            {Math.max(images.findIndex((image) => image.id === activeImage.id) + 1, 1)} / {images.length}
+          </span>
+        ) : null}
       </div>
 
       {images.length > 0 ? (
-        <div className="flex gap-3 overflow-x-auto pb-1" aria-label="Product images">
+        <div
+          className="grid grid-cols-4 gap-2.5 sm:grid-cols-5 sm:gap-3 lg:grid-cols-6"
+          aria-label="Product images"
+        >
           {images.map((image, index) => {
             const imageId = image.id ?? null;
             const isActive = imageId === activeImageId;
@@ -60,9 +69,9 @@ export function ProductGallery({
                 type="button"
                 key={image.id ?? index}
                 aria-label={`View image ${index + 1} of ${images.length}`}
-                aria-pressed={isActive}
+                aria-current={isActive ? 'true' : undefined}
                 onClick={() => setActiveImageId(imageId)}
-                className={`relative w-20 shrink-0 overflow-hidden rounded-xl bg-[#a4e8aa] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00521d] sm:w-24 ${isActive ? 'ring-2 ring-[#00521d] ring-offset-2' : 'opacity-75 transition-opacity hover:opacity-100 motion-reduce:transition-none'}`}
+                className={`group relative aspect-[4/5] min-w-0 overflow-hidden rounded-2xl bg-[#f1efe8] p-0.5 transition-[box-shadow,opacity,transform] duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00521d] motion-reduce:transition-none ${isActive ? 'shadow-[0_0_0_2px_#00521d,0_0_0_4px_#fff]' : 'opacity-70 hover:-translate-y-0.5 hover:opacity-100 hover:shadow-[0_8px_18px_rgba(0,72,23,0.12)]'}`}
               >
                 <Image
                   alt={image.altText || `${title} image ${index + 1}`}
@@ -70,7 +79,12 @@ export function ProductGallery({
                   data={image}
                   loading="lazy"
                   sizes="6rem"
-                  className="size-full rounded-none! object-cover"
+                  className="size-full rounded-[0.9rem]! object-cover"
+                />
+
+                <span
+                  aria-hidden="true"
+                  className={`absolute inset-0 rounded-[0.9rem] border transition-colors motion-reduce:transition-none ${isActive ? 'border-[#00521d]/20' : 'border-white/50 group-hover:border-white'}`}
                 />
               </button>
             );
