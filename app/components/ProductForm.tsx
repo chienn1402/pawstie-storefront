@@ -47,33 +47,35 @@ export function ProductForm({
       })}
 
       <div className="product-purchase-actions">
-        <div className="product-quantity-row">
-          <span className="product-quantity-label">Quantity</span>
-          <QuantitySelector
-            value={quantity}
-            onChange={setQuantity}
-            disabled={!available}
-          />
-        </div>
-        <AddToCartButton
-          disabled={!available}
-          onClick={() => open('cart')}
-          lines={
-            selectedVariant
-              ? [{merchandiseId: selectedVariant.id, quantity, selectedVariant}]
-              : []
-          }
-          className={`product-add-to-cart ${FOCUS_RING}`}
-        >
-          {available ? (
-            <ShoppingCart
-              aria-hidden="true"
-              className="size-5"
-              strokeWidth={2.25}
+        <div className="product-purchase-controls">
+          <div className="product-quantity-row">
+            <span className="product-quantity-label">Quantity</span>
+            <QuantitySelector
+              value={quantity}
+              onChange={setQuantity}
+              disabled={!available}
             />
-          ) : null}
-          <span>{available ? 'Add to cart' : 'Sold out'}</span>
-        </AddToCartButton>
+          </div>
+          <AddToCartButton
+            disabled={!available}
+            onClick={() => open('cart')}
+            lines={
+              selectedVariant
+                ? [{merchandiseId: selectedVariant.id, quantity, selectedVariant}]
+                : []
+            }
+            className={`product-add-to-cart ${FOCUS_RING}`}
+          >
+            {available ? (
+              <ShoppingCart
+                aria-hidden="true"
+                className="size-5"
+                strokeWidth={2.25}
+              />
+            ) : null}
+            <span>{available ? 'Add to cart' : 'Sold out'}</span>
+          </AddToCartButton>
+        </div>
 
         <aside
           className="product-assurance"
