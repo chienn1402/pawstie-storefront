@@ -6,6 +6,7 @@ import {Hero} from '~/components/home/Hero';
 import {MockShopNotice} from '~/components/home/MockShopNotice';
 import {NewArrivals} from '~/components/home/NewArrivals';
 import {ShopByRoutine} from '~/components/home/ShopByRoutine';
+import {RECOMMENDED_PRODUCT_FRAGMENT} from '~/lib/fragments';
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -72,56 +73,6 @@ export default function Homepage() {
 }
 
 const RECOMMENDED_PRODUCTS_QUERY = `#graphql
-  fragment RecommendedProduct on Product {
-    id
-    title
-    handle
-    options {
-      optionValues {
-        name
-      }
-    }
-    priceRange {
-      minVariantPrice {
-        amount
-        currencyCode
-      }
-    }
-    featuredImage {
-      id
-      url
-      altText
-      width
-      height
-    }
-    selectedOrFirstAvailableVariant(
-      selectedOptions: []
-      ignoreUnknownOptions: true
-      caseInsensitiveMatch: true
-    ) {
-      id
-      availableForSale
-      price {
-        amount
-        currencyCode
-      }
-      image {
-        id
-        url
-        altText
-        width
-        height
-      }
-      product {
-        handle
-        title
-      }
-      selectedOptions {
-        name
-        value
-      }
-    }
-  }
   query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
     products(first: 4, sortKey: UPDATED_AT, reverse: true) {
@@ -130,4 +81,5 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
       }
     }
   }
+  ${RECOMMENDED_PRODUCT_FRAGMENT}
 ` as const;

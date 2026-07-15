@@ -240,3 +240,58 @@ export const FOOTER_QUERY = `#graphql
   }
   ${MENU_FRAGMENT}
 ` as const;
+
+// Shared product-card shape, consumed by _index.tsx (New Arrivals) and
+// products.$handle.tsx (You may also like). Keep in sync with ProductCard.
+export const RECOMMENDED_PRODUCT_FRAGMENT = `#graphql
+  fragment RecommendedProduct on Product {
+    id
+    title
+    handle
+    options {
+      optionValues {
+        name
+      }
+    }
+    priceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+    }
+    featuredImage {
+      id
+      url
+      altText
+      width
+      height
+    }
+    selectedOrFirstAvailableVariant(
+      selectedOptions: []
+      ignoreUnknownOptions: true
+      caseInsensitiveMatch: true
+    ) {
+      id
+      availableForSale
+      price {
+        amount
+        currencyCode
+      }
+      image {
+        id
+        url
+        altText
+        width
+        height
+      }
+      product {
+        handle
+        title
+      }
+      selectedOptions {
+        name
+        value
+      }
+    }
+  }
+` as const;

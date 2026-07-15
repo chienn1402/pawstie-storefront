@@ -149,3 +149,74 @@ export function CloseIcon(props: IconProps) {
     </svg>
   );
 }
+
+export function MinusIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="M5 12h14" />
+    </svg>
+  );
+}
+
+export function ChevronDownIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
+}
+
+export function TruckIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="M2 5.5h10.5v9.5H2z" />
+      <path d="M12.5 8.5H16l3.5 3.5V15h-7z" />
+      <circle cx="6.5" cy="17.5" r="1.7" />
+      <circle cx="16.5" cy="17.5" r="1.7" />
+    </svg>
+  );
+}
+
+export function ShieldCheckIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="M12 3 5 6v5c0 4.2 2.9 7.4 7 8.8 4.1-1.4 7-4.6 7-8.8V6l-7-3Z" />
+      <path d="m9 11.5 2 2 4-4" />
+    </svg>
+  );
+}
