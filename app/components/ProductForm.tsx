@@ -3,10 +3,10 @@ import {Link, useNavigate} from 'react-router';
 import {type MappedProductOptions} from '@shopify/hydrogen';
 import type {Maybe, ProductOptionValueSwatch} from '@shopify/hydrogen/storefront-api-types';
 import type {ProductFragment} from 'storefrontapi.generated';
+import {LockKeyhole, RotateCcw, ShoppingCart, Truck} from 'lucide-react';
 import {AddToCartButton} from './AddToCartButton';
 import {QuantitySelector} from './QuantitySelector';
 import {useAside} from './Aside';
-import {ArrowRightIcon} from './icons';
 
 const FOCUS_RING =
   'focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#00521d]';
@@ -46,17 +46,78 @@ export function ProductForm({
         );
       })}
 
-      <div className="flex flex-wrap items-center gap-4">
-        <QuantitySelector value={quantity} onChange={setQuantity} disabled={!available} />
+      <div className="product-purchase-actions">
+        <div className="product-quantity-row">
+          <span className="product-quantity-label">Quantity</span>
+          <QuantitySelector
+            value={quantity}
+            onChange={setQuantity}
+            disabled={!available}
+          />
+        </div>
         <AddToCartButton
           disabled={!available}
           onClick={() => open('cart')}
-          lines={selectedVariant ? [{merchandiseId: selectedVariant.id, quantity, selectedVariant}] : []}
-          className={`group inline-flex min-h-14 items-center gap-4 rounded-full bg-primary py-2 pl-8 pr-2 font-heading text-lg font-semibold text-white! shadow-[0_12px_28px_-10px_rgba(169,83,14,0.5)] transition-[transform,box-shadow,background-color] duration-300 hover:-translate-y-0.5 hover:bg-[#8f440b] hover:shadow-[0_20px_38px_-12px_rgba(169,83,14,0.65)] ${FOCUS_RING} disabled:cursor-not-allowed disabled:bg-[#c7bcae] disabled:text-white! disabled:shadow-none disabled:hover:translate-y-0 motion-reduce:transition-none`}
+          lines={
+            selectedVariant
+              ? [{merchandiseId: selectedVariant.id, quantity, selectedVariant}]
+              : []
+          }
+          className={`product-add-to-cart ${FOCUS_RING}`}
         >
-          {available ? 'Add to cart' : 'Sold out'}
-          {available ? <span className="relative grid size-10 place-items-center overflow-hidden rounded-full bg-white text-primary"><ArrowRightIcon className="size-4 transition-transform duration-300 motion-safe:group-hover:translate-x-[220%]" /><ArrowRightIcon className="absolute size-4 -translate-x-[220%] transition-transform duration-300 motion-safe:group-hover:translate-x-0" /></span> : null}
+          {available ? (
+            <ShoppingCart
+              aria-hidden="true"
+              className="size-5"
+              strokeWidth={2.25}
+            />
+          ) : null}
+          <span>{available ? 'Add to cart' : 'Sold out'}</span>
         </AddToCartButton>
+
+        <aside
+          className="product-assurance"
+          aria-labelledby="product-assurance-title"
+        >
+          <p id="product-assurance-title" className="product-assurance__title">
+            The Pawstie Promise
+          </p>
+          <ul className="product-assurance__list">
+            <li className="product-assurance__item">
+              <LockKeyhole
+                aria-hidden="true"
+                className="product-assurance__icon"
+              />
+              <span>
+                <strong>Secure Shopify checkout</strong>
+                <small>Protected payment processing.</small>
+              </span>
+            </li>
+            <li className="product-assurance__item">
+              <Truck aria-hidden="true" className="product-assurance__icon" />
+              <span>
+                <strong>Shipping rates at checkout</strong>
+                <small>
+                  Rates shown before you pay.{' '}
+                  <Link to="/policies/shipping-policy">View policy</Link>
+                </small>
+              </span>
+            </li>
+            <li className="product-assurance__item">
+              <RotateCcw
+                aria-hidden="true"
+                className="product-assurance__icon"
+              />
+              <span>
+                <strong>Easy returns</strong>
+                <small>
+                  Simple support when plans change.{' '}
+                  <Link to="/policies/refund-policy">View policy</Link>
+                </small>
+              </span>
+            </li>
+          </ul>
+        </aside>
       </div>
     </div>
   );
