@@ -18,7 +18,7 @@ export function RelatedProducts({products}: RelatedProductsProps) {
           if (recommendations.length === 0) return null;
 
           return (
-            <section aria-labelledby="related-products-heading" className="-mx-4 mt-16 w-[calc(100%+2rem)] overflow-hidden bg-[#effce9] px-6 py-20 lg:mt-24 lg:px-[7vw] lg:py-28">
+            <section aria-labelledby="related-products-heading" className="mt-16 overflow-hidden bg-[#effce9] px-6 py-16 lg:mt-24 lg:px-[7vw] lg:py-20">
               <div className="mx-auto max-w-[80rem]">
                 <p className="font-heading text-sm font-bold uppercase tracking-[0.16em] text-primary">More to sniff out</p>
                 <h2 id="related-products-heading" className="mb-0 mt-4 max-w-[13ch] font-heading text-4xl font-semibold leading-[0.95] tracking-[-0.05em] text-[#004817] sm:text-5xl">You may also like</h2>

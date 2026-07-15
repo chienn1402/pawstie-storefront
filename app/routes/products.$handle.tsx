@@ -75,7 +75,7 @@ export default function Product() {
   const heroImage = selectedVariant?.image ?? product.featuredImage;
 
   return (
-    <div className="pb-4">
+    <div>
       <div className="px-6 pt-8 lg:px-[7vw] lg:pt-12">
         <div className="mx-auto max-w-[80rem]">
           <ProductBreadcrumb title={title} />
