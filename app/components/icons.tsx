@@ -203,6 +203,43 @@ export function TruckIcon(props: IconProps) {
   );
 }
 
+export function MapPinIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="M19 10.5c0 5-7 10.5-7 10.5S5 15.5 5 10.5a7 7 0 1 1 14 0Z" />
+      <circle cx="12" cy="10.5" r="2.3" />
+    </svg>
+  );
+}
+
+export function ArrowRightOnRectangleIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="M14 20H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h8" />
+      <path d="M16 16l4-4-4-4" />
+      <path d="M20 12H9" />
+    </svg>
+  );
+}
+
 export function ShieldCheckIcon(props: IconProps) {
   return (
     <svg
