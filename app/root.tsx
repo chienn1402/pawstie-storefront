@@ -8,6 +8,7 @@ import {
   Meta,
   Scripts,
   ScrollRestoration,
+  useLocation,
   useRouteLoaderData,
 } from 'react-router';
 import type {Route} from './+types/root';
@@ -78,6 +79,7 @@ export async function loader(args: Route.LoaderArgs) {
   return {
     ...deferredData,
     ...criticalData,
+    origin: new URL(args.request.url).origin,
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
     shop: getShopAnalytics({
       storefront,
@@ -144,6 +146,16 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 
 export function Layout({children}: {children?: React.ReactNode}) {
   const nonce = useNonce();
+  const data = useRouteLoaderData<RootLoader>('root');
+  const {pathname} = useLocation();
+
+  // Dropping the query string consolidates ?variant=, pagination cursors and
+  // ?q= onto a single canonical per page. Rendered here rather than per-route so
+  // that every page gets one; there is no root data to build it from when the
+  // ErrorBoundary renders, which is fine since error pages shouldn't be indexed.
+  const canonical = data?.origin
+    ? `${data.origin}${pathname.replace(/\/+$/, '') || '/'}`
+    : null;
 
   return (
     <html lang="en">
@@ -153,6 +165,7 @@ export function Layout({children}: {children?: React.ReactNode}) {
         <link rel="stylesheet" href={tailwindCss}></link>
         <link rel="stylesheet" href={resetStyles}></link>
         <link rel="stylesheet" href={appStyles}></link>
+        {canonical ? <link rel="canonical" href={canonical} /> : null}
         <Meta />
         <Links />
       </head>

@@ -17,15 +17,20 @@ import {RelatedProducts} from '~/components/RelatedProducts';
 import {PawIcon} from '~/components/icons';
 import {RECOMMENDED_PRODUCT_FRAGMENT} from '~/lib/fragments';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import {productJsonLd} from '~/lib/structured-data';
 
-export const meta: Route.MetaFunction = ({data}) => {
+export const meta: Route.MetaFunction = ({data, matches}) => {
+  const jsonLd = data?.product
+    ? productJsonLd({product: data.product, origin: matches[0]?.data?.origin})
+    : null;
+
   return [
     {title: `Pawstie | ${data?.product.title ?? ''}`},
     {
       name: 'description',
       content: data?.product.seo?.description ?? data?.product.description ?? '',
     },
-    {rel: 'canonical', href: `/products/${data?.product.handle}`},
+    ...(jsonLd ? [{'script:ld+json': jsonLd}] : []),
   ];
 };
 

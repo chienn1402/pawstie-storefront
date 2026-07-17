@@ -1355,6 +1355,47 @@ export type ShopProductsQuery = {
   };
 };
 
+export type SitemapBlogsQueryVariables = StorefrontAPI.Exact<{
+  country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
+  language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
+  blogsFirst: StorefrontAPI.Scalars['Int']['input'];
+  blogsAfter?: StorefrontAPI.InputMaybe<
+    StorefrontAPI.Scalars['String']['input']
+  >;
+  articlesFirst: StorefrontAPI.Scalars['Int']['input'];
+}>;
+
+export type SitemapBlogsQuery = {
+  blogs: {
+    nodes: Array<
+      Pick<StorefrontAPI.Blog, 'handle'> & {
+        articles: {
+          nodes: Array<Pick<StorefrontAPI.Article, 'handle'>>;
+          pageInfo: Pick<StorefrontAPI.PageInfo, 'endCursor' | 'hasNextPage'>;
+        };
+      }
+    >;
+    pageInfo: Pick<StorefrontAPI.PageInfo, 'endCursor' | 'hasNextPage'>;
+  };
+};
+
+export type SitemapBlogArticlesQueryVariables = StorefrontAPI.Exact<{
+  country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
+  language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
+  blogHandle: StorefrontAPI.Scalars['String']['input'];
+  articlesFirst: StorefrontAPI.Scalars['Int']['input'];
+  after?: StorefrontAPI.InputMaybe<StorefrontAPI.Scalars['String']['input']>;
+}>;
+
+export type SitemapBlogArticlesQuery = {
+  blog?: StorefrontAPI.Maybe<{
+    articles: {
+      nodes: Array<Pick<StorefrontAPI.Article, 'handle'>>;
+      pageInfo: Pick<StorefrontAPI.PageInfo, 'endCursor' | 'hasNextPage'>;
+    };
+  }>;
+};
+
 interface GeneratedQueryTypes {
   '#graphql\n  fragment Shop on Shop {\n    id\n    name\n    description\n    primaryDomain {\n      url\n    }\n    brand {\n      logo {\n        image {\n          url\n        }\n      }\n    }\n  }\n  query Header(\n    $country: CountryCode\n    $headerMenuHandle: String!\n    $language: LanguageCode\n  ) @inContext(language: $language, country: $country) {\n    shop {\n      ...Shop\n    }\n    menu(handle: $headerMenuHandle) {\n      ...Menu\n    }\n  }\n  #graphql\n  fragment MenuItem on MenuItem {\n    id\n    resourceId\n    tags\n    title\n    type\n    url\n  }\n  fragment ChildMenuItem on MenuItem {\n    ...MenuItem\n  }\n  fragment ParentMenuItem on MenuItem {\n    ...MenuItem\n    items {\n      ...ChildMenuItem\n    }\n  }\n  fragment Menu on Menu {\n    id\n    items {\n      ...ParentMenuItem\n    }\n  }\n\n': {
     return: HeaderQuery;
@@ -1419,6 +1460,14 @@ interface GeneratedQueryTypes {
   '#graphql\n  query ShopProducts(\n    $country: CountryCode\n    $language: LanguageCode\n    $query: String\n    $sortKey: ProductSortKeys\n    $reverse: Boolean\n    $first: Int\n    $last: Int\n    $startCursor: String\n    $endCursor: String\n  ) @inContext(country: $country, language: $language) {\n    products(\n      query: $query\n      sortKey: $sortKey\n      reverse: $reverse\n      first: $first\n      last: $last\n      before: $startCursor\n      after: $endCursor\n    ) {\n      nodes {\n        ...RecommendedProduct\n      }\n      pageInfo {\n        hasPreviousPage\n        hasNextPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n  #graphql\n  fragment RecommendedProduct on Product {\n    id\n    title\n    handle\n    options {\n      optionValues {\n        name\n      }\n    }\n    priceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n    featuredImage {\n      id\n      url\n      altText\n      width\n      height\n    }\n    selectedOrFirstAvailableVariant(\n      selectedOptions: []\n      ignoreUnknownOptions: true\n      caseInsensitiveMatch: true\n    ) {\n      id\n      availableForSale\n      price {\n        amount\n        currencyCode\n      }\n      image {\n        id\n        url\n        altText\n        width\n        height\n      }\n      product {\n        handle\n        title\n      }\n      selectedOptions {\n        name\n        value\n      }\n    }\n  }\n\n': {
     return: ShopProductsQuery;
     variables: ShopProductsQueryVariables;
+  };
+  '#graphql\n  query SitemapBlogs(\n    $country: CountryCode\n    $language: LanguageCode\n    $blogsFirst: Int!\n    $blogsAfter: String\n    $articlesFirst: Int!\n  ) @inContext(country: $country, language: $language) {\n    blogs(first: $blogsFirst, after: $blogsAfter, sortKey: ID) {\n      nodes {\n        handle\n        articles(first: $articlesFirst, sortKey: ID) {\n          nodes {\n            handle\n          }\n          pageInfo {\n            endCursor\n            hasNextPage\n          }\n        }\n      }\n      pageInfo {\n        endCursor\n        hasNextPage\n      }\n    }\n  }\n': {
+    return: SitemapBlogsQuery;
+    variables: SitemapBlogsQueryVariables;
+  };
+  '#graphql\n  query SitemapBlogArticles(\n    $country: CountryCode\n    $language: LanguageCode\n    $blogHandle: String!\n    $articlesFirst: Int!\n    $after: String\n  ) @inContext(country: $country, language: $language) {\n    blog(handle: $blogHandle) {\n      articles(first: $articlesFirst, after: $after, sortKey: ID) {\n        nodes {\n          handle\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n  }\n': {
+    return: SitemapBlogArticlesQuery;
+    variables: SitemapBlogArticlesQueryVariables;
   };
 }
 
