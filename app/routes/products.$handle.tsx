@@ -137,6 +137,9 @@ const PRODUCT_FRAGMENT = `#graphql
     vendor
     handle
     featuredImage { __typename id url altText width height }
+    productImages: images(first: 12) {
+      nodes { __typename id url altText width height }
+    }
     media(first: 12) {
       nodes {
         __typename

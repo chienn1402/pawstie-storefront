@@ -62,16 +62,24 @@ export function ProductGallery({
     )?.id ?? null;
   const fallbackMediaId = displayableMedia[0]?.id ?? null;
   const [activeMediaId, setActiveMediaId] = useState<string | null>(
-    () => selectedMediaId ?? fallbackMediaId,
+    () => selectedMediaId ?? selectedImageId ?? fallbackMediaId,
   );
 
   useEffect(() => {
-    setActiveMediaId(selectedMediaId ?? fallbackMediaId);
-  }, [fallbackMediaId, selectedMediaId]);
+    setActiveMediaId(
+      selectedMediaId ?? selectedImageId ?? fallbackMediaId,
+    );
+    // A manual thumbnail choice persists until the selected variant image changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedImageId]);
 
-  const activeMedia =
-    displayableMedia.find((item) => item.id === activeMediaId) ??
-    displayableMedia[0];
+  const selectedImageIsActive = Boolean(
+    selectedImage?.url && activeMediaId === selectedImageId,
+  );
+  const activeMedia = selectedImageIsActive
+    ? undefined
+    : (displayableMedia.find((item) => item.id === activeMediaId) ??
+      displayableMedia[0]);
   const activeIndex = activeMedia
     ? displayableMedia.findIndex((item) => item.id === activeMedia.id)
     : -1;
@@ -80,7 +88,17 @@ export function ProductGallery({
   return (
     <div className="flex min-w-0 flex-col gap-5">
       <div className="relative overflow-hidden rounded-[2rem] rounded-br-[4.75rem] bg-[#f1efe8] shadow-[0_18px_45px_rgba(0,72,23,0.08)]">
-        {activeMedia ? (
+        {selectedImageIsActive && selectedImage ? (
+          <Image
+            alt={selectedImage.altText || title || 'Product image'}
+            aspectRatio="4/5"
+            className="aspect-[4/5] w-full rounded-none! object-cover"
+            data={selectedImage}
+            key={selectedImage.id}
+            loading="eager"
+            sizes="(min-width: 64em) 45vw, 100vw"
+          />
+        ) : activeMedia ? (
           <MediaFile
             aria-label={activeMedia.alt || `${title} ${activeKind}`}
             className="aspect-[4/5] w-full rounded-none! object-cover"
@@ -118,6 +136,7 @@ export function ProductGallery({
         <div
           className="grid grid-cols-4 gap-2.5 sm:grid-cols-5 sm:gap-3 lg:grid-cols-6"
           aria-label="Product media"
+          role="group"
         >
           {displayableMedia.map((item, index) => {
             const isActive = item.id === activeMediaId;

@@ -29,11 +29,9 @@ export function productJsonLd({
   const url = origin
     ? `${origin}/products/${encodeURIComponent(product.handle)}`
     : undefined;
-  const images = product.media.nodes.flatMap((media) =>
-    media.__typename === 'MediaImage' && media.image?.url
-      ? [media.image.url]
-      : [],
-  );
+  const images = product.productImages.nodes
+    .map((image) => image.url)
+    .filter(Boolean);
   const description = product.seo?.description || product.description;
 
   return {

@@ -12,6 +12,11 @@ const productGallery = await readFile(
   'utf8',
 );
 
+const structuredData = await readFile(
+  new URL('../app/lib/structured-data.ts', import.meta.url),
+  'utf8',
+);
+
 test('the product query requests every Hydrogen product-media shape', () => {
   const requiredGraphql = [
     'media(first: 12)',
@@ -30,10 +35,13 @@ test('the product query requests every Hydrogen product-media shape', () => {
   }
 });
 
-test('the product route passes ordered media to the gallery', () => {
+test('the product route isolates ordered gallery media from JSON-LD images', () => {
   assert.ok(productRoute.includes('media={product.media.nodes}'));
   assert.equal(productRoute.includes('images={product.images.nodes}'), false);
-  assert.equal(productRoute.includes('images(first: 12)'), false);
+  assert.ok(productRoute.includes('productImages: images(first: 12)'));
+  assert.doesNotMatch(productRoute, /^\s+images\(first: 12\)/m);
+  assert.ok(structuredData.includes('product.productImages.nodes'));
+  assert.equal(structuredData.includes('product.media.nodes'), false);
 });
 
 test('the gallery uses Hydrogen media rendering and defers video loading', () => {
@@ -43,5 +51,17 @@ test('the gallery uses Hydrogen media rendering and defers video loading', () =>
   assert.ok(productGallery.includes("preload: 'none'"));
   assert.ok(productGallery.includes('playsInline: true'));
   assert.ok(productGallery.includes('Product media'));
+  assert.ok(productGallery.includes('role="group"'));
   assert.ok(productGallery.includes('<PlayIcon'));
+});
+
+test('the gallery preserves direct variant fallback and manual media selection', () => {
+  assert.ok(
+    productGallery.includes(
+      'selectedMediaId ?? selectedImageId ?? fallbackMediaId',
+    ),
+  );
+  assert.ok(productGallery.includes('data={selectedImage}'));
+  assert.ok(productGallery.includes('key={selectedImage.id}'));
+  assert.match(productGallery, /\}, \[selectedImageId\]\);/);
 });
