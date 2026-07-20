@@ -22,6 +22,17 @@ const entryServer = await readFile(
   'utf8',
 );
 
+function getCspDirectiveSources(directive) {
+  const block = entryServer.match(
+    new RegExp(`${directive}:\\s*\\[([\\s\\S]*?)\\],`),
+  );
+  assert.ok(block, `missing CSP directive: ${directive}`);
+
+  return [...block[1].matchAll(/(?:"([^"]+)"|'([^']+)'|`([^`]+)`)/g)].map(
+    (match) => match[1] ?? match[2] ?? match[3],
+  );
+}
+
 test('the product query requests every Hydrogen product-media shape', () => {
   const requiredGraphql = [
     'media(first: 12)',
@@ -71,10 +82,23 @@ test('the gallery preserves direct variant fallback and manual media selection',
   assert.match(productGallery, /\}, \[selectedImageId\]\);/);
 });
 
-test('the CSP permits hosted product media from the configured store domain', () => {
-  assert.ok(entryServer.includes('mediaSrc: ['));
-  assert.ok(entryServer.includes("'https://cdn.shopify.com'"));
-  assert.ok(
-    entryServer.includes('`https://${context.env.PUBLIC_STORE_DOMAIN}`'),
-  );
+test('the CSP permits only required product video and embed origins', () => {
+  const mediaSrc = getCspDirectiveSources('mediaSrc');
+  const frameSrc = getCspDirectiveSources('frameSrc');
+
+  assert.deepEqual(mediaSrc, [
+    "'self'",
+    'https://cdn.shopify.com',
+    'https://${context.env.PUBLIC_STORE_DOMAIN}',
+  ]);
+  assert.deepEqual(frameSrc, [
+    "'self'",
+    'https://www.youtube.com',
+    'https://player.vimeo.com',
+  ]);
+
+  for (const source of [...mediaSrc, ...frameSrc]) {
+    assert.notEqual(source, '*');
+    assert.notEqual(source, 'https:');
+  }
 });

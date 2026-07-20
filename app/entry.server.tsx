@@ -24,6 +24,11 @@ export default async function handleRequest(
       'https://cdn.shopify.com',
       `https://${context.env.PUBLIC_STORE_DOMAIN}`,
     ],
+    frameSrc: [
+      "'self'",
+      'https://www.youtube.com',
+      'https://player.vimeo.com',
+    ],
   });
 
   const body = await renderToReadableStream(
