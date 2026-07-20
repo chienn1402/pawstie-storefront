@@ -133,6 +133,28 @@ const PRODUCT_FRAGMENT = `#graphql
     handle
     featuredImage { __typename id url altText width height }
     images(first: 12) { nodes { __typename id url altText width height } }
+    media(first: 12) {
+      nodes {
+        __typename
+        id
+        alt
+        mediaContentType
+        previewImage { id url altText width height }
+        ... on MediaImage {
+          image { __typename id url altText width height }
+        }
+        ... on Video {
+          sources { url mimeType }
+        }
+        ... on ExternalVideo {
+          embedUrl
+          host
+        }
+        ... on Model3d {
+          sources { url mimeType }
+        }
+      }
+    }
     descriptionHtml
     description
     encodedVariantExistence
