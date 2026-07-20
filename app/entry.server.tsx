@@ -29,6 +29,12 @@ export default async function handleRequest(
       'https://www.youtube.com',
       'https://player.vimeo.com',
     ],
+    scriptSrc: [
+      "'self'",
+      'https://cdn.shopify.com',
+      'https://shopify.com',
+      'https://unpkg.com/@google/model-viewer@v1.12.1/dist/model-viewer.min.js',
+    ],
   });
 
   const body = await renderToReadableStream(

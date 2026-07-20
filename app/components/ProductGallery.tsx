@@ -84,6 +84,10 @@ export function ProductGallery({
     ? displayableMedia.findIndex((item) => item.id === activeMedia.id)
     : -1;
   const activeKind = activeMedia ? getMediaKind(activeMedia) : null;
+  const activeMediaData =
+    activeMedia?.__typename === 'ExternalVideo' && !activeMedia.alt
+      ? {...activeMedia, alt: `${title} video`}
+      : activeMedia;
 
   return (
     <div className="flex min-w-0 flex-col gap-5">
@@ -98,15 +102,15 @@ export function ProductGallery({
             loading="eager"
             sizes="(min-width: 64em) 45vw, 100vw"
           />
-        ) : activeMedia ? (
+        ) : activeMediaData ? (
           <MediaFile
-            aria-label={activeMedia.alt || `${title} ${activeKind}`}
+            aria-label={activeMediaData.alt || `${title} ${activeKind}`}
             className="aspect-[4/5] w-full rounded-none! object-cover"
-            data={activeMedia}
-            key={activeMedia.id}
+            data={activeMediaData}
+            key={activeMediaData.id}
             mediaOptions={{
               image: {
-                alt: activeMedia.alt || title || 'Product image',
+                alt: activeMediaData.alt || title || 'Product image',
                 aspectRatio: '4/5',
                 loading: 'eager',
                 sizes: '(min-width: 64em) 45vw, 100vw',
