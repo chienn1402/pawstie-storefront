@@ -225,9 +225,11 @@ export default [
   ...compat.extends('plugin:jest/recommended').map((config) => ({
     ...config,
     files: ['**/*.test.*'],
+    ignores: ['scripts/product-gallery-media.test.mjs'],
   })),
   {
     files: ['**/*.test.*'],
+    ignores: ['scripts/product-gallery-media.test.mjs'],
     plugins: {
       jest,
     },

@@ -14,6 +14,19 @@ export function PawIcon(props: IconProps) {
   );
 }
 
+export function PlayIcon(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="M8.2 5.4a1 1 0 0 1 1.52-.85l9.05 6.1a1.62 1.62 0 0 1 0 2.7l-9.05 6.1a1 1 0 0 1-1.52-.85V5.4Z" />
+    </svg>
+  );
+}
+
 export function SearchIcon(props: IconProps) {
   return (
     <svg
