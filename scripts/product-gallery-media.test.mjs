@@ -17,6 +17,11 @@ const structuredData = await readFile(
   'utf8',
 );
 
+const entryServer = await readFile(
+  new URL('../app/entry.server.tsx', import.meta.url),
+  'utf8',
+);
+
 test('the product query requests every Hydrogen product-media shape', () => {
   const requiredGraphql = [
     'media(first: 12)',
@@ -64,4 +69,12 @@ test('the gallery preserves direct variant fallback and manual media selection',
   assert.ok(productGallery.includes('data={selectedImage}'));
   assert.ok(productGallery.includes('key={selectedImage.id}'));
   assert.match(productGallery, /\}, \[selectedImageId\]\);/);
+});
+
+test('the CSP permits hosted product media from the configured store domain', () => {
+  assert.ok(entryServer.includes('mediaSrc: ['));
+  assert.ok(entryServer.includes("'https://cdn.shopify.com'"));
+  assert.ok(
+    entryServer.includes('`https://${context.env.PUBLIC_STORE_DOMAIN}`'),
+  );
 });
