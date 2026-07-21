@@ -5,6 +5,12 @@
   --color-light: #fff;
 }
 
+/* Shopify rich text can include inline typography from pasted content. */
+.product-info-prose :where(:not(h1, h2, h3)) {
+  font-family: inherit !important;
+  font-size: inherit !important;
+}
+
 /*
 * --------------------------------------------------
 * Product purchase action
