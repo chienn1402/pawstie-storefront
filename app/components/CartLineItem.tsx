@@ -41,6 +41,10 @@ export function CartLineItem({
   const options = selectedOptions.filter(
     (option) => option.name !== 'Title' || option.value !== 'Default Title',
   );
+  const personalization = (line.attributes ?? []).filter(
+    (attribute) =>
+      !attribute.key.startsWith('_') && Boolean(attribute.value?.trim()),
+  );
 
   return (
     <li
@@ -86,6 +90,29 @@ export function CartLineItem({
               ))}
             </ul>
           )}
+
+          {personalization.length > 0 ? (
+            <div className="mt-2 rounded-xl border border-[#dfc17e] bg-[#fff8e8] px-3 py-2">
+              <p className="font-heading text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-[#754000]">
+                Personalization
+              </p>
+              <dl className="mt-1 space-y-0.5">
+                {personalization.map((attribute) => (
+                  <div
+                    className="grid grid-cols-[auto_1fr] gap-1.5 text-xs leading-relaxed"
+                    key={attribute.key}
+                  >
+                    <dt className="font-semibold text-[#5c7060]">
+                      {attribute.key}:
+                    </dt>
+                    <dd className="min-w-0 break-words text-[#253529]">
+                      {attribute.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          ) : null}
 
           {line?.cost?.totalAmount && (
             <p className="mt-1 font-heading text-sm font-extrabold text-primary">

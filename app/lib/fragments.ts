@@ -248,6 +248,12 @@ export const RECOMMENDED_PRODUCT_FRAGMENT = `#graphql
     id
     title
     handle
+    printOnDemand: metafield(
+      namespace: "custom"
+      key: "print_on_demand"
+    ) {
+      value
+    }
     options {
       optionValues {
         name

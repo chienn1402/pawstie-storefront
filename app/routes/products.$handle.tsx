@@ -14,6 +14,11 @@ import {ProductForm} from '~/components/ProductForm';
 import {ProductBreadcrumb} from '~/components/ProductBreadcrumb';
 import {ProductInfoTabs} from '~/components/ProductInfoTabs';
 import {RelatedProducts} from '~/components/RelatedProducts';
+import {
+  isNameplatePodProduct,
+  isPrintOnDemand,
+  ProductPodBadge,
+} from '~/components/ProductPodBadge';
 import {PawIcon} from '~/components/icons';
 import {RECOMMENDED_PRODUCT_FRAGMENT} from '~/lib/fragments';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
@@ -78,6 +83,11 @@ export default function Product() {
   });
   const {title, descriptionHtml, vendor} = product;
   const heroImage = selectedVariant?.image ?? product.featuredImage;
+  const isPod = isPrintOnDemand(product.printOnDemand);
+  const requiresPersonalization = isNameplatePodProduct(
+    product.id,
+    product.printOnDemand,
+  );
 
   return (
     <div className="pb-20 lg:pb-28">
@@ -93,11 +103,19 @@ export default function Product() {
             />
             <div className="flex flex-col gap-7">
               <div>
-                <p className="inline-flex items-center gap-2 font-heading text-sm font-bold uppercase tracking-[0.16em] text-[#347345]"><PawIcon className="size-4 text-[#00752d]" />{vendor}</p>
+                <div className="flex flex-wrap items-center gap-3">
+                  <p className="inline-flex items-center gap-2 font-heading text-sm font-bold uppercase tracking-[0.16em] text-[#347345]"><PawIcon className="size-4 text-[#00752d]" />{vendor}</p>
+                  {isPod ? <ProductPodBadge /> : null}
+                </div>
                 <h1 className="mb-0 mt-3 font-heading text-4xl font-semibold leading-[0.95] tracking-[-0.05em] text-[#004817] sm:text-5xl">{title}</h1>
               </div>
               <ProductPrice price={selectedVariant?.price} compareAtPrice={selectedVariant?.compareAtPrice} availableForSale={selectedVariant?.availableForSale} />
-              <ProductForm key={product.id} productOptions={productOptions} selectedVariant={selectedVariant} />
+              <ProductForm
+                isPod={requiresPersonalization}
+                key={product.id}
+                productOptions={productOptions}
+                selectedVariant={selectedVariant}
+              />
             </div>
           </div>
           <ProductInfoTabs
@@ -136,6 +154,12 @@ const PRODUCT_FRAGMENT = `#graphql
     title
     vendor
     handle
+    printOnDemand: metafield(
+      namespace: "custom"
+      key: "print_on_demand"
+    ) {
+      value
+    }
     featuredImage { __typename id url altText width height }
     productImages: images(first: 12) {
       nodes { __typename id url altText width height }

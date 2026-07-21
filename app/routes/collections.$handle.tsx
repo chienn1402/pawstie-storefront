@@ -105,6 +105,12 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
     id
     handle
     title
+    printOnDemand: metafield(
+      namespace: "custom"
+      key: "print_on_demand"
+    ) {
+      value
+    }
     featuredImage {
       id
       altText

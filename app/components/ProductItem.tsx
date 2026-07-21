@@ -4,6 +4,10 @@ import type {
   ProductItemFragment,
   RecommendedProductFragment,
 } from 'storefrontapi.generated';
+import {
+  isPrintOnDemand,
+  ProductPodBadge,
+} from '~/components/ProductPodBadge';
 import {useVariantUrl} from '~/lib/variants';
 
 export function ProductItem({
@@ -17,6 +21,7 @@ export function ProductItem({
 }) {
   const variantUrl = useVariantUrl(product.handle);
   const image = product.featuredImage;
+  const isPod = isPrintOnDemand(product.printOnDemand);
   return (
     <Link
       className="product-item group flex flex-col rounded-3xl bg-white p-3 shadow-[0_18px_30px_-20px_rgba(1,51,18,0.35)] ring-1 ring-[#d6f3d0] transition duration-200 hover:-translate-y-1 hover:no-underline! hover:shadow-[0_26px_42px_-20px_rgba(1,51,18,0.45)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00521d]"
@@ -25,10 +30,17 @@ export function ProductItem({
       to={variantUrl}
     >
       <div className="relative overflow-hidden rounded-2xl bg-[#effce9]">
-        {isNew ? (
-          <span className="absolute left-3 top-3 z-10 rounded-full bg-[#00521d] px-3 py-1 font-heading text-xs font-semibold uppercase tracking-wide text-white">
-            New
-          </span>
+        {isNew || isPod ? (
+          <div className="pointer-events-none absolute left-2 top-3 z-10 flex flex-col items-start gap-2 sm:left-3">
+            {isNew ? (
+              <span className="rounded-full bg-[#00521d] px-3 py-1 font-heading text-xs font-semibold uppercase tracking-wide text-white">
+                New
+              </span>
+            ) : null}
+            {isPod ? (
+              <ProductPodBadge className="whitespace-nowrap px-2 text-[0.625rem] tracking-[0.08em] sm:px-2.5 sm:text-[0.6875rem] sm:tracking-[0.11em]" />
+            ) : null}
+          </div>
         ) : null}
         {image && (
           <Image
