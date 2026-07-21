@@ -64,7 +64,7 @@ export function ProductInfoTabs({
       <div
         role="tablist"
         aria-label={`${title} information`}
-        className="inline-flex max-w-full gap-1 overflow-x-auto rounded-full bg-white p-1 ring-1 ring-[#d6f3d0]"
+        className="flex w-full flex-col gap-1 rounded-[1.75rem] bg-white p-1 ring-1 ring-[#d6f3d0] sm:inline-flex sm:w-auto sm:flex-row sm:rounded-full"
       >
         {tabs.map((tab) => {
           const selected = activeTab === tab;
@@ -84,7 +84,7 @@ export function ProductInfoTabs({
               tabIndex={selected ? 0 : -1}
               onClick={() => selectTab(tab)}
               onKeyDown={(event) => handleTabKeyDown(event, tab)}
-              className={`shrink-0 rounded-full px-4 py-2.5 font-heading text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#00521d] sm:px-5 ${
+              className={`w-full shrink-0 rounded-full px-4 py-2.5 font-heading text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#00521d] sm:w-auto sm:px-5 ${
                 selected
                   ? 'bg-[#00521d] text-white'
                   : 'text-[#347345] hover:bg-[#e2f2dd] hover:text-[#004817]'

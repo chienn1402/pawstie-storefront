@@ -18,16 +18,22 @@
 }
 
 .product-purchase-controls {
+  align-items: stretch;
   display: grid;
   gap: 0.75rem;
 }
 
+.product-purchase-controls form {
+  inline-size: 100%;
+  max-inline-size: none;
+}
+
 .product-quantity-row {
   align-items: center;
-  display: flex;
-  justify-content: space-between;
+  column-gap: 1rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
   min-block-size: 3.75rem;
-  padding-inline: 0.25rem;
 }
 
 .product-quantity-label {
@@ -171,10 +177,6 @@
 }
 
 @container product-purchase (inline-size >= 34rem) {
-  .product-purchase-controls {
-    grid-template-columns: minmax(15rem, 0.8fr) minmax(16rem, 1.35fr);
-  }
-
   .product-assurance__list {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
