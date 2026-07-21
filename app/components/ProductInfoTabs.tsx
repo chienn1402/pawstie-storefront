@@ -101,7 +101,7 @@ export function ProductInfoTabs({
         role="tabpanel"
         aria-labelledby={`${baseId}-description-tab`}
         hidden={activeTab !== 'description'}
-        className="mt-8 max-w-[48rem]"
+        className="mt-8 w-full"
       >
         <div
           className={PROSE}
