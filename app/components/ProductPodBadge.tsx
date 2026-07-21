@@ -8,21 +8,10 @@ type PodMetafield = {
   value?: string | null;
 } | null;
 
-const NAMEPLATE_POD_PRODUCT_ID = 'gid://shopify/Product/9181531570331';
-
 export function isPrintOnDemand(
   metafield: PodMetafield | undefined,
 ): boolean {
   return metafield?.value === 'true';
-}
-
-export function isNameplatePodProduct(
-  productId: string,
-  metafield: PodMetafield | undefined,
-): boolean {
-  return (
-    productId === NAMEPLATE_POD_PRODUCT_ID && isPrintOnDemand(metafield)
-  );
 }
 
 export function ProductPodBadge({className}: ProductPodBadgeProps) {

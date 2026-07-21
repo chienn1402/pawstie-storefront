@@ -4,7 +4,7 @@ import type {RecommendedProductFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
 import {ArrowRightIcon, PlusIcon} from '~/components/icons';
 import {useVariantUrl} from '~/lib/variants';
-import {isNameplatePodProduct} from '~/components/ProductPodBadge';
+import {isPrintOnDemand} from '~/components/ProductPodBadge';
 
 type CardVariant = NonNullable<
   RecommendedProductFragment['selectedOrFirstAvailableVariant']
@@ -73,10 +73,7 @@ export function ProductCardActions({
   const hasChoices = product.options.some(
     (option) => option.optionValues.length > 1,
   );
-  const requiresPersonalization = isNameplatePodProduct(
-    product.id,
-    product.printOnDemand,
-  );
+  const requiresPersonalization = isPrintOnDemand(product.printOnDemand);
 
   if (requiresPersonalization || hasChoices) {
     return (

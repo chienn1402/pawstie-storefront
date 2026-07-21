@@ -15,7 +15,6 @@ import {ProductBreadcrumb} from '~/components/ProductBreadcrumb';
 import {ProductInfoTabs} from '~/components/ProductInfoTabs';
 import {RelatedProducts} from '~/components/RelatedProducts';
 import {
-  isNameplatePodProduct,
   isPrintOnDemand,
   ProductPodBadge,
 } from '~/components/ProductPodBadge';
@@ -84,10 +83,6 @@ export default function Product() {
   const {title, descriptionHtml, vendor} = product;
   const heroImage = selectedVariant?.image ?? product.featuredImage;
   const isPod = isPrintOnDemand(product.printOnDemand);
-  const requiresPersonalization = isNameplatePodProduct(
-    product.id,
-    product.printOnDemand,
-  );
 
   return (
     <div className="pb-20 lg:pb-28">
@@ -111,7 +106,7 @@ export default function Product() {
               </div>
               <ProductPrice price={selectedVariant?.price} compareAtPrice={selectedVariant?.compareAtPrice} availableForSale={selectedVariant?.availableForSale} />
               <ProductForm
-                isPod={requiresPersonalization}
+                isPod={isPod}
                 key={product.id}
                 productOptions={productOptions}
                 selectedVariant={selectedVariant}
