@@ -13,16 +13,42 @@ export async function loader({
   const response =
     params.type === 'articles'
       ? await articlesSitemap({request, page: params.page, storefront})
-      : await getSitemap({
-          storefront,
-          request,
-          params,
-          getLink: ({type, baseUrl, handle}) => `${baseUrl}/${type}/${handle}`,
-        });
+      : params.type === 'static'
+        ? staticSitemap({request, page: params.page})
+        : await getSitemap({
+            storefront,
+            request,
+            params,
+            getLink: ({type, baseUrl, handle}) => `${baseUrl}/${type}/${handle}`,
+          });
 
   response.headers.set('Cache-Control', `max-age=${60 * 60 * 24}`);
 
   return response;
+}
+
+/**
+ * Hand-written routes have no Shopify resource behind them, so nothing in the
+ * Storefront API's sitemap data covers them. Without this they are submitted
+ * nowhere — including /shop, which is the storefront's actual catalog page.
+ *
+ * Excludes /cart, /account and /search: robots.txt disallows all three, and a
+ * sitemap entry for a disallowed URL is a Search Console warning. Excludes
+ * /collections/all too, since it permanently redirects to /shop.
+ */
+function staticSitemap({request, page}: {request: Request; page?: string}) {
+  if (page !== '1') {
+    throw new Response('Not found', {status: 404});
+  }
+
+  const baseUrl = new URL(request.url).origin;
+  const urls = STATIC_ROUTES.map((path) =>
+    renderUrl({loc: `${baseUrl}${path}`}),
+  );
+
+  return new Response(`${URLSET_OPEN}\n${urls.join('\n')}\n${URLSET_CLOSE}`, {
+    headers: {'Content-Type': 'application/xml'},
+  });
 }
 
 /**
@@ -156,6 +182,15 @@ function escapeXml(value: string) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;');
 }
+
+const STATIC_ROUTES = [
+  '/',
+  '/shop',
+  '/about',
+  '/collections',
+  '/blogs',
+  '/policies',
+];
 
 const SITEMAP_PAGE_SIZE = 250;
 const STOREFRONT_ARTICLES_PAGE_SIZE = 250;

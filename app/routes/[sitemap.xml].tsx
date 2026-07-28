@@ -10,7 +10,18 @@ export async function loader({
     request,
   });
 
-  response.headers.set('Cache-Control', `max-age=${60 * 60 * 24}`);
+  // getSitemapIndex only knows about Shopify resources, so the hand-written
+  // routes in /sitemap/static/1.xml have to be appended to its output.
+  const baseUrl = new URL(request.url).origin;
+  const body = (await response.text()).replace(
+    '</sitemapindex>',
+    `  <sitemap><loc>${baseUrl}/sitemap/static/1.xml</loc></sitemap>\n</sitemapindex>`,
+  );
 
-  return response;
+  return new Response(body, {
+    headers: {
+      'Content-Type': 'application/xml',
+      'Cache-Control': `max-age=${60 * 60 * 24}`,
+    },
+  });
 }

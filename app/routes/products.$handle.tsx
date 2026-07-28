@@ -22,6 +22,7 @@ import {PawIcon} from '~/components/icons';
 import {RECOMMENDED_PRODUCT_FRAGMENT} from '~/lib/fragments';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {productJsonLd} from '~/lib/structured-data';
+import {metaDescription} from '~/lib/seo';
 
 export const meta: Route.MetaFunction = ({data, matches}) => {
   const jsonLd = data?.product
@@ -32,7 +33,9 @@ export const meta: Route.MetaFunction = ({data, matches}) => {
     {title: `Pawstie | ${data?.product.title ?? ''}`},
     {
       name: 'description',
-      content: data?.product.seo?.description ?? data?.product.description ?? '',
+      content: metaDescription(
+        data?.product.seo?.description ?? data?.product.description,
+      ),
     },
     ...(jsonLd ? [{'script:ld+json': jsonLd}] : []),
   ];
