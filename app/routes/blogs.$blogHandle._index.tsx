@@ -192,11 +192,15 @@ const BLOGS_QUERY = `#graphql
         title
         description
       }
+      # Newest first. Without an explicit sortKey the API defaults to ID,
+      # which is creation order, not publish date.
       articles(
         first: $first,
         last: $last,
         before: $startCursor,
-        after: $endCursor
+        after: $endCursor,
+        sortKey: PUBLISHED_AT,
+        reverse: true
       ) {
         nodes {
           ...ArticleItem
