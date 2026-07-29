@@ -1,4 +1,4 @@
-import {Link} from 'react-router';
+import {Link, useViewTransitionState} from 'react-router';
 import {Image, Money} from '@shopify/hydrogen';
 import type {RecommendedProductFragment} from 'storefrontapi.generated';
 import {ProductCardActions} from '~/components/ProductCardActions';
@@ -21,9 +21,26 @@ export function ProductCard({
   const image = product.featuredImage;
   const isPod = isPrintOnDemand(product.printOnDemand);
 
+  // Only the card being navigated to claims the name, and only for the length
+  // of the transition — a `view-transition-name` shared by two live elements
+  // aborts the transition, and every other card on the grid keeps its own.
+  // Naming it per handle also keeps the related-products case clean: leaving a
+  // product page, the outgoing gallery holds `…-<old>` while the clicked card
+  // holds `…-<new>`, so they pair up instead of colliding.
+  const isTransitioning = useViewTransitionState(
+    `/products/${product.handle}`,
+  );
+
   return (
     <article className="group relative flex min-w-0 flex-col">
-      <div className="relative overflow-hidden rounded-[1.5rem] rounded-br-[3.75rem] bg-[#a4e8aa] lg:rounded-[2rem] lg:rounded-br-[4.75rem]">
+      <div
+        className="relative overflow-hidden rounded-[1.5rem] rounded-br-[3.75rem] bg-[#a4e8aa] lg:rounded-[2rem] lg:rounded-br-[4.75rem]"
+        style={
+          isTransitioning
+            ? {viewTransitionName: `product-media-${product.handle}`}
+            : undefined
+        }
+      >
         {isNew || isPod ? (
           <div className="pointer-events-none absolute left-2 top-0 z-10 flex flex-col items-start gap-2 sm:left-4">
             {isNew ? (
@@ -57,6 +74,7 @@ export function ProductCard({
           className="rounded-sm text-[#004817] after:absolute after:inset-0 after:content-[''] hover:text-[#00752d] hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#00521d]"
           prefetch="intent"
           to={variantUrl}
+          viewTransition
         >
           {product.title}
         </Link>

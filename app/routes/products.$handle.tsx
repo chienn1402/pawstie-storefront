@@ -95,6 +95,7 @@ export default function Product() {
           <div className="mt-8 grid gap-10 lg:mt-12 lg:grid-cols-2 lg:gap-16">
             <ProductGallery
               key={product.id}
+              handle={product.handle}
               media={product.media.nodes}
               selectedImage={heroImage}
               title={title}

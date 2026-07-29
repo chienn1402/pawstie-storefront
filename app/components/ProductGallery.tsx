@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import {useViewTransitionState} from 'react-router';
 import {Image, MediaFile} from '@shopify/hydrogen';
 import type {
   ProductFragment,
@@ -45,14 +46,21 @@ function MediaFallback() {
 }
 
 export function ProductGallery({
+  handle,
   media,
   selectedImage,
   title,
 }: {
+  handle: string;
   media: ProductFragment['media']['nodes'];
   selectedImage?: ProductVariantFragment['image'];
   title: string;
 }) {
+  // Pairs with the grid card in ProductCard: same name, so the thumbnail morphs
+  // into this frame rather than cutting. `useViewTransitionState` is true for
+  // both sides of the navigation, which is what makes product → product work —
+  // this gallery holds the name on the way out too.
+  const isTransitioning = useViewTransitionState(`/products/${handle}`);
   const displayableMedia = media.filter(isRenderableMedia);
   const selectedImageId = selectedImage?.id ?? null;
   const selectedMediaId =
@@ -91,7 +99,14 @@ export function ProductGallery({
 
   return (
     <div className="flex min-w-0 flex-col gap-5">
-      <div className="relative overflow-hidden rounded-[2rem] rounded-br-[4.75rem] bg-[#f1efe8] shadow-[0_18px_45px_rgba(0,72,23,0.08)]">
+      <div
+        className="relative overflow-hidden rounded-[2rem] rounded-br-[4.75rem] bg-[#f1efe8] shadow-[0_18px_45px_rgba(0,72,23,0.08)]"
+        style={
+          isTransitioning
+            ? {viewTransitionName: `product-media-${handle}`}
+            : undefined
+        }
+      >
         {selectedImageIsActive && selectedImage ? (
           <Image
             alt={selectedImage.altText || title || 'Product image'}

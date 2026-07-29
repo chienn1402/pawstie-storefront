@@ -28,6 +28,7 @@ export function ProductItem({
       key={product.id}
       prefetch="intent"
       to={variantUrl}
+      viewTransition
     >
       <div className="relative overflow-hidden rounded-2xl bg-[#effce9]">
         {isNew || isPod ? (

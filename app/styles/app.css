@@ -713,3 +713,20 @@ button.reset:hover:not(:has(> *)) {
   gap: 0.75rem;
   flex-wrap: wrap;
 }
+
+/* View transitions
+   ----------------
+   Product links opt in via React Router's `viewTransition` prop, and the grid
+   card shares a `view-transition-name` with the product page gallery so the
+   image morphs into place instead of cutting. Both frames are 4/5, so the
+   default group animation needs no aspect-ratio correction.
+
+   Purely decorative, so it goes away entirely when the user asks for less
+   motion — the navigation still happens, just without the animation. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
