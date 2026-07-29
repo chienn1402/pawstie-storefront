@@ -16,7 +16,7 @@ export function NewArrivals({products}: NewArrivalsProps) {
       <div className="mx-auto max-w-[80rem]">
         <div className="max-w-[46rem]">
           <p className="font-heading text-sm font-bold uppercase tracking-[0.16em] text-primary">
-            New this week
+            Latest additions
           </p>
           <h2
             id="new-arrivals-heading"
@@ -25,8 +25,8 @@ export function NewArrivals({products}: NewArrivalsProps) {
             Just landed. Already loved.
           </h2>
           <p className="mt-8 max-w-[31rem] text-lg leading-relaxed text-[#347345]">
-            The newest toys, beds, and treats to reach the shelf — picked the
-            moment they arrived.
+            The newest things to reach the shelf — picked the moment they
+            arrived.
           </p>
         </div>
 
