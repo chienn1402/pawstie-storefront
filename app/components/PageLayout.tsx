@@ -9,8 +9,11 @@ import type {
 import {Aside} from '~/components/Aside';
 import {Footer} from '~/components/Footer';
 import {Header, HeaderMenu} from '~/components/Header';
+import {LandingFooter} from '~/components/LandingFooter';
+import {LandingHeader} from '~/components/LandingHeader';
 import {CartMain} from '~/components/CartMain';
 import {CartFab} from '~/components/CartFab';
+import {useMinimalChrome} from '~/lib/chrome';
 
 interface PageLayoutProps {
   cart: Promise<CartApiQueryFragment | null>;
@@ -29,6 +32,10 @@ export function PageLayout({
   isLoggedIn,
   publicStoreDomain,
 }: PageLayoutProps) {
+  // Paid landing pages swap the store nav for logo-only chrome — see
+  // `app/lib/chrome.ts` for why the exits are the point.
+  const minimal = useMinimalChrome();
+
   return (
     <Aside.Provider>
       <a
@@ -38,22 +45,37 @@ export function PageLayout({
         Skip to content
       </a>
       <CartAside cart={cart} />
-      <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} />
-      {header && (
-        <Header
-          header={header}
-          isLoggedIn={isLoggedIn}
-          publicStoreDomain={publicStoreDomain}
-        />
+      {/* No hamburger on landing pages, so nothing can open this aside. */}
+      {!minimal && (
+        <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} />
+      )}
+      {minimal ? (
+        <LandingHeader shopName={header.shop.name} />
+      ) : (
+        header && (
+          <Header
+            header={header}
+            isLoggedIn={isLoggedIn}
+            publicStoreDomain={publicStoreDomain}
+          />
+        )
       )}
       <main id="main-content" tabIndex={-1}>
         {children}
       </main>
-      <Footer
-        footer={footer}
-        header={header}
-        publicStoreDomain={publicStoreDomain}
-      />
+      {minimal ? (
+        <LandingFooter
+          footer={footer}
+          header={header}
+          publicStoreDomain={publicStoreDomain}
+        />
+      ) : (
+        <Footer
+          footer={footer}
+          header={header}
+          publicStoreDomain={publicStoreDomain}
+        />
+      )}
       <CartFab cart={cart} />
     </Aside.Provider>
   );

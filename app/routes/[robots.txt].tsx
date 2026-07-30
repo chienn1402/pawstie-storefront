@@ -17,6 +17,12 @@ export function loader({request}: Route.LoaderArgs) {
 function robotsTxtData({url}: {url?: string}) {
   const sitemapUrl = url ? `${url}/sitemap.xml` : undefined;
 
+  // Note for future edits: /lp/* (paid-social landing pages) is deliberately
+  // NOT disallowed here. Those pages must stay out of the index, and they do it
+  // with `noindex` — via a robots meta tag and an X-Robots-Tag header. A
+  // Disallow would be counterproductive: it stops crawlers fetching the page at
+  // all, so they never read the noindex, and the URL can still get indexed
+  // bare-listed if anything links to it. Crawlable + noindex is what works.
   return `
 User-agent: *
 ${generalDisallowRules({sitemapUrl})}

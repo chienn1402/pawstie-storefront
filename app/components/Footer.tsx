@@ -9,10 +9,10 @@ interface FooterProps {
   publicStoreDomain: string;
 }
 
-type FooterLink = {id: string; title: string; url: string};
+export type FooterLink = {id: string; title: string; url: string};
 
 /** Structural shape shared by the Storefront header/footer menus and the fallback below. */
-type MenuLike =
+export type MenuLike =
   | {items: Array<{id: string; title: string; url?: string | null}>}
   | null
   | undefined;
@@ -131,7 +131,7 @@ function FooterMenu({
 }
 
 /** Shopify menu items keep their absolute URLs; strip the domain off our own. */
-function menuLinks(
+export function menuLinks(
   menu: MenuLike,
   primaryDomainUrl: string | undefined,
   publicStoreDomain: string,
@@ -163,7 +163,7 @@ function exploreLinks(
   ];
 }
 
-const FALLBACK_FOOTER_MENU = {
+export const FALLBACK_FOOTER_MENU = {
   id: 'gid://shopify/Menu/199655620664',
   items: [
     {
