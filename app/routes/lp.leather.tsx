@@ -1,15 +1,21 @@
 import type {Route} from './+types/lp.leather';
-import {useLoaderData} from 'react-router';
+import {Link, useLoaderData} from 'react-router';
 import {Analytics} from '@shopify/hydrogen';
 import type {LeatherLandingProductsQuery} from 'storefrontapi.generated';
+import {LandingFaq, FAQ_LINK, type Faq} from '~/components/landing/LandingFaq';
+import {LandingFinalCta} from '~/components/landing/LandingFinalCta';
+import {LandingPillars, type Pillar} from '~/components/landing/LandingPillars';
+import {LandingStickyCta} from '~/components/landing/LandingStickyCta';
+import {ProductSpotlight} from '~/components/landing/ProductSpotlight';
+import {
+  LEATHER_CTA_SECTION_IDS,
+  LEATHER_COLLECTION_HREF,
+  LEATHER_FINAL_CTA_ID,
+  LEATHER_HERO_ID,
+} from '~/components/leather/anchors';
 import {LeatherCollection} from '~/components/leather/LeatherCollection';
-import {LeatherFaq} from '~/components/leather/LeatherFaq';
-import {LeatherFinalCta} from '~/components/leather/LeatherFinalCta';
 import {LeatherFit} from '~/components/leather/LeatherFit';
 import {LeatherHero} from '~/components/leather/LeatherHero';
-import {LeatherPillars} from '~/components/leather/LeatherPillars';
-import {LeatherSpotlight} from '~/components/leather/LeatherSpotlight';
-import {LeatherStickyCta} from '~/components/leather/LeatherStickyCta';
 import {LANDING_CHROME} from '~/lib/chrome';
 import {RECOMMENDED_PRODUCT_FRAGMENT} from '~/lib/fragments';
 import {
@@ -75,6 +81,80 @@ export const headers: Route.HeadersFunction = () => ({
  */
 export const handle = LANDING_CHROME;
 
+/** Claims lifted from the product descriptions, not invented for the ad. */
+const LEATHER_PILLARS: readonly Pillar[] = [
+  {
+    title: 'It breaks in, not down',
+    copy: 'The top grain of the hide — the strong part. Softens to fit in a few weeks and holds its shape for years. Nylon frays at the buckle.',
+  },
+  {
+    title: 'Hardware built for the pull',
+    copy: 'Solid alloy buckles and reinforced rings, rated for pull force. No thin welded loop to straighten out mid-walk.',
+  },
+  {
+    title: 'Edges that don’t chafe',
+    copy: 'Bevelled and smoothed instead of cut square, so the strap lies flat. The difference between a collar they forget and one they scratch at.',
+  },
+];
+
+/**
+ * Two of these exist purely to lose a sale honestly rather than win it and
+ * refund it: the AirTag isn't in the box, and delivery terms live in the store
+ * policies because this page has no business inventing a delivery date.
+ */
+const LEATHER_FAQS: readonly Faq[] = [
+  {
+    question: 'Is this actually real leather?',
+    answer:
+      'Yes — 100% first-layer genuine leather, the top grain of the hide, not bonded offcuts or coated synthetic. It scuffs and softens as it is worn. That is the material behaving correctly, not wearing out.',
+  },
+  {
+    question: 'Does the AirTag collar include an AirTag?',
+    answer:
+      'No. The pocket is moulded and riveted to hold an Apple AirTag flush against the strap, but the tracker is bought separately.',
+  },
+  {
+    question: 'Can I put my dog’s name and number on the collar?',
+    answer: (
+      <>
+        Yes, on the{' '}
+        <Link
+          to={`/products/${LEATHER_NAMEPLATE_HANDLE}`}
+          prefetch="intent"
+          className={FAQ_LINK}
+        >
+          Heritage Nameplate collar
+        </Link>
+        . The name and phone number are laser-etched into a brass plate riveted
+        flat onto the leather — no jingling tag to lose. Engraving is included;
+        you add the details when you add it to the cart.
+      </>
+    ),
+  },
+  {
+    question: 'Which size do I order?',
+    answer:
+      'Measure around the base of the neck, leaving two fingers of slack under the tape. Each product page carries its own chart — collars are sized by neck range, leashes by length. Between two sizes, size up.',
+  },
+  {
+    question: 'How do I look after it?',
+    answer:
+      'Wipe it with a damp cloth when it gets muddy, and work in a little leather conditioner every few months. That is the whole routine.',
+  },
+  {
+    question: 'What about delivery and returns?',
+    answer: (
+      <>
+        Delivery times, returns and refunds are all set out in our{' '}
+        <Link to="/policies" prefetch="intent" className={FAQ_LINK}>
+          store policies
+        </Link>
+        . Checkout is handled by Shopify, so card details never touch this site.
+      </>
+    ),
+  },
+];
+
 /** `...RecommendedProduct` plus the extra `images` this page asks for. */
 type LeatherProduct = LeatherLandingProductsQuery['products']['nodes'][number];
 
@@ -129,11 +209,23 @@ export default function LeatherLandingPage() {
             : null
         }
       />
-      <LeatherStickyCta fromPrice={fromPrice} />
-      <LeatherPillars />
+      <LandingStickyCta
+        heroId={LEATHER_HERO_ID}
+        quietSectionIds={LEATHER_CTA_SECTION_IDS}
+        href={LEATHER_COLLECTION_HREF}
+        label="Shop leather"
+        price={fromPrice}
+        priceLabel="from"
+      />
+      <LandingPillars
+        id="leather"
+        eyebrow="Why leather"
+        heading="Three reasons it outlasts the nylon one."
+        pillars={LEATHER_PILLARS}
+      />
 
       {airtagProduct ? (
-        <LeatherSpotlight
+        <ProductSpotlight
           product={airtagProduct}
           tone="sand"
           eyebrow="The flagship"
@@ -158,7 +250,7 @@ export default function LeatherLandingPage() {
       <LeatherCollection products={products} />
 
       {nameplateProduct ? (
-        <LeatherSpotlight
+        <ProductSpotlight
           product={nameplateProduct}
           tone="sand"
           reverse
@@ -178,8 +270,16 @@ export default function LeatherLandingPage() {
       ) : null}
 
       <LeatherFit />
-      <LeatherFaq />
-      <LeatherFinalCta />
+      <LandingFaq id="leather" faqs={LEATHER_FAQS} />
+      <LandingFinalCta
+        id={LEATHER_FINAL_CTA_ID}
+        heading="Buy the collar once."
+        copy="Genuine leather, alloy hardware, engraving included on the nameplate collars. It should outlast every nylon one you've replaced."
+        ctaHref={LEATHER_COLLECTION_HREF}
+        ctaLabel="Shop the leather range"
+        secondaryHref="/shop"
+        secondaryLabel="Or see everything else in the shop"
+      />
 
       {/* Lets the campaign be attributed in Shopify analytics without a
           third-party pixel. `custom_` prefix is required by Hydrogen. */}

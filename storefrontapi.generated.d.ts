@@ -689,6 +689,54 @@ export type StoreCollectionsQuery = {
   };
 };
 
+export type AirtagLandingProductQueryVariables = StorefrontAPI.Exact<{
+  country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
+  language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
+  handle: StorefrontAPI.Scalars['String']['input'];
+}>;
+
+export type AirtagLandingProductQuery = {
+  product?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Product, 'vendor' | 'id' | 'title' | 'handle'> & {
+      images: {
+        nodes: Array<
+          Pick<
+            StorefrontAPI.Image,
+            'id' | 'url' | 'altText' | 'width' | 'height'
+          >
+        >;
+      };
+      printOnDemand?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.Metafield, 'value'>
+      >;
+      options: Array<{
+        optionValues: Array<Pick<StorefrontAPI.ProductOptionValue, 'name'>>;
+      }>;
+      priceRange: {
+        minVariantPrice: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
+      };
+      featuredImage?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.Image, 'id' | 'url' | 'altText' | 'width' | 'height'>
+      >;
+      selectedOrFirstAvailableVariant?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.ProductVariant, 'id' | 'availableForSale'> & {
+          price: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
+          image?: StorefrontAPI.Maybe<
+            Pick<
+              StorefrontAPI.Image,
+              'id' | 'url' | 'altText' | 'width' | 'height'
+            >
+          >;
+          product: Pick<StorefrontAPI.Product, 'handle' | 'title'>;
+          selectedOptions: Array<
+            Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
+          >;
+        }
+      >;
+    }
+  >;
+};
+
 export type LeatherLandingProductsQueryVariables = StorefrontAPI.Exact<{
   country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
   language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
@@ -1620,6 +1668,10 @@ interface GeneratedQueryTypes {
   '#graphql\n  fragment Collection on Collection {\n    id\n    title\n    handle\n    image {\n      id\n      url\n      altText\n      width\n      height\n    }\n  }\n  query StoreCollections(\n    $country: CountryCode\n    $endCursor: String\n    $first: Int\n    $language: LanguageCode\n    $last: Int\n    $startCursor: String\n  ) @inContext(country: $country, language: $language) {\n    collections(\n      first: $first,\n      last: $last,\n      before: $startCursor,\n      after: $endCursor\n    ) {\n      nodes {\n        ...Collection\n      }\n      pageInfo {\n        hasNextPage\n        hasPreviousPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n': {
     return: StoreCollectionsQuery;
     variables: StoreCollectionsQueryVariables;
+  };
+  '#graphql\n  query AirtagLandingProduct(\n    $country: CountryCode\n    $language: LanguageCode\n    $handle: String!\n  ) @inContext(country: $country, language: $language) {\n    product(handle: $handle) {\n      ...RecommendedProduct\n      # Not in the shared fragment, but Analytics.ProductView refuses to\n      # register the event at all without it.\n      vendor\n      # The spotlight and the colour section each need a shot of their own, so\n      # the hero\'s featured image isn\'t repeated twice further down the page.\n      images(first: 4) {\n        nodes {\n          id\n          url\n          altText\n          width\n          height\n        }\n      }\n    }\n  }\n  #graphql\n  fragment RecommendedProduct on Product {\n    id\n    title\n    handle\n    printOnDemand: metafield(\n      namespace: "custom"\n      key: "print_on_demand"\n    ) {\n      value\n    }\n    options {\n      optionValues {\n        name\n      }\n    }\n    priceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n    featuredImage {\n      id\n      url\n      altText\n      width\n      height\n    }\n    selectedOrFirstAvailableVariant(\n      selectedOptions: []\n      ignoreUnknownOptions: true\n      caseInsensitiveMatch: true\n    ) {\n      id\n      availableForSale\n      price {\n        amount\n        currencyCode\n      }\n      image {\n        id\n        url\n        altText\n        width\n        height\n      }\n      product {\n        handle\n        title\n      }\n      selectedOptions {\n        name\n        value\n      }\n    }\n  }\n\n': {
+    return: AirtagLandingProductQuery;
+    variables: AirtagLandingProductQueryVariables;
   };
   '#graphql\n  query LeatherLandingProducts(\n    $country: CountryCode\n    $language: LanguageCode\n    $query: String\n  ) @inContext(country: $country, language: $language) {\n    products(first: 24, query: $query) {\n      nodes {\n        ...RecommendedProduct\n        # The spotlight sections need a *second* shot: the hero already shows\n        # the flagship\'s featured image, and running the same photo twice on\n        # one page reads as a mistake. Two is all any section uses.\n        images(first: 2) {\n          nodes {\n            id\n            url\n            altText\n            width\n            height\n          }\n        }\n      }\n    }\n  }\n  #graphql\n  fragment RecommendedProduct on Product {\n    id\n    title\n    handle\n    printOnDemand: metafield(\n      namespace: "custom"\n      key: "print_on_demand"\n    ) {\n      value\n    }\n    options {\n      optionValues {\n        name\n      }\n    }\n    priceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n    featuredImage {\n      id\n      url\n      altText\n      width\n      height\n    }\n    selectedOrFirstAvailableVariant(\n      selectedOptions: []\n      ignoreUnknownOptions: true\n      caseInsensitiveMatch: true\n    ) {\n      id\n      availableForSale\n      price {\n        amount\n        currencyCode\n      }\n      image {\n        id\n        url\n        altText\n        width\n        height\n      }\n      product {\n        handle\n        title\n      }\n      selectedOptions {\n        name\n        value\n      }\n    }\n  }\n\n': {
     return: LeatherLandingProductsQuery;

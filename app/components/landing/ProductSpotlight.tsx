@@ -5,16 +5,16 @@ import {ArrowRightIcon} from '~/components/icons';
 import {cn} from '~/lib/utils';
 
 /**
- * A single product argued at length: photo on one side, the four things worth
- * knowing on the other. Used twice on the landing page — once for the AirTag
- * collar, once mirrored for the engraved nameplate collar — because a cold
- * visitor needs one product made concrete before a grid of six means anything.
+ * A single product argued at length: photo on one side, the handful of things
+ * worth knowing on the other. A cold visitor needs one product made concrete
+ * before a grid of six means anything, and on a single-product page this is
+ * where the case actually gets made.
  *
  * `footnote` exists for the disclaimers that belong next to the claim rather
- * than buried on the PDP (the AirTag itself isn't in the box, engraving is
- * permanent). Cold traffic that finds those out at checkout refunds.
+ * than buried on the PDP — the AirTag isn't in the box, engraving is permanent.
+ * Cold traffic that finds those out at checkout refunds.
  */
-export function LeatherSpotlight({
+export function ProductSpotlight({
   product,
   eyebrow,
   heading,
@@ -55,7 +55,7 @@ export function LeatherSpotlight({
 
   return (
     <section
-      aria-labelledby={`leather-spotlight-${product.handle}`}
+      aria-labelledby={`spotlight-${product.handle}`}
       className={cn(
         '-mx-4 w-[calc(100%+2rem)] px-6 py-20 lg:px-[7vw] lg:py-28',
         tone === 'cream' ? 'bg-[#faf4ec]' : 'bg-[#f0e3d1]',
@@ -99,7 +99,7 @@ export function LeatherSpotlight({
             </p>
 
             <h2
-              id={`leather-spotlight-${product.handle}`}
+              id={`spotlight-${product.handle}`}
               className="mb-0 mt-4 max-w-[16ch] font-heading text-4xl font-semibold leading-[0.94] tracking-[-0.05em] text-[#2e1c12] sm:text-5xl"
             >
               {heading}

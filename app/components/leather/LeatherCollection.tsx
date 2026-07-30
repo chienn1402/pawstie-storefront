@@ -1,7 +1,7 @@
 import {Link} from 'react-router';
 import type {RecommendedProductFragment} from 'storefrontapi.generated';
 import {ProductCard} from '~/components/ProductCard';
-import {LEATHER_COLLECTION_ID} from '~/components/leather/LeatherCta';
+import {LEATHER_COLLECTION_ID} from '~/components/leather/anchors';
 
 /**
  * The page's destination — every CTA above scrolls here. Deliberately reuses
