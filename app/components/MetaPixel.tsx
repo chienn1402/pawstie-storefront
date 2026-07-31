@@ -35,16 +35,28 @@ declare global {
 }
 
 /**
- * The `eventID` is what lets Meta deduplicate a browser event against the same
- * event sent server-side. Nothing sends server-side yet, but emitting it now
- * means a future Conversions API layer only has to reuse the id.
+ * Sends each event down both paths with one shared id: `fbq()` in the browser,
+ * and /api/meta-events which forwards to the Conversions API server-side. Meta
+ * deduplicates on (event_name, event_id), so an event that survives both is
+ * counted once — and one whose browser half is blocked still arrives.
  */
 function track(
   method: 'track' | 'trackCustom',
   event: string,
   params: Record<string, unknown>,
 ) {
-  window.fbq?.(method, event, params, {eventID: crypto.randomUUID()});
+  const eventId = crypto.randomUUID();
+
+  window.fbq?.(method, event, params, {eventID: eventId});
+
+  // keepalive so the request survives the navigation that often follows.
+  // Analytics must never break the page, hence the swallowed rejection.
+  void fetch('/api/meta-events', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({event, eventId, url: window.location.href, params}),
+    keepalive: true,
+  }).catch(() => {});
 }
 
 /** `gid://shopify/ProductVariant/123` -> `123`, which is what Meta catalogs key on. */
