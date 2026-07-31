@@ -191,6 +191,8 @@ test('the CSP permits only required product media, embed, and script sources', (
   const mediaSrc = getCspDirectiveSources('mediaSrc');
   const frameSrc = getCspDirectiveSources('frameSrc');
   const scriptSrc = getCspDirectiveSources('scriptSrc');
+  const connectSrc = getCspDirectiveSources('connectSrc');
+  const imgSrc = getCspDirectiveSources('imgSrc');
 
   assert.deepEqual(mediaSrc, [
     "'self'",
@@ -207,6 +209,14 @@ test('the CSP permits only required product media, embed, and script sources', (
     'https://cdn.shopify.com',
     'https://shopify.com',
     'https://unpkg.com/@google/model-viewer@v1.12.1/dist/model-viewer.min.js',
+    'https://connect.facebook.net',
+  ]);
+  assert.deepEqual(connectSrc, ['https://www.facebook.com']);
+  assert.deepEqual(imgSrc, [
+    "'self'",
+    'https://cdn.shopify.com',
+    'https://shopify.com',
+    'https://www.facebook.com',
   ]);
 
   const {header} = createContentSecurityPolicy({
@@ -217,12 +227,36 @@ test('the CSP permits only required product media, embed, and script sources', (
     ),
     frameSrc,
     scriptSrc,
+    connectSrc,
+    imgSrc,
   });
   const renderedScriptSrc = getHeaderDirectiveSources(header, 'script-src');
   assert.deepEqual(renderedScriptSrc.slice(0, -1), scriptSrc);
   assert.match(renderedScriptSrc.at(-1), /^'nonce-[a-f0-9]+'$/);
 
-  for (const source of [...mediaSrc, ...frameSrc, ...scriptSrc]) {
+  // imgSrc does not inherit Hydrogen's defaults the way connectSrc does, so an
+  // img-src that lists Facebook without restating the Shopify sources would
+  // block every product image. Assert the rendered header, not just the source.
+  const renderedImgSrc = getHeaderDirectiveSources(header, 'img-src');
+  assert.ok(renderedImgSrc.includes('https://cdn.shopify.com'));
+  assert.ok(renderedImgSrc.includes("'self'"));
+  assert.ok(renderedImgSrc.includes('https://www.facebook.com'));
+
+  // connectSrc does merge; confirm Shopify's own endpoints survived.
+  const renderedConnectSrc = getHeaderDirectiveSources(header, 'connect-src');
+  assert.ok(renderedConnectSrc.includes('https://www.facebook.com'));
+  assert.ok(renderedConnectSrc.includes("'self'"));
+  assert.ok(
+    renderedConnectSrc.some((source) => source.includes('monorail-edge')),
+  );
+
+  for (const source of [
+    ...mediaSrc,
+    ...frameSrc,
+    ...scriptSrc,
+    ...connectSrc,
+    ...imgSrc,
+  ]) {
     assert.notEqual(source, '*');
     assert.notEqual(source, 'https:');
   }

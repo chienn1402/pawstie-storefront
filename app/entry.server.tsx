@@ -34,6 +34,25 @@ export default async function handleRequest(
       'https://cdn.shopify.com',
       'https://shopify.com',
       'https://unpkg.com/@google/model-viewer@v1.12.1/dist/model-viewer.min.js',
+      // Meta Pixel loader. The inline bootstrap in MetaPixel.tsx carries the
+      // nonce; the fbevents.js tag it injects does not, so the host must be
+      // allowlisted here or the pixel never loads.
+      'https://connect.facebook.net',
+    ],
+    // fbevents.js beacons to facebook.com by fetch/sendBeacon.
+    // connectSrc MERGES with Hydrogen's defaults (Shopify CDN, monorail,
+    // checkout + store domains stay intact), so listing only Facebook is safe.
+    connectSrc: ['https://www.facebook.com'],
+    // imgSrc does NOT merge, and there was no img-src before this — images
+    // fell back to default-src. Passing Facebook alone would have created an
+    // img-src that blocked every Shopify CDN image on the site, so this
+    // restates default-src's sources verbatim and adds Facebook for the
+    // pixel's image-beacon fallback.
+    imgSrc: [
+      "'self'",
+      'https://cdn.shopify.com',
+      'https://shopify.com',
+      'https://www.facebook.com',
     ],
   });
 
