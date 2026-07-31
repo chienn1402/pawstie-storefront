@@ -166,6 +166,13 @@ export function Layout({children}: {children?: React.ReactNode}) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
+        {/* Meta (Facebook) Business domain verification for pawstie.com. Must be
+            server-rendered inside <head> — Meta's crawler ignores tags injected
+            by client JS. Don't remove; the ad account's domain claim depends on it. */}
+        <meta
+          name="facebook-domain-verification"
+          content="ittbmb8w9o7w13mm6t70ktmqkp62ib"
+        />
         <link rel="stylesheet" href={tailwindCss}></link>
         <link rel="stylesheet" href={resetStyles}></link>
         <link rel="stylesheet" href={appStyles}></link>
