@@ -14,5 +14,13 @@ declare global {
      * not need it and cannot accidentally send server-side events.
      */
     PRIVATE_META_CAPI_TOKEN?: string;
+    /**
+     * Optional `TEST#####` code from Events Manager -> Test events. When set,
+     * server events are tagged as test traffic: they appear live in that tab
+     * and are EXCLUDED from reporting and ad optimization. Use it locally to
+     * debug; never set it in the Oxygen production environment, or real
+     * conversions stop counting.
+     */
+    PRIVATE_META_CAPI_TEST_CODE?: string;
   }
 }

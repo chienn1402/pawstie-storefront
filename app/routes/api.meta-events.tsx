@@ -98,12 +98,21 @@ export async function action({request, context}: Route.ActionArgs) {
     ],
   };
 
+  // Tagging as test traffic makes events show up live in Events Manager ->
+  // Test events, at the cost of being excluded from reporting. Set only in
+  // local/preview environments — see the note in env.d.ts.
+  const testCode = context.env.PRIVATE_META_CAPI_TEST_CODE;
+
   const send = fetch(
     `https://graph.facebook.com/${API_VERSION}/${PIXEL_ID}/events`,
     {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({...payload, access_token: token}),
+      body: JSON.stringify({
+        ...payload,
+        ...(testCode ? {test_event_code: testCode} : {}),
+        access_token: token,
+      }),
     },
   )
     .then(async (response) => {
