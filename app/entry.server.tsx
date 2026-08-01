@@ -28,6 +28,13 @@ export default async function handleRequest(
       "'self'",
       'https://www.youtube.com',
       'https://player.vimeo.com',
+      // fbevents.js delivers most events through a hidden iframe on
+      // facebook.com, falling back to an image beacon only for small payloads.
+      // Without this, every ViewContent/AddToCart is blocked in the browser
+      // ("Framing 'https://www.facebook.com/' violates ... frame-src") while
+      // the CAPI half still lands — so the pixel looks alive but the browser
+      // signal, and with it event match quality, quietly disappears.
+      'https://www.facebook.com',
     ],
     scriptSrc: [
       "'self'",
