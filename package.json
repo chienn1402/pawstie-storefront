@@ -9,6 +9,8 @@
     "dev": "shopify hydrogen dev --codegen",
     "preview": "shopify hydrogen preview --build",
     "lint": "eslint --no-error-on-unmatched-pattern .",
+    "test": "node --test \"scripts/**/*.test.mjs\"",
+    "pretypecheck": "npm test",
     "typecheck": "react-router typegen && tsc --noEmit",
     "codegen": "shopify hydrogen codegen && react-router typegen"
   },

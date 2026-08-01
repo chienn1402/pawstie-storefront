@@ -35,6 +35,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Gates the deploy. The source-contract tests in scripts/ are the only
+      # automated check that a hand-tuned CSP directive in entry.server.tsx
+      # still lists every host the storefront needs — a dropped source there
+      # fails silently in production (blocked beacons, blocked media) rather
+      # than breaking the build.
+      - name: Run tests
+        run: npm test
+
       - name: Build and Publish to Oxygen
         run: npx shopify hydrogen deploy
         env:

@@ -17,13 +17,14 @@ npm run dev         # Local dev server via Shopify CLI + MiniOxygen, runs codege
 npm run build       # Production build (shopify hydrogen build --codegen)
 npm run preview     # Build then serve the production bundle locally
 npm run lint        # ESLint over the repo
-npm run typecheck   # react-router typegen && tsc --noEmit
+npm run test        # node:test over scripts/**/*.test.mjs (see below)
+npm run typecheck   # npm test, then react-router typegen && tsc --noEmit
 npm run codegen     # Regenerate GraphQL types + React Router route types
-
-node --test scripts/product-gallery-media.test.mjs   # the one test file (see below)
 ```
 
-- **There is no `test` npm script and no test framework.** The single test file, `scripts/product-gallery-media.test.mjs`, uses the built-in `node:test` runner and is invoked by hand. It is a *source-contract* test: it reads `products.$handle.tsx`, `ProductGallery.tsx`, `structured-data.ts`, and `entry.server.tsx` as text and asserts on their contents (query fields, CSP directives). Editing those files can break it without any behavioral regression — check it after touching product media or CSP. Don't assume broader test coverage exists; confirm with the user before adding a runner.
+- **There is no test framework** — `npm test` is the built-in `node:test` runner over `scripts/**/*.test.mjs`, currently one file: `scripts/product-gallery-media.test.mjs`. It is a *source-contract* test: it reads `products.$handle.tsx`, `ProductGallery.tsx`, `structured-data.ts`, and `entry.server.tsx` as text and asserts on their contents (query fields, CSP directives). Editing those files can break it without any behavioral regression. Don't assume broader test coverage exists; confirm with the user before adding a runner or a second framework.
+- It runs in two places automatically: a `pretypecheck` hook (so `npm run typecheck` covers it locally) and a CI step in the Oxygen workflow **before** the deploy — a red test blocks the deploy. That gate exists because a CSP regression is invisible in production: beacons and media are silently blocked, nothing 500s.
+- **Watch quotation marks in the CSP comments.** `getCspDirectiveSources` scrapes *every* quoted string out of a directive's array block, comments included, so quoting a URL or an error message inside `entry.server.tsx`'s CSP block reads as an extra source and fails the test.
 - Node `^22 || ^24` required.
 - `.env` holds Shopify storefront credentials and `SESSION_SECRET` (required — context creation throws without it). The Customer Account API (`/account`) needs a public dev domain; see the README step for setup.
 
