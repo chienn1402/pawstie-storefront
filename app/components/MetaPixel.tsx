@@ -119,14 +119,21 @@ export function MetaPixel({origin}: {origin: string}) {
       // Hydrogen fires this on any quantity increase, so report the delta
       // rather than the line's new total.
       const added = line.quantity - (payload.prevLine?.quantity ?? 0);
+      const quantity = added > 0 ? added : line.quantity;
+
+      // Price the delta, not the line. `totalAmount` covers the line's whole
+      // quantity, so adding one $19.99 item to a line that already held two
+      // reported $59.97 against quantity 1 — inflating the value Meta optimizes
+      // bids on. `amountPerQuantity` is the unit price, already in the fragment.
+      const unitPrice = Number(line.cost?.amountPerQuantity?.amount ?? 0);
 
       track('track', 'AddToCart', {
         content_type: 'product',
         content_ids: [id],
         content_name: line.merchandise?.product?.title,
-        value: Number(line.cost?.totalAmount?.amount ?? 0),
-        currency: line.cost?.totalAmount?.currencyCode,
-        contents: [{id, quantity: added > 0 ? added : line.quantity}],
+        value: unitPrice * quantity,
+        currency: line.cost?.amountPerQuantity?.currencyCode,
+        contents: [{id, quantity}],
       });
     });
 
