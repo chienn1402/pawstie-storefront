@@ -30,10 +30,14 @@ export default async function handleRequest(
       'https://player.vimeo.com',
       // fbevents.js delivers most events through a hidden iframe on
       // facebook.com, falling back to an image beacon only for small payloads.
-      // Without this, every ViewContent/AddToCart is blocked in the browser
-      // ("Framing 'https://www.facebook.com/' violates ... frame-src") while
-      // the CAPI half still lands — so the pixel looks alive but the browser
-      // signal, and with it event match quality, quietly disappears.
+      // Without this, every ViewContent/AddToCart is blocked in the browser as
+      // a frame-src violation while the CAPI half still lands — so the pixel
+      // looks alive but the browser signal, and with it event match quality,
+      // quietly disappears.
+      //
+      // Keep quotation marks out of these comments: getCspDirectiveSources in
+      // scripts/product-gallery-media.test.mjs scrapes every quoted string in
+      // the array block, so a quoted example reads as an extra source.
       'https://www.facebook.com',
     ],
     scriptSrc: [

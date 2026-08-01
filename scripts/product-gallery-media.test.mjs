@@ -203,6 +203,9 @@ test('the CSP permits only required product media, embed, and script sources', (
     "'self'",
     'https://www.youtube.com',
     'https://player.vimeo.com',
+    // fbevents.js sends events via a hidden iframe; without this the browser
+    // half of every ViewContent/AddToCart is silently dropped.
+    'https://www.facebook.com',
   ]);
   assert.deepEqual(scriptSrc, [
     "'self'",
