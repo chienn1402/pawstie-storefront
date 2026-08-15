@@ -79,6 +79,7 @@ export function Footer({
               <div className="flex flex-col gap-2 border-t border-white/15 pt-6 text-sm sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-[#a4e8aa]">
                   © {new Date().getFullYear()} {shopName}. All rights reserved.
+                  Operated by Horizon Retail Ventures LLC.
                 </p>
                 <p className="text-[#a4e8aa]">
                   Made for pets. Chosen by their people.

@@ -67,7 +67,7 @@ function LandingFooterShell({
     <footer className="bg-[#1c110b] px-6 py-10 lg:px-[7vw]">
       <div className="mx-auto flex max-w-[80rem] flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
         <p className="mb-0 order-2 text-sm text-[#9a7c60] sm:order-1">
-          © {new Date().getFullYear()} {shopName}. All rights reserved.
+          © {new Date().getFullYear()} {shopName}. All rights reserved. Operated by Horizon Retail Ventures LLC.
         </p>
 
         {links.length > 0 ? (
