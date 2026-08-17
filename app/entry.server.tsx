@@ -49,11 +49,15 @@ export default async function handleRequest(
       // nonce; the fbevents.js tag it injects does not, so the host must be
       // allowlisted here or the pixel never loads.
       'https://connect.facebook.net',
+      // Same deal for TikTok: the inline base code in TikTokPixel.tsx injects
+      // an un-nonced events.js tag from this host.
+      'https://analytics.tiktok.com',
     ],
-    // fbevents.js beacons to facebook.com by fetch/sendBeacon.
+    // fbevents.js beacons to facebook.com by fetch/sendBeacon, and the TikTok
+    // SDK beacons to analytics.tiktok.com the same way.
     // connectSrc MERGES with Hydrogen's defaults (Shopify CDN, monorail,
-    // checkout + store domains stay intact), so listing only Facebook is safe.
-    connectSrc: ['https://www.facebook.com'],
+    // checkout + store domains stay intact), so listing only these is safe.
+    connectSrc: ['https://www.facebook.com', 'https://analytics.tiktok.com'],
     // imgSrc does NOT merge, and there was no img-src before this — images
     // fell back to default-src. Passing Facebook alone would have created an
     // img-src that blocked every Shopify CDN image on the site, so this
@@ -64,6 +68,7 @@ export default async function handleRequest(
       'https://cdn.shopify.com',
       'https://shopify.com',
       'https://www.facebook.com',
+      'https://analytics.tiktok.com',
     ],
   });
 

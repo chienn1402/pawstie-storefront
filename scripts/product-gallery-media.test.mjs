@@ -213,13 +213,19 @@ test('the CSP permits only required product media, embed, and script sources', (
     'https://shopify.com',
     'https://unpkg.com/@google/model-viewer@v1.12.1/dist/model-viewer.min.js',
     'https://connect.facebook.net',
+    // The TikTok base code injects an un-nonced events.js tag from this host.
+    'https://analytics.tiktok.com',
   ]);
-  assert.deepEqual(connectSrc, ['https://www.facebook.com']);
+  assert.deepEqual(connectSrc, [
+    'https://www.facebook.com',
+    'https://analytics.tiktok.com',
+  ]);
   assert.deepEqual(imgSrc, [
     "'self'",
     'https://cdn.shopify.com',
     'https://shopify.com',
     'https://www.facebook.com',
+    'https://analytics.tiktok.com',
   ]);
 
   const {header} = createContentSecurityPolicy({
@@ -244,10 +250,12 @@ test('the CSP permits only required product media, embed, and script sources', (
   assert.ok(renderedImgSrc.includes('https://cdn.shopify.com'));
   assert.ok(renderedImgSrc.includes("'self'"));
   assert.ok(renderedImgSrc.includes('https://www.facebook.com'));
+  assert.ok(renderedImgSrc.includes('https://analytics.tiktok.com'));
 
   // connectSrc does merge; confirm Shopify's own endpoints survived.
   const renderedConnectSrc = getHeaderDirectiveSources(header, 'connect-src');
   assert.ok(renderedConnectSrc.includes('https://www.facebook.com'));
+  assert.ok(renderedConnectSrc.includes('https://analytics.tiktok.com'));
   assert.ok(renderedConnectSrc.includes("'self'"));
   assert.ok(
     renderedConnectSrc.some((source) => source.includes('monorail-edge')),

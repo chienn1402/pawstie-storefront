@@ -18,6 +18,7 @@ import appStyles from '~/styles/app.css?url';
 import tailwindCss from './styles/tailwind.css?url';
 import {PageLayout} from './components/PageLayout';
 import {MetaPixel} from './components/MetaPixel';
+import {TikTokPixel} from './components/TikTokPixel';
 
 export type RootLoader = typeof loader;
 
@@ -207,6 +208,7 @@ export default function App() {
         <Outlet />
       </PageLayout>
       <MetaPixel origin={data.origin} />
+      <TikTokPixel origin={data.origin} />
     </Analytics.Provider>
   );
 }

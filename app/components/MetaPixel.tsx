@@ -1,5 +1,6 @@
 import {useEffect} from 'react';
-import {parseGid, useAnalytics, useNonce} from '@shopify/hydrogen';
+import {useAnalytics, useNonce} from '@shopify/hydrogen';
+import {isPixelHost, numericId} from '~/lib/pixels';
 
 /**
  * Meta (Facebook) Pixel, driven off Hydrogen's analytics events rather than
@@ -15,18 +16,15 @@ import {parseGid, useAnalytics, useNonce} from '@shopify/hydrogen';
  *    requires consent in the visitor's region and none was collected, no
  *    events fire. That is intentional — don't "fix" it by overriding
  *    `canTrack`, which would track people who declined.
- * 2. It only runs on the production host (see PIXEL_HOSTS). Every branch
- *    deploys to Oxygen, so without this guard preview traffic would be mixed
- *    into the ad account's optimization data.
+ * 2. It only runs on the production host (see `isPixelHost` in ~/lib/pixels).
+ *    Every branch deploys to Oxygen, so without this guard preview traffic
+ *    would be mixed into the ad account's optimization data.
  *
  * Purchase is deliberately absent: checkout happens on Shopify's domain, so it
  * has to come from the Meta sales channel / a checkout web pixel, not here.
  */
 
 const PIXEL_ID = '1718042242858307';
-
-/** Hosts allowed to send events. Add a preview host here to test a deploy. */
-const PIXEL_HOSTS = ['pawstie.com', 'www.pawstie.com'];
 
 declare global {
   interface Window {
@@ -57,24 +55,6 @@ function track(
     body: JSON.stringify({event, eventId, url: window.location.href, params}),
     keepalive: true,
   }).catch(() => {});
-}
-
-/** `gid://shopify/ProductVariant/123` -> `123`, which is what Meta catalogs key on. */
-function numericId(gid?: string | null) {
-  if (!gid) return null;
-  try {
-    return parseGid(gid).id || null;
-  } catch {
-    return null;
-  }
-}
-
-function isPixelHost(origin: string) {
-  try {
-    return PIXEL_HOSTS.includes(new URL(origin).hostname);
-  } catch {
-    return false;
-  }
 }
 
 export function MetaPixel({origin}: {origin: string}) {
