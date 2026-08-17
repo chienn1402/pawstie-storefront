@@ -8,7 +8,7 @@ Shopify **Hydrogen** headless storefront (Hydrogen `2026.4.3`) for **Pawstie**, 
 
 It started from the Hydrogen "Skeleton" template, but the storefront is now bespoke: home, shop, product, blog, policies, about, and account pages have all been redesigned. `README.md` and `CHANGELOG.md` are still upstream skeleton files — they describe the template, not this shop; don't treat them as documentation of current behavior.
 
-Pushes to any branch deploy to Oxygen via `.github/workflows/oxygen-deployment-1000156338.yml`.
+Pushes to any branch deploy to Oxygen via `.github/workflows/oxygen-deployment-1000170383.yml`.
 
 ## Commands
 
