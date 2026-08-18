@@ -12,12 +12,22 @@ import type {RecommendedProductFragment} from 'storefrontapi.generated';
  */
 export const LEATHER_SEARCH_QUERY = 'leather';
 
-/** The product the hero and the spotlight section are built around. */
+/**
+ * The product the hero and the spotlight section are built around.
+ *
+ * These are Shopify *handles*, not titles, and on this store the two barely
+ * resemble each other — the handles came over from the supplier import while
+ * the titles were rewritten. Read a handle off the product's admin URL or the
+ * Storefront API; deriving one by slugifying the title gives a handle that does
+ * not exist, and `product(handle:)` answers that with `null` rather than an
+ * error, so the page redirects instead of failing loudly.
+ */
 export const LEATHER_HERO_HANDLE =
-  'the-signature-genuine-leather-airtag-collar';
+  'location-tracker-first-layer-leather-dog-pet-collar';
 
 /** The engravable collar, used by the personalization section. */
-export const LEATHER_NAMEPLATE_HANDLE = 'the-heritage-nameplate-leather-collar';
+export const LEATHER_NAMEPLATE_HANDLE =
+  'genuine-leather-dog-collars-with-engraved-nameplate';
 
 /**
  * Curated running order. Handles missing from this list still render — they
@@ -27,9 +37,10 @@ export const LEATHER_NAMEPLATE_HANDLE = 'the-heritage-nameplate-leather-collar';
 const CURATED_HANDLE_ORDER: readonly string[] = [
   LEATHER_HERO_HANDLE,
   LEATHER_NAMEPLATE_HANDLE,
-  'the-artisan-braided-leather-dog-collar',
-  'the-heritage-genuine-leather-leash-1',
-  'the-heritage-reflective-leather-harness',
+  // The Artisan Braided Leather Dog Collar.
+  'dog-braided-leather-medium-large-dog-collar',
+  // The Heritage Genuine Leather Leash.
+  'the-heritage-genuine-leather-leash',
 ];
 
 function curatedIndex(handle: string) {
