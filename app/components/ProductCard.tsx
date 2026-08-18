@@ -80,11 +80,18 @@ export function ProductCard({
         </Link>
       </h3>
 
-      <p className="mt-1.5 font-heading text-sm font-bold text-primary sm:text-base">
-        <Money as="span" data={product.priceRange.minVariantPrice} />
-      </p>
+      {/*
+        Price and action travel together, pinned to the bottom of the card.
+        Anchoring only the action left the price riding on the title, so a
+        one-line title next to a two-line one staggered the price row.
+      */}
+      <div className="mt-auto pt-1.5">
+        <p className="font-heading text-sm font-bold text-primary sm:text-base">
+          <Money as="span" data={product.priceRange.minVariantPrice} />
+        </p>
 
-      <ProductCardActions product={product} />
+        <ProductCardActions product={product} />
+      </div>
     </article>
   );
 }

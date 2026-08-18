@@ -63,6 +63,12 @@ function AddToCartButton({
   );
 }
 
+/**
+ * Renders the card's single action. Bottom anchoring lives on the wrapper in
+ * `ProductCard` — it pins the price and this action together, so don't put
+ * `mt-auto` back here or the two will split the card's free space between
+ * them and the price row will stagger again.
+ */
 export function ProductCardActions({
   product,
 }: {
@@ -77,7 +83,7 @@ export function ProductCardActions({
 
   if (requiresPersonalization || hasChoices) {
     return (
-      <div className="relative z-10 mt-auto pt-2">
+      <div className="relative z-10 pt-2">
         <Link to={variantUrl} prefetch="intent" className={ACTION}>
           <span>
             {requiresPersonalization ? 'Personalize' : 'Choose options'}
@@ -91,7 +97,7 @@ export function ProductCardActions({
 
   if (!variant || !variant.availableForSale) {
     return (
-      <div className="relative z-10 mt-auto pt-2">
+      <div className="relative z-10 pt-2">
         <span className="inline-flex min-h-12 items-center py-2 font-heading text-sm font-semibold text-[#347345]">
           Sold out
         </span>
@@ -100,7 +106,7 @@ export function ProductCardActions({
   }
 
   return (
-    <div className="relative z-10 mt-auto pt-2">
+    <div className="relative z-10 pt-2">
       <AddToCartButton
         variant={variant}
         title={product.title}
