@@ -62,6 +62,17 @@ Product fragments are duplicated across `app/lib/fragments.ts`, `app/routes/prod
 ### Session
 `AppSession` (`app/lib/session.ts`) is a cookie-based `HydrogenSession`. Mutating methods (`set`/`unset`) flip `isPending`, which `server.ts` uses to decide when to commit the cookie.
 
+### Markets and currency
+The shop has **two** Shopify markets: United States (USD, the base currency) and Canada (CAD). `app/lib/i18n.ts` resolves which one a request belongs to, in this order: an explicit shopper choice in the session → the `oxygen-buyer-country` header (Oxygen only; never set in local dev) → `US`. Anything outside `{US, CA}` resolves to `US`. `app/lib/context.ts` feeds the result to `storefront.i18n`, and every `@inContext` query follows from there. `CountrySelector` posts to `app/routes/country.tsx` to override detection; it sits in the header's CTA cluster on desktop and in the mobile menu aside below `lg`.
+
+Three things to keep in mind when touching this:
+
+- **The cart carries its own market.** `buyerIdentity.countryCode` is what travels to checkout, and it is a *separate* value from the query context — a cart created before a switch keeps its original country. `syncCartBuyerIdentity` (`app/lib/cart-market.ts`) reconciles them; it is called on the switch and on `LinesAdd`.
+- **Never put a public `Cache-Control` on an HTML route.** Prices now vary by geo header and cookie, so a shared cache would serve one market's prices to the other — invisibly, like a CSP regression. `scripts/market-detection.test.mjs` enforces this and carries the audited exception list.
+- Storefront **sub-request** caching (`CacheLong` etc.) is safe as-is: `$country` is part of the query variables and therefore of the cache key.
+
+`app/lib/i18n.ts` and `app/lib/safe-redirect.ts` are deliberately free of runtime imports and of the `~/` alias, so `npm test` can load them through Node's native type stripping and exercise the real functions. Keep them that way.
+
 ### root.tsx
 Loads header/footer data and shop analytics, wraps everything in `PageLayout`, and sets `shouldRevalidate` to skip root-loader revalidation on sub-navigation (perf optimization) except on mutations. It also exposes `origin` (from the request URL) in loader data — canonical URLs and Product JSON-LD derive from it, so there's no hardcoded production domain in the code.
 

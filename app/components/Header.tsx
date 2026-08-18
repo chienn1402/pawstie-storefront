@@ -2,6 +2,7 @@ import {NavLink, useLocation} from 'react-router';
 import type {HeaderQuery} from 'storefrontapi.generated';
 import logo from '~/assets/img-logo.png';
 import {useAside} from '~/components/Aside';
+import {CountrySelector} from '~/components/CountrySelector';
 import {cn} from '~/lib/utils';
 import {MenuIcon, UserIcon} from '~/components/icons';
 
@@ -13,8 +14,10 @@ interface HeaderProps {
 
 type Viewport = 'desktop' | 'mobile';
 
+// The fill has to carry the shape on its own: `#effce9` disappears into the
+// translucent white glass, so these sit a step deeper on the brand ramp.
 const pillClass =
-  'inline-flex min-block-size-11 min-inline-size-11 items-center justify-center rounded-full bg-[#effce9] text-[#004817] transition-[background-color,color,box-shadow,scale,translate] duration-300 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:hover:scale-[1.03] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.98] hover:bg-[#e2f8dd] hover:shadow-sm hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#00521d] motion-reduce:transition-none';
+  'inline-flex min-block-size-11 min-inline-size-11 items-center justify-center rounded-full bg-[#c3edc0] text-[#004817] transition-[background-color,color,box-shadow,scale,translate] duration-300 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:hover:scale-[1.03] motion-safe:active:translate-y-0 motion-safe:active:scale-[0.98] hover:bg-[#a4e8aa] hover:shadow-sm hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#00521d] motion-reduce:transition-none';
 
 function navLinkClass({isActive}: {isActive: boolean; isPending: boolean}) {
   return cn(
@@ -145,6 +148,12 @@ function HeaderCtas() {
       className="flex items-center justify-self-end gap-2 lg:gap-2.5"
       aria-label="Account actions"
     >
+      {/*
+        Desktop only — the mobile bar is already toggle, logo, and account, and
+        a fourth control crowds it. Mobile reaches the switcher through the menu
+        aside instead (see `PageLayout`).
+      */}
+      <CountrySelector className="hidden lg:inline-flex" />
       <AccountLink />
     </nav>
   );
@@ -155,13 +164,13 @@ function AccountLink() {
     <NavLink
       prefetch="intent"
       to="/account"
-      className={cn(
-        pillClass,
-        'size-12 bg-[#00521d] text-white! hover:bg-[#006523]',
-      )}
+      // Was a solid dark-green disc — the heaviest thing in the header for its
+      // least-used action, and it fought the currency control beside it. The
+      // shared light pill puts it in the same family as the menu toggle.
+      className={cn(pillClass, 'size-11')}
       aria-label="Account"
     >
-      <UserIcon className="size-5" />
+      <UserIcon className="size-[1.375rem]" />
     </NavLink>
   );
 }
@@ -171,7 +180,7 @@ function HeaderMenuMobileToggle() {
   return (
     <button
       type="button"
-      className={cn(pillClass, 'size-12 justify-self-start lg:hidden')}
+      className={cn(pillClass, 'size-11 justify-self-start lg:hidden')}
       onClick={() => open('mobile')}
       aria-label="Open menu"
     >

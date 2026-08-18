@@ -87,6 +87,7 @@ export async function loader(args: Route.LoaderArgs) {
     ...criticalData,
     origin: new URL(args.request.url).origin,
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
+    country: storefront.i18n.country,
     shop: getShopAnalytics({
       storefront,
       publicStorefrontId: env.PUBLIC_STOREFRONT_ID,

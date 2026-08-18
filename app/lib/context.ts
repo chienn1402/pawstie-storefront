@@ -1,5 +1,6 @@
 import {createHydrogenContext} from '@shopify/hydrogen';
 import {AppSession} from '~/lib/session';
+import {resolveI18n} from '~/lib/i18n';
 import {CART_QUERY_FRAGMENT} from '~/lib/fragments';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
 
@@ -52,8 +53,10 @@ export async function createHydrogenRouterContext(
       cache,
       waitUntil,
       session,
-      // Or detect from URL path based on locale subpath, cookies, or any other strategy
-      i18n: {language: 'EN', country: 'US'},
+      // Market: an explicit shopper choice in the session, then the
+      // oxygen-buyer-country header, then US. Every @inContext query and the
+      // cart handler read this, so it is what decides the currency on offer.
+      i18n: resolveI18n({request, session}),
       cart: {
         queryFragment: CART_QUERY_FRAGMENT,
       },

@@ -3,6 +3,7 @@ import type {Route} from './+types/cart';
 import type {CartQueryDataReturn} from '@shopify/hydrogen';
 import {CartForm} from '@shopify/hydrogen';
 import {CartMain} from '~/components/CartMain';
+import {syncCartBuyerIdentity} from '~/lib/cart-market';
 
 export const meta: Route.MetaFunction = () => {
   return [{title: `Pawstie | Cart`}];
@@ -11,7 +12,7 @@ export const meta: Route.MetaFunction = () => {
 export const headers: HeadersFunction = ({actionHeaders}) => actionHeaders;
 
 export async function action({request, context}: Route.ActionArgs) {
-  const {cart} = context;
+  const {cart, storefront} = context;
 
   const formData = await request.formData();
 
@@ -25,9 +26,27 @@ export async function action({request, context}: Route.ActionArgs) {
   let result: CartQueryDataReturn;
 
   switch (action) {
-    case CartForm.ACTIONS.LinesAdd:
+    case CartForm.ACTIONS.LinesAdd: {
       result = await cart.addLines(inputs.lines);
+
+      // Where a cart first comes into existence, so this is where its market
+      // gets pinned. Conditional inside the helper — an unconditional mutation
+      // here would cost a round trip on every add to cart.
+      const synced = await syncCartBuyerIdentity({
+        cart,
+        country: storefront.i18n.country,
+        snapshot: result?.cart,
+      });
+      if (synced?.cart) {
+        result = {
+          ...result,
+          cart: synced.cart,
+          errors: [...(result.errors ?? []), ...(synced.errors ?? [])],
+          warnings: [...(result.warnings ?? []), ...(synced.warnings ?? [])],
+        };
+      }
       break;
+    }
     case CartForm.ACTIONS.LinesUpdate:
       result = await cart.updateLines(inputs.lines);
       break;
