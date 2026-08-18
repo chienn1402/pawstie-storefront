@@ -19,6 +19,7 @@ import {
   ProductPodBadge,
 } from '~/components/ProductPodBadge';
 import {PawIcon} from '~/components/icons';
+import type {RecommendedProductFragment} from 'storefrontapi.generated';
 import {RECOMMENDED_PRODUCT_FRAGMENT} from '~/lib/fragments';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {productJsonLd} from '~/lib/structured-data';
@@ -41,16 +42,50 @@ export const meta: Route.MetaFunction = ({data, matches}) => {
   ];
 };
 
-export async function loader(args: Route.LoaderArgs) {
-  const criticalData = await loadCriticalData(args);
-  const recommended = args.context.storefront
-    .query(PRODUCT_RECOMMENDATIONS_QUERY, {
-      variables: {productId: criticalData.product.id},
+/** How many cards fill the "You may also like" row at every breakpoint. */
+const RECOMMENDED_PRODUCT_COUNT = 4;
+
+/**
+ * `productRecommendations` is behaviour-driven: Shopify needs order and browse
+ * history before it returns anything, so on a small or freshly migrated catalog
+ * it answers with an empty list and the section silently renders nothing. Lead
+ * with the real recommendations so they take over once they warm up, then top
+ * the row up from the catalog to avoid a half-empty (or missing) grid.
+ */
+function loadRecommendedProducts(
+  storefront: Route.LoaderArgs['context']['storefront'],
+  productId: string,
+) {
+  return storefront
+    .query(PRODUCT_RECOMMENDATIONS_QUERY, {variables: {productId}})
+    .then(({productRecommendations, products}) => {
+      const seen = new Set([productId]);
+      const picked: RecommendedProductFragment[] = [];
+
+      for (const product of [
+        ...(productRecommendations ?? []),
+        ...products.nodes,
+      ]) {
+        if (seen.has(product.id)) continue;
+        seen.add(product.id);
+        picked.push(product);
+        if (picked.length === RECOMMENDED_PRODUCT_COUNT) break;
+      }
+
+      return picked;
     })
     .catch((error: Error) => {
       console.error(error);
-      return null;
+      return [];
     });
+}
+
+export async function loader(args: Route.LoaderArgs) {
+  const criticalData = await loadCriticalData(args);
+  const recommended = loadRecommendedProducts(
+    args.context.storefront,
+    criticalData.product.id,
+  );
 
   return {...criticalData, recommended};
 }
@@ -88,7 +123,11 @@ export default function Product() {
   const isPod = isPrintOnDemand(product.printOnDemand);
 
   return (
-    <div className="pb-20 lg:pb-28">
+    // The recommendations section brings its own padded green background, so
+    // the wrapper's bottom padding would leave an empty white tail above the
+    // footer. It streams in deferred, so `:has()` drops the padding live
+    // rather than the loader having to resolve first.
+    <div className="pb-20 has-[[data-related-products]]:pb-0 lg:pb-28 lg:has-[[data-related-products]]:pb-0">
       <div className="px-6 pt-8 lg:px-[7vw] lg:pt-12">
         <div className="mx-auto max-w-[80rem]">
           <ProductBreadcrumb title={title} />
@@ -214,6 +253,7 @@ const PRODUCT_QUERY = `#graphql
 const PRODUCT_RECOMMENDATIONS_QUERY = `#graphql
   query ProductRecommendations($country: CountryCode, $language: LanguageCode, $productId: ID!) @inContext(country: $country, language: $language) {
     productRecommendations(productId: $productId, intent: RELATED) { ...RecommendedProduct }
+    products(first: 8, sortKey: BEST_SELLING) { nodes { ...RecommendedProduct } }
   }
   ${RECOMMENDED_PRODUCT_FRAGMENT}
 ` as const;

@@ -1313,6 +1313,45 @@ export type ProductRecommendationsQuery = {
       }
     >
   >;
+  products: {
+    nodes: Array<
+      Pick<StorefrontAPI.Product, 'id' | 'title' | 'handle'> & {
+        printOnDemand?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.Metafield, 'value'>
+        >;
+        options: Array<{
+          optionValues: Array<Pick<StorefrontAPI.ProductOptionValue, 'name'>>;
+        }>;
+        priceRange: {
+          minVariantPrice: Pick<
+            StorefrontAPI.MoneyV2,
+            'amount' | 'currencyCode'
+          >;
+        };
+        featuredImage?: StorefrontAPI.Maybe<
+          Pick<
+            StorefrontAPI.Image,
+            'id' | 'url' | 'altText' | 'width' | 'height'
+          >
+        >;
+        selectedOrFirstAvailableVariant?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.ProductVariant, 'id' | 'availableForSale'> & {
+            price: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
+            image?: StorefrontAPI.Maybe<
+              Pick<
+                StorefrontAPI.Image,
+                'id' | 'url' | 'altText' | 'width' | 'height'
+              >
+            >;
+            product: Pick<StorefrontAPI.Product, 'handle' | 'title'>;
+            selectedOptions: Array<
+              Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
+            >;
+          }
+        >;
+      }
+    >;
+  };
 };
 
 export type SearchProductFragment = {__typename: 'Product'} & Pick<
@@ -1693,7 +1732,7 @@ interface GeneratedQueryTypes {
     return: ProductQuery;
     variables: ProductQueryVariables;
   };
-  '#graphql\n  query ProductRecommendations($country: CountryCode, $language: LanguageCode, $productId: ID!) @inContext(country: $country, language: $language) {\n    productRecommendations(productId: $productId, intent: RELATED) { ...RecommendedProduct }\n  }\n  #graphql\n  fragment RecommendedProduct on Product {\n    id\n    title\n    handle\n    printOnDemand: metafield(\n      namespace: "custom"\n      key: "print_on_demand"\n    ) {\n      value\n    }\n    options {\n      optionValues {\n        name\n      }\n    }\n    priceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n    featuredImage {\n      id\n      url\n      altText\n      width\n      height\n    }\n    selectedOrFirstAvailableVariant(\n      selectedOptions: []\n      ignoreUnknownOptions: true\n      caseInsensitiveMatch: true\n    ) {\n      id\n      availableForSale\n      price {\n        amount\n        currencyCode\n      }\n      image {\n        id\n        url\n        altText\n        width\n        height\n      }\n      product {\n        handle\n        title\n      }\n      selectedOptions {\n        name\n        value\n      }\n    }\n  }\n\n': {
+  '#graphql\n  query ProductRecommendations($country: CountryCode, $language: LanguageCode, $productId: ID!) @inContext(country: $country, language: $language) {\n    productRecommendations(productId: $productId, intent: RELATED) { ...RecommendedProduct }\n    products(first: 8, sortKey: BEST_SELLING) { nodes { ...RecommendedProduct } }\n  }\n  #graphql\n  fragment RecommendedProduct on Product {\n    id\n    title\n    handle\n    printOnDemand: metafield(\n      namespace: "custom"\n      key: "print_on_demand"\n    ) {\n      value\n    }\n    options {\n      optionValues {\n        name\n      }\n    }\n    priceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n    featuredImage {\n      id\n      url\n      altText\n      width\n      height\n    }\n    selectedOrFirstAvailableVariant(\n      selectedOptions: []\n      ignoreUnknownOptions: true\n      caseInsensitiveMatch: true\n    ) {\n      id\n      availableForSale\n      price {\n        amount\n        currencyCode\n      }\n      image {\n        id\n        url\n        altText\n        width\n        height\n      }\n      product {\n        handle\n        title\n      }\n      selectedOptions {\n        name\n        value\n      }\n    }\n  }\n\n': {
     return: ProductRecommendationsQuery;
     variables: ProductRecommendationsQueryVariables;
   };
