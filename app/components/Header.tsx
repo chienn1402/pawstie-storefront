@@ -49,9 +49,9 @@ export function Header({header, publicStoreDomain}: HeaderProps) {
         <img
           src={logo}
           alt=""
-          width="164"
-          height="179"
-          className="h-8 w-auto shrink-0 scale-80 -rotate-20 rounded-none! lg:h-9 hidden md:inline-block"
+          width="765"
+          height="816"
+          className="h-8 w-auto shrink-0 scale-80 rounded-none! lg:h-9 hidden md:inline-block"
         />
         <span className="font-heading text-xl! font-normal tracking-[-0.04em] text-[#004817]">
           {shop.name}

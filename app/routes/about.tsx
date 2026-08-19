@@ -128,8 +128,8 @@ export default function About() {
                   <img
                     src={logo}
                     alt=""
-                    width="830"
-                    height="788"
+                    width="765"
+                    height="816"
                     loading="lazy"
                     className="size-5 rounded-none! md:size-6"
                   />

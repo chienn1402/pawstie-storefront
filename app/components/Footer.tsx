@@ -45,9 +45,9 @@ export function Footer({
                     <img
                       src={logo}
                       alt=""
-                      width="164"
-                      height="179"
-                      className="h-10 w-auto shrink-0 -rotate-20 scale-80 rounded-none!"
+                      width="765"
+                      height="816"
+                      className="h-10 w-auto shrink-0 scale-80 rounded-none!"
                     />
                     <span className="font-heading text-2xl font-normal tracking-[-0.04em] text-white">
                       {shopName}

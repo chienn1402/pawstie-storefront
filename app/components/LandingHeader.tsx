@@ -21,9 +21,9 @@ export function LandingHeader({shopName}: {shopName: HeaderQuery['shop']['name']
         <img
           src={logo}
           alt=""
-          width="164"
-          height="179"
-          className="h-8 w-auto shrink-0 -rotate-20 scale-80 rounded-none! lg:h-9"
+          width="765"
+          height="816"
+          className="h-8 w-auto shrink-0 scale-80 rounded-none! lg:h-9"
         />
         <span className="font-heading text-xl font-normal tracking-[-0.04em] text-[#faf4ec] lg:text-2xl">
           {shopName}
