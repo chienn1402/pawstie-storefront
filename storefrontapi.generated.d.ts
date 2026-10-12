@@ -452,6 +452,67 @@ export type RecommendedProductsQuery = {
   };
 };
 
+export type HeroProductFragment = Pick<
+  StorefrontAPI.Product,
+  'id' | 'title' | 'handle'
+> & {
+  featuredImage?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Image, 'id' | 'url' | 'altText' | 'width' | 'height'>
+  >;
+  selectedOrFirstAvailableVariant?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.ProductVariant, 'availableForSale'> & {
+      price: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
+      compareAtPrice?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>
+      >;
+    }
+  >;
+};
+
+export type HeroProductsQueryVariables = StorefrontAPI.Exact<{
+  country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
+  language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
+  featuredHandle: StorefrontAPI.Scalars['String']['input'];
+}>;
+
+export type HeroProductsQuery = {
+  featured?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Product, 'id' | 'title' | 'handle'> & {
+      featuredImage?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.Image, 'id' | 'url' | 'altText' | 'width' | 'height'>
+      >;
+      selectedOrFirstAvailableVariant?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.ProductVariant, 'availableForSale'> & {
+          price: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
+          compareAtPrice?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>
+          >;
+        }
+      >;
+    }
+  >;
+  products: {
+    nodes: Array<
+      Pick<StorefrontAPI.Product, 'id' | 'title' | 'handle'> & {
+        featuredImage?: StorefrontAPI.Maybe<
+          Pick<
+            StorefrontAPI.Image,
+            'id' | 'url' | 'altText' | 'width' | 'height'
+          >
+        >;
+        selectedOrFirstAvailableVariant?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.ProductVariant, 'availableForSale'> & {
+            price: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
+            compareAtPrice?: StorefrontAPI.Maybe<
+              Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>
+            >;
+          }
+        >;
+      }
+    >;
+  };
+};
+
 export type ArticleQueryVariables = StorefrontAPI.Exact<{
   articleHandle: StorefrontAPI.Scalars['String']['input'];
   blogHandle: StorefrontAPI.Scalars['String']['input'];
@@ -1687,6 +1748,10 @@ interface GeneratedQueryTypes {
   '#graphql\n  query RecommendedProducts ($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    products(first: 4, sortKey: UPDATED_AT, reverse: true) {\n      nodes {\n        ...RecommendedProduct\n      }\n    }\n  }\n  #graphql\n  fragment RecommendedProduct on Product {\n    id\n    title\n    handle\n    printOnDemand: metafield(\n      namespace: "custom"\n      key: "print_on_demand"\n    ) {\n      value\n    }\n    options {\n      optionValues {\n        name\n      }\n    }\n    priceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n    featuredImage {\n      id\n      url\n      altText\n      width\n      height\n    }\n    selectedOrFirstAvailableVariant(\n      selectedOptions: []\n      ignoreUnknownOptions: true\n      caseInsensitiveMatch: true\n    ) {\n      id\n      availableForSale\n      price {\n        amount\n        currencyCode\n      }\n      image {\n        id\n        url\n        altText\n        width\n        height\n      }\n      product {\n        handle\n        title\n      }\n      selectedOptions {\n        name\n        value\n      }\n    }\n  }\n\n': {
     return: RecommendedProductsQuery;
     variables: RecommendedProductsQueryVariables;
+  };
+  '#graphql\n  fragment HeroProduct on Product {\n    id\n    title\n    handle\n    featuredImage {\n      id\n      url\n      altText\n      width\n      height\n    }\n    selectedOrFirstAvailableVariant(\n      selectedOptions: []\n      ignoreUnknownOptions: true\n      caseInsensitiveMatch: true\n    ) {\n      availableForSale\n      price {\n        amount\n        currencyCode\n      }\n      compareAtPrice {\n        amount\n        currencyCode\n      }\n    }\n  }\n  query HeroProducts(\n    $country: CountryCode\n    $language: LanguageCode\n    $featuredHandle: String!\n  ) @inContext(country: $country, language: $language) {\n    featured: product(handle: $featuredHandle) {\n      ...HeroProduct\n    }\n    products(first: 8, sortKey: BEST_SELLING) {\n      nodes {\n        ...HeroProduct\n      }\n    }\n  }\n': {
+    return: HeroProductsQuery;
+    variables: HeroProductsQueryVariables;
   };
   '#graphql\n  query Article(\n    $articleHandle: String!\n    $blogHandle: String!\n    $country: CountryCode\n    $language: LanguageCode\n  ) @inContext(language: $language, country: $country) {\n    blog(handle: $blogHandle) {\n      handle\n      articleByHandle(handle: $articleHandle) {\n        handle\n        title\n        contentHtml\n        publishedAt\n        author: authorV2 {\n          name\n        }\n        image {\n          id\n          altText\n          url\n          width\n          height\n        }\n        seo {\n          description\n          title\n        }\n      }\n    }\n  }\n': {
     return: ArticleQuery;

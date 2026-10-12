@@ -22,7 +22,7 @@ npm run typecheck   # npm test, then react-router typegen && tsc --noEmit
 npm run codegen     # Regenerate GraphQL types + React Router route types
 ```
 
-- **There is no test framework** — `npm test` is the built-in `node:test` runner over `scripts/**/*.test.mjs`, currently one file: `scripts/product-gallery-media.test.mjs`. It is a *source-contract* test: it reads `products.$handle.tsx`, `ProductGallery.tsx`, `structured-data.ts`, and `entry.server.tsx` as text and asserts on their contents (query fields, CSP directives). Editing those files can break it without any behavioral regression. Don't assume broader test coverage exists; confirm with the user before adding a runner or a second framework.
+- **There is no test framework** — `npm test` is the built-in `node:test` runner over `scripts/**/*.test.mjs`. `scripts/product-gallery-media.test.mjs` is a *source-contract* test: it reads `products.$handle.tsx`, `ProductGallery.tsx`, `structured-data.ts`, and `entry.server.tsx` as text and asserts on their contents (query fields, CSP directives). Editing those files can break it without any behavioral regression. Don't assume broader test coverage exists; confirm with the user before adding a runner or a second framework.
 - It runs in two places automatically: a `pretypecheck` hook (so `npm run typecheck` covers it locally) and a CI step in the Oxygen workflow **before** the deploy — a red test blocks the deploy. That gate exists because a CSP regression is invisible in production: beacons and media are silently blocked, nothing 500s.
 - **Watch quotation marks in the CSP comments.** `getCspDirectiveSources` scrapes *every* quoted string out of a directive's array block, comments included, so quoting a URL or an error message inside `entry.server.tsx`'s CSP block reads as an extra source and fails the test.
 - Node `^22 || ^24` required.
@@ -48,6 +48,7 @@ File-based via `@react-router/fs-routes` `flatRoutes()`, wrapped in Hydrogen's `
 
 Storefront-specific routing decisions:
 - **`/shop` (`shop.tsx`) is the catalog page**, not `/collections/all`. `collections.all.tsx` is a bare `301` redirect to `/shop`, and the header nav points at `/shop`. Category chips and sort options are config in `app/lib/shop.ts` — the store has no real category collections, so "categories" are keyword queries run through Storefront product search.
+- **The home hero is a live product story** (`app/components/home/Hero.tsx`, data shaping in `app/lib/hero.ts`): best sellers from Storefront, interleaved by routine so the headline word ("Walks, upgraded.") rotates, with "Up to N% off" computed from real compare-at prices. **`/?hero=<product-handle>` puts that product first** — use it in paid-social ad URLs so the landing screen matches the ad. Unknown handles are ignored.
 - Custom content routes: `about.tsx` (hand-built, not a Shopify page), `blogs.*`, `policies.*`, `[robots.txt].tsx`, `[sitemap.xml].tsx`, `sitemap.$type.$page[.xml].tsx`.
 
 ### GraphQL + codegen (two schemas)
@@ -71,7 +72,7 @@ Three things to keep in mind when touching this:
 - **Never put a public `Cache-Control` on an HTML route.** Prices now vary by geo header and cookie, so a shared cache would serve one market's prices to the other — invisibly, like a CSP regression. `scripts/market-detection.test.mjs` enforces this and carries the audited exception list.
 - Storefront **sub-request** caching (`CacheLong` etc.) is safe as-is: `$country` is part of the query variables and therefore of the cache key.
 
-`app/lib/i18n.ts` and `app/lib/safe-redirect.ts` are deliberately free of runtime imports and of the `~/` alias, so `npm test` can load them through Node's native type stripping and exercise the real functions. Keep them that way.
+`app/lib/i18n.ts`, `app/lib/safe-redirect.ts` and `app/lib/hero.ts` are deliberately free of runtime imports and of the `~/` alias, so `npm test` can load them through Node's native type stripping and exercise the real functions. Keep them that way.
 
 ### root.tsx
 Loads header/footer data and shop analytics, wraps everything in `PageLayout`, and sets `shouldRevalidate` to skip root-loader revalidation on sub-navigation (perf optimization) except on mutations. It also exposes `origin` (from the request URL) in loader data — canonical URLs and Product JSON-LD derive from it, so there's no hardcoded production domain in the code.

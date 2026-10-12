@@ -730,3 +730,26 @@ button.reset:hover:not(:has(> *)) {
     animation: none !important;
   }
 }
+
+/* Home hero
+   ---------
+   `hero-progress` fills the active story segment; its `animationend` is what
+   advances the hero to the next product, so pausing the animation (hover,
+   focus, the pause button, the hero scrolling off-screen) pauses the story
+   with no timer to keep in sync. `hero-marquee` scrolls the trust strip,
+   which renders its list twice so a -50% shift loops seamlessly. Both are
+   switched off under `motion-reduce:` in the component. */
+@keyframes hero-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes hero-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}

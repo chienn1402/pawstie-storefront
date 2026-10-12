@@ -7,6 +7,7 @@ import {MockShopNotice} from '~/components/home/MockShopNotice';
 import {NewArrivals} from '~/components/home/NewArrivals';
 import {ShopByRoutine} from '~/components/home/ShopByRoutine';
 import {RECOMMENDED_PRODUCT_FRAGMENT} from '~/lib/fragments';
+import {toHeroSlides, withFeaturedFirst} from '~/lib/hero';
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -30,12 +31,31 @@ export async function loader(args: Route.LoaderArgs) {
 }
 
 /**
- * Load data necessary for rendering content above the fold. The hero is static,
- * so there are no above-the-fold Storefront queries here.
+ * Load data necessary for rendering content above the fold: the hero's product
+ * story. Awaited, because its first slide is the page's LCP image and has to
+ * be in the server HTML. A failed query must not 500 the page a paid click
+ * lands on — the hero renders a fallback card from an empty list instead.
+ *
+ * `?hero=<handle>` puts that product first, so an ad can link to the home page
+ * and still open on the product it was showing. Unknown handles are ignored.
  */
-function loadCriticalData({context}: Route.LoaderArgs) {
+async function loadCriticalData({context, request}: Route.LoaderArgs) {
+  const featuredHandle =
+    new URL(request.url).searchParams.get('hero')?.trim().slice(0, 255) ?? '';
+
+  const heroSlides = await context.storefront
+    .query(HERO_PRODUCTS_QUERY, {variables: {featuredHandle}})
+    .then(({featured, products}) =>
+      toHeroSlides(withFeaturedFirst(featured, products.nodes)),
+    )
+    .catch((error: Error) => {
+      console.error(error);
+      return [];
+    });
+
   return {
     isShopLinked: Boolean(context.env.PUBLIC_STORE_DOMAIN),
+    heroSlides,
   };
 }
 
@@ -63,7 +83,7 @@ export default function Homepage() {
   return (
     <div className="home">
       {data.isShopLinked ? null : <MockShopNotice />}
-      <Hero />
+      <Hero slides={data.heroSlides} />
       <NewArrivals products={data.recommendedProducts} />
       <EverydayPromises />
       <ShopByRoutine />
@@ -82,4 +102,57 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
     }
   }
   ${RECOMMENDED_PRODUCT_FRAGMENT}
+` as const;
+
+/**
+ * The hero's story card. Best sellers first — `toHeroSlides` then drops
+ * anything sold out or without a photo, and interleaves by routine so the
+ * headline word actually rotates. Eight in, at most seven out: one spare for a
+ * product that gets filtered.
+ *
+ * `featured` is the `?hero=` product. An empty handle matches nothing and
+ * comes back null, so one query serves both cases.
+ */
+const HERO_PRODUCTS_QUERY = `#graphql
+  fragment HeroProduct on Product {
+    id
+    title
+    handle
+    featuredImage {
+      id
+      url
+      altText
+      width
+      height
+    }
+    selectedOrFirstAvailableVariant(
+      selectedOptions: []
+      ignoreUnknownOptions: true
+      caseInsensitiveMatch: true
+    ) {
+      availableForSale
+      price {
+        amount
+        currencyCode
+      }
+      compareAtPrice {
+        amount
+        currencyCode
+      }
+    }
+  }
+  query HeroProducts(
+    $country: CountryCode
+    $language: LanguageCode
+    $featuredHandle: String!
+  ) @inContext(country: $country, language: $language) {
+    featured: product(handle: $featuredHandle) {
+      ...HeroProduct
+    }
+    products(first: 8, sortKey: BEST_SELLING) {
+      nodes {
+        ...HeroProduct
+      }
+    }
+  }
 ` as const;

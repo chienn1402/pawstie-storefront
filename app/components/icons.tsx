@@ -27,6 +27,15 @@ export function PlayIcon(props: IconProps) {
   );
 }
 
+export function PauseIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
+      <rect x="6.5" y="5" width="3.8" height="14" rx="1.2" />
+      <rect x="13.7" y="5" width="3.8" height="14" rx="1.2" />
+    </svg>
+  );
+}
+
 export function SearchIcon(props: IconProps) {
   return (
     <svg
