@@ -338,89 +338,56 @@ button.reset:hover:not(:has(> *)) {
 * components/Header
 * --------------------------------------------------
 */
+/* Two coats, picked by `data-tone` (`useHeaderTone` in Header.tsx): white glass
+   over the light pages, deep-green glass while the bar floats over a band
+   marked `data-header-tone="dark"` — the home hero, the footer. The old single
+   coat ran white→sage, which went murky grey over the green hero.
+
+   A full capsule at every width: 32px is the 22px of the 44px controls plus
+   the bar's 10px padding, so the corners stay concentric with them. No
+   `overflow: hidden` — it clipped the controls' offset focus rings. */
 .liquid-glass-header {
-  --glass-border: rgba(255, 255, 255, 0.88);
-  --glass-green: rgba(164, 232, 170, 0.22);
-  --glass-radius: 1.35rem;
-
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--glass-radius);
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(0, 82, 29, 0.08);
+  border-radius: 999px;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 0 rgba(0, 72, 23, 0.05),
-    0 18px 50px rgba(0, 72, 23, 0.13),
-    0 3px 10px rgba(0, 72, 23, 0.07);
-  isolation: isolate;
-  overflow: hidden;
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 12px 28px -16px rgba(0, 62, 21, 0.32),
+    0 2px 6px rgba(0, 62, 21, 0.05);
+  transition:
+    background-color 400ms ease-out,
+    border-color 400ms ease-out,
+    box-shadow 400ms ease-out;
 }
 
-.liquid-glass-header::before,
-.liquid-glass-header::after {
-  border-radius: inherit;
-  content: "" / "";
-  inset: 0;
-  pointer-events: none;
-  position: absolute;
-  z-index: 0;
-}
-
-.liquid-glass-header > * {
-  position: relative;
-  z-index: 1;
-}
-
-.liquid-glass-header::before {
-  background:
-    radial-gradient(
-      circle at 14% -40%,
-      rgba(255, 255, 255, 0.95) 0 27%,
-      transparent 58%
-    ),
-    linear-gradient(
-      112deg,
-      rgba(255, 255, 255, 0.52) 0%,
-      rgba(255, 255, 255, 0.08) 42%,
-      var(--glass-green) 100%
-    );
-}
-
-.liquid-glass-header::after {
-  background: linear-gradient(
-    115deg,
-    transparent 18%,
-    rgba(255, 255, 255, 0.38) 38%,
-    transparent 58%
-  );
-  opacity: 0.58;
+.liquid-glass-header[data-tone="dark"] {
+  background: rgba(0, 50, 17, 0.96);
+  border-color: rgba(195, 237, 192, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 16px 36px -18px rgba(0, 0, 0, 0.55);
 }
 
 @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
   .liquid-glass-header {
-    -webkit-backdrop-filter: blur(20px) saturate(165%) contrast(103%);
-    backdrop-filter: blur(20px) saturate(165%) contrast(103%);
-    background: rgba(255, 255, 255, 0.58);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
+    backdrop-filter: blur(18px) saturate(180%);
+    background: rgba(255, 255, 255, 0.78);
   }
-}
 
-@media (min-width: 64rem) {
-  .liquid-glass-header {
-    --glass-radius: 999px;
+  .liquid-glass-header[data-tone="dark"] {
+    background: rgba(12, 84, 36, 0.52);
   }
 }
 
 @media (forced-colors: active) {
-  .liquid-glass-header {
+  .liquid-glass-header,
+  .liquid-glass-header[data-tone="dark"] {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
     background: Canvas;
     border-color: ButtonBorder;
     box-shadow: none;
-  }
-
-  .liquid-glass-header::before,
-  .liquid-glass-header::after {
-    display: none;
   }
 }
 
@@ -431,8 +398,29 @@ button.reset:hover:not(:has(> *)) {
     background: rgba(255, 255, 255, 0.98);
   }
 
-  .liquid-glass-header::after {
-    opacity: 0;
+  .liquid-glass-header[data-tone="dark"] {
+    background: rgba(0, 50, 17, 0.98);
+  }
+}
+
+/* The hero's hand-drawn underline, reused as "you are here" in the nav. It
+   draws in left to right when a link becomes the current page. */
+.header-squiggle {
+  animation: header-squiggle-draw 480ms cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+@keyframes header-squiggle-draw {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header-squiggle {
+    animation: none;
   }
 }
 

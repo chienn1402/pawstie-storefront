@@ -32,7 +32,10 @@ export function Footer({
     <Suspense>
       <Await resolve={footerPromise}>
         {(footer) => (
-          <footer className="bg-[#003e15] px-6 pb-8 pt-14 text-white lg:px-[7vw] lg:pb-10 lg:pt-20">
+          <footer
+            data-header-tone="dark"
+            className="bg-[#003e15] px-6 pb-8 pt-14 text-white lg:px-[7vw] lg:pb-10 lg:pt-20"
+          >
             <div className="mx-auto max-w-[80rem]">
               <div className="grid grid-cols-2 gap-x-6 gap-y-12 pb-12 lg:grid-cols-[1.4fr_0.8fr_0.8fr] lg:gap-16 lg:pb-16">
                 <div className="col-span-2 lg:col-span-1">
@@ -49,7 +52,7 @@ export function Footer({
                       height="816"
                       className="h-10 w-auto shrink-0 scale-80 rounded-none!"
                     />
-                    <span className="font-heading text-2xl font-normal tracking-[-0.04em] text-white">
+                    <span className="font-heading text-2xl font-bold tracking-[-0.05em] text-white">
                       {shopName}
                     </span>
                   </Link>

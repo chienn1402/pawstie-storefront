@@ -171,6 +171,8 @@ export function Hero({slides}: {slides: HeroProductSlide[]}) {
     <section
       ref={sectionRef}
       aria-labelledby="hero-heading"
+      // The header switches to its dark coat while it floats over this.
+      data-header-tone="dark"
       // Full-bleed past the 1rem margin `reset.css` puts on `body > main`.
       className="relative isolate -mx-4 w-[calc(100%+2rem)] overflow-hidden bg-[#003e15] px-6 pb-0 pt-24 lg:px-[7vw] lg:pt-36"
     >

@@ -5,6 +5,7 @@ import {
   useRouteLoaderData,
 } from 'react-router';
 import {MARKETS, SUPPORTED_COUNTRIES, isSupportedCountry} from '~/lib/i18n';
+import type {HeaderTone} from '~/components/Header';
 import {cn} from '~/lib/utils';
 import type {RootLoader} from '~/root';
 
@@ -21,7 +22,14 @@ import type {RootLoader} from '~/root';
  * needs no on-change navigation, which strands keyboard and screen-reader
  * users mid-list.
  */
-export function CountrySelector({className}: {className?: string}) {
+export function CountrySelector({
+  className,
+  tone = 'light',
+}: {
+  className?: string;
+  /** `dark` while the header floats over the home hero or the footer. */
+  tone?: HeaderTone;
+}) {
   const data = useRouteLoaderData<RootLoader>('root');
   const {pathname, search} = useLocation();
   const navigation = useNavigation();
@@ -48,7 +56,8 @@ export function CountrySelector({className}: {className?: string}) {
       // The track carries its own edge through value alone — no outline. A step
       // deeper on the brand green is what separates it from the white glass.
       className={cn(
-        'inline-flex h-11 items-center gap-0.5 rounded-full bg-[#c3edc0] p-1',
+        'inline-flex h-11 items-center gap-0.5 rounded-full p-1 transition-colors duration-300 ease-out motion-reduce:transition-none',
+        tone === 'dark' ? 'bg-white/12' : 'bg-[#c3edc0]',
         className,
       )}
     >
@@ -68,13 +77,18 @@ export function CountrySelector({className}: {className?: string}) {
             aria-current={active ? 'true' : undefined}
             aria-label={`Show prices in ${label} ${currency}`}
             className={cn(
-              'h-9 rounded-full px-3 text-xs font-semibold tracking-[0.04em] transition-[background-color,color,box-shadow] duration-300 ease-out focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#00521d] motion-reduce:transition-none',
-              // The one dark mark in the bar. It reads as "you are here" rather
-              // than as a button because it sits inside the track — and the
-              // account pill beside it is no longer dark to compete with it.
-              active
-                ? 'bg-[#00521d] text-white shadow-[0_1px_2px_rgba(0,72,23,0.25)]'
-                : 'text-[#00521d] hover:text-[#003a14]',
+              'h-9 rounded-full px-3 text-xs font-semibold tracking-[0.04em] transition-[background-color,color,box-shadow] duration-300 ease-out focus-visible:outline-2 focus-visible:outline-offset-3 motion-reduce:transition-none',
+              // The one solid mark in the bar. It reads as "you are here"
+              // rather than as a button because it sits inside the track — and
+              // the account pill beside it is no longer solid to compete. On
+              // the dark coat it inverts to sprout green on forest.
+              tone === 'dark'
+                ? active
+                  ? 'bg-[#a4e8aa] text-[#003e15] focus-visible:outline-[#a4e8aa]'
+                  : 'text-[#d9f7d5] hover:text-white focus-visible:outline-[#a4e8aa]'
+                : active
+                  ? 'bg-[#00521d] text-white shadow-[0_1px_2px_rgba(0,72,23,0.25)] focus-visible:outline-[#00521d]'
+                  : 'text-[#00521d] hover:text-[#003a14] focus-visible:outline-[#00521d]',
             )}
           >
             {currency}

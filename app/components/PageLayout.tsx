@@ -140,9 +140,10 @@ function MobileMenuAside({
         />
         {/*
           The header hides the switcher below `lg`; this is its mobile home.
-          The rule and eyebrow keep it from reading as one more nav link.
+          The last nav row's rule and the eyebrow keep it from reading as one
+          more nav link.
         */}
-        <div className="mx-6 mt-2 border-t border-[#00521d]/10 pb-6 pt-5">
+        <div className="mx-6 pb-6 pt-7">
           <p className="mb-3 font-heading text-xs font-bold uppercase tracking-[0.16em] text-[#00521d]/55">
             Currency
           </p>
