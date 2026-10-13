@@ -44,11 +44,11 @@ const HIDDEN_PRIORITY = {fetchpriority: 'low'} as const;
 
 /**
  * Mirrors the card's width at every breakpoint: 32rem from xl, 27rem from lg,
- * and the stacked column (viewport minus the 1.5rem gutters, capped at 28rem)
- * below that.
+ * and below that the stacked column (viewport minus the 1.5rem gutters, capped
+ * at 28rem) less the card's own 0.75rem inset on each side.
  */
 const CARD_SIZES =
-  '(min-width: 1280px) 32rem, (min-width: 1024px) 27rem, min(100vw - 3rem, 28rem)';
+  '(min-width: 1280px) 32rem, (min-width: 1024px) 27rem, min(100vw - 4.5rem, 26.5rem)';
 
 const FALLBACK_SRCSET = `${heroPet375} 375w, ${heroPet500} 500w, ${heroPet} 750w`;
 
@@ -174,7 +174,7 @@ export function Hero({slides}: {slides: HeroProductSlide[]}) {
       // The header switches to its dark coat while it floats over this.
       data-header-tone="dark"
       // Full-bleed past the 1rem margin `reset.css` puts on `body > main`.
-      className="relative isolate -mx-4 w-[calc(100%+2rem)] overflow-hidden bg-[#003e15] px-6 pb-0 pt-24 lg:px-[7vw] lg:pt-36"
+      className="relative isolate -mx-4 w-[calc(100%+2rem)] overflow-hidden bg-[#003e15] px-6 pb-0 pt-28 lg:px-[7vw] lg:pt-36"
     >
       {/* Two soft lights: lime behind the card, orange low on the left. Radial
           rather than solid discs — a hard arc on a flat dark field reads as a
@@ -197,7 +197,7 @@ export function Hero({slides}: {slides: HeroProductSlide[]}) {
       />
 
       <div className="mx-auto max-w-md pb-12 lg:max-w-[80rem] lg:pb-20">
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,27rem)] lg:gap-x-16 lg:gap-y-0 xl:grid-cols-[minmax(0,1fr)_minmax(0,32rem)] xl:gap-x-24">
+        <div className="grid gap-9 lg:grid-cols-[minmax(0,1fr)_minmax(0,27rem)] lg:gap-x-16 lg:gap-y-0 xl:grid-cols-[minmax(0,1fr)_minmax(0,32rem)] xl:gap-x-24">
           {/* ── Hook ─────────────────────────────────────────────────── */}
           <div className="min-w-0 lg:col-start-1 lg:row-start-1 lg:self-end">
             <p className="mb-0 inline-flex items-center gap-2 rounded-full bg-white/10 py-1.5 pl-2.5 pr-3.5 font-heading text-xs font-bold uppercase tracking-[0.14em] text-[#c9f7cc] ring-1 ring-white/15 lg:text-sm">
@@ -215,7 +215,7 @@ export function Hero({slides}: {slides: HeroProductSlide[]}) {
                 every routine label is short enough to fit it at 320px. */}
             <h1
               id="hero-heading"
-              className="mb-0 mt-4 font-heading text-[clamp(2.9rem,13vw,4.5rem)] font-semibold leading-[0.88] tracking-[-0.055em] text-[#f3fff1] lg:mt-6 lg:text-[clamp(3.5rem,5.6vw,6.5rem)] xl:text-[clamp(4rem,6.6vw,7rem)]"
+              className="mb-0 mt-5 font-heading text-[clamp(2.9rem,13vw,4.5rem)] font-semibold leading-[0.88] tracking-[-0.055em] text-[#f3fff1] lg:mt-6 lg:text-[clamp(3.5rem,5.6vw,6.5rem)] xl:text-[clamp(4rem,6.6vw,7rem)]"
             >
               <span className="sr-only">{routinesSentence(slides)}</span>
               <span aria-hidden="true" className="block">
@@ -251,7 +251,9 @@ export function Hero({slides}: {slides: HeroProductSlide[]}) {
           </div>
 
           {/* ── The story card ───────────────────────────────────────── */}
-          <div className="relative isolate min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center">
+          {/* Inset on phones so the tilted stack behind it lands inside the
+              page gutters instead of brushing the screen edge. */}
+          <div className="relative isolate mx-3 min-w-0 lg:col-start-2 lg:mx-0 lg:row-span-2 lg:row-start-1 lg:self-center">
             {/* A loose stack behind the card — reads as "more where this came
                 from" before the visitor has noticed the progress bars. */}
             <span
