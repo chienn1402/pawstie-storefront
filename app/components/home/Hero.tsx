@@ -54,10 +54,13 @@ const FALLBACK_SRCSET = `${heroPet375} 375w, ${heroPet500} 500w, ${heroPet} 750w
 
 /**
  * Shop-level facts only, for the scrolling strip. Same rule as everywhere else
- * on this page: no review counts, no customer totals, and nothing about
- * delivery — a shipping line here is a promise fulfilment then has to keep.
+ * on this page: no review counts, no customer totals, and no delivery window —
+ * a date here is a promise fulfilment then has to keep. Free shipping is the
+ * exception because it's store policy (every order, confirmed by the owner), not
+ * a delivery estimate.
  */
 const STRIP_FACTS = [
+  'Free shipping on every order',
   'Free engraving on personalised pieces',
   'Secure Shopify checkout',
   'Made for dogs & cats',

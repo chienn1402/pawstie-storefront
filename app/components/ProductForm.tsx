@@ -322,9 +322,9 @@ export function ProductForm({
             <li className="product-assurance__item">
               <Truck aria-hidden="true" className="product-assurance__icon" />
               <span>
-                <strong>Shipping rates at checkout</strong>
+                <strong>Free shipping</strong>
                 <small>
-                  Rates shown before you pay.{' '}
+                  On every order to the US &amp; Canada.{' '}
                   <Link to="/policies/shipping-policy">View policy</Link>
                 </small>
               </span>

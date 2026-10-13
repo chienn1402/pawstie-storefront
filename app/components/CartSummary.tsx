@@ -68,7 +68,7 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
       </dl>
 
       <p className="mt-1 text-[0.6875rem] text-[#8fc99a]">
-        Shipping &amp; taxes calculated at checkout
+        Free shipping · Taxes calculated at checkout
       </p>
 
       <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} />
