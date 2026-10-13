@@ -213,7 +213,7 @@ test('the CSP permits only required product media, embed, and script sources', (
     'https://shopify.com',
     'https://unpkg.com/@google/model-viewer@v1.12.1/dist/model-viewer.min.js',
     'https://connect.facebook.net',
-    // The TikTok base code injects an un-nonced events.js tag from this host.
+    // TikTokPixel.tsx appends an un-nonced events.js tag from this host.
     'https://analytics.tiktok.com',
   ]);
   assert.deepEqual(connectSrc, [

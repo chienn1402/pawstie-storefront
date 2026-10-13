@@ -124,6 +124,7 @@ Reviews come from Judge.me and are read **server-side**: there's no Judge.me wid
 ## Critical conventions
 
 - **React Router, not Remix.** Import routing hooks/components from `react-router` (e.g. `useLoaderData`, `Link`, `Form`). Never import from `@remix-run/*`, and **never** from `react-router-dom` — note that `react-router-dom` *is* an installed dependency, so a wrong import resolves and type-checks cleanly instead of failing loudly. Nothing in `app/` imports it today; keep it that way. See `.cursor/rules/hydrogen-react-router.mdc` for the full Remix→React Router package mapping.
+- **Never render a third-party snippet that touches the DOM.** React 18 hydrates the whole document, so any inline script that inserts nodes while the page is being parsed breaks hydration on every page (#418, then #423 and a full client re-render). Vendor pixel snippets do exactly that: they insert their SDK tag before the first `<script>`, which on product pages is the JSON-LD in `<head>`. `MetaPixel.tsx` and `TikTokPixel.tsx` port the snippets into effects and load SDKs with `appendScript()` from `app/lib/pixels.ts`. Do the same for any new tag.
 - **Path alias:** `~/*` → `app/*`.
 - `build.assetsInlineLimit: 0` in `vite.config.ts` is intentional — keeps assets un-inlined so a strict CSP works. Don't change without reason.
 

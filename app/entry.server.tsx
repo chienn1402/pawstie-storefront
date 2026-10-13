@@ -45,12 +45,12 @@ export default async function handleRequest(
       'https://cdn.shopify.com',
       'https://shopify.com',
       'https://unpkg.com/@google/model-viewer@v1.12.1/dist/model-viewer.min.js',
-      // Meta Pixel loader. The inline bootstrap in MetaPixel.tsx carries the
-      // nonce; the fbevents.js tag it injects does not, so the host must be
+      // Meta Pixel SDK. MetaPixel.tsx appends the fbevents.js tag from an
+      // effect after hydration, without a nonce, so the host must be
       // allowlisted here or the pixel never loads.
       'https://connect.facebook.net',
-      // Same deal for TikTok: the inline base code in TikTokPixel.tsx injects
-      // an un-nonced events.js tag from this host.
+      // Same for TikTok: TikTokPixel.tsx appends an un-nonced events.js tag
+      // from this host, and events.js loads its modules from here too.
       'https://analytics.tiktok.com',
     ],
     // fbevents.js beacons to facebook.com by fetch/sendBeacon, and the TikTok

@@ -1,6 +1,11 @@
 import {useEffect} from 'react';
-import {useAnalytics, useNonce} from '@shopify/hydrogen';
-import {TIKTOK_PIXEL_ID, isPixelHost, numericId} from '~/lib/pixels';
+import {useAnalytics} from '@shopify/hydrogen';
+import {
+  TIKTOK_PIXEL_ID,
+  appendScript,
+  isPixelHost,
+  numericId,
+} from '~/lib/pixels';
 
 /**
  * TikTok Pixel, driven off Hydrogen's analytics events rather than TikTok's
@@ -35,7 +40,75 @@ type TikTokQueue = {
 declare global {
   interface Window {
     ttq?: TikTokQueue;
+    TiktokAnalyticsObject?: string;
   }
+}
+
+/** TikTok's queue: an array of calls with the stub methods hung off it. */
+type Deferred = unknown[] & Record<string, unknown>;
+
+const TIKTOK_METHODS = [
+  'page',
+  'track',
+  'identify',
+  'instances',
+  'debug',
+  'on',
+  'off',
+  'once',
+  'ready',
+  'alias',
+  'group',
+  'enableCookie',
+  'disableCookie',
+  'holdConsent',
+  'revokeConsent',
+  'grantConsent',
+];
+
+/**
+ * TikTok's base code, ported from the copy-paste snippet so it runs in an
+ * effect after hydration instead of as an inline script (see `appendScript`).
+ * It keeps the snippet's structure because events.js reads it back: the
+ * `methods` list, `setAndDefer`, `instance`, and the `_i`/`_t`/`_o` registries.
+ * The snippet's trailing `ttq.page()` is left out, because the page_viewed
+ * subscriber owns that, and keeping both double-counts the first pageview of
+ * every session and every client-side navigation after it.
+ */
+function installTikTokPixel(pixelId: string) {
+  if (window.ttq) return;
+  window.TiktokAnalyticsObject = 'ttq';
+
+  const ttq = [] as unknown as Deferred;
+  const setAndDefer = (target: Deferred, method: string) => {
+    target[method] = (...args: unknown[]) => {
+      target.push([method, ...args]);
+    };
+  };
+
+  ttq.methods = TIKTOK_METHODS;
+  ttq.setAndDefer = setAndDefer;
+  for (const method of TIKTOK_METHODS) setAndDefer(ttq, method);
+
+  ttq.instance = (id: string) => {
+    const registry = (ttq._i ?? {}) as Record<string, Deferred | undefined>;
+    const instance = registry[id] ?? ([] as unknown as Deferred);
+    for (const method of TIKTOK_METHODS) setAndDefer(instance, method);
+    return instance;
+  };
+
+  ttq.load = (id: string, options?: Record<string, unknown>) => {
+    const src = 'https://analytics.tiktok.com/i18n/pixel/events.js';
+    const registry = (ttq._i ??= {}) as Record<string, Deferred>;
+    registry[id] = [] as unknown as Deferred;
+    registry[id]._u = src;
+    ((ttq._t ??= {}) as Record<string, number>)[id] = Date.now();
+    ((ttq._o ??= {}) as Record<string, unknown>)[id] = options ?? {};
+    appendScript(`${src}?sdkid=${id}&lib=ttq`);
+  };
+
+  window.ttq = ttq as unknown as TikTokQueue;
+  (ttq.load as (id: string) => void)(pixelId);
 }
 
 /**
@@ -64,7 +137,6 @@ function track(event: string, params: Record<string, unknown>) {
 }
 
 export function TikTokPixel({origin}: {origin: string}) {
-  const nonce = useNonce();
   const {subscribe, register} = useAnalytics();
   const enabled = Boolean(TIKTOK_PIXEL_ID) && isPixelHost(origin);
 
@@ -78,6 +150,8 @@ export function TikTokPixel({origin}: {origin: string}) {
       ready();
       return;
     }
+
+    installTikTokPixel(TIKTOK_PIXEL_ID);
 
     subscribe('page_viewed', () => {
       window.ttq?.page?.();
@@ -169,12 +243,5 @@ export function TikTokPixel({origin}: {origin: string}) {
     ready();
   }, [enabled, subscribe, ready]);
 
-  if (!enabled) return null;
-
-  // TikTok's base code, minus its trailing `ttq.page()` — the page_viewed
-  // subscriber above owns that, and keeping both double-counts the first
-  // pageview of every session (and every client-side navigation after it).
-  const bootstrap = `!function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=d.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=d.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};ttq.load('${TIKTOK_PIXEL_ID}');}(window,document,'ttq');`;
-
-  return <script nonce={nonce} dangerouslySetInnerHTML={{__html: bootstrap}} />;
+  return null;
 }

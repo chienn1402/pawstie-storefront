@@ -1,6 +1,6 @@
 import {useEffect} from 'react';
-import {useAnalytics, useNonce} from '@shopify/hydrogen';
-import {isPixelHost, numericId} from '~/lib/pixels';
+import {useAnalytics} from '@shopify/hydrogen';
+import {appendScript, isPixelHost, numericId} from '~/lib/pixels';
 
 /**
  * Meta (Facebook) Pixel, driven off Hydrogen's analytics events rather than
@@ -29,7 +29,41 @@ const PIXEL_ID = '1718042242858307';
 declare global {
   interface Window {
     fbq?: (...args: unknown[]) => void;
+    _fbq?: unknown;
   }
+}
+
+/** The stub Meta's base code builds; fbevents.js reads these fields off it. */
+type FbqStub = ((...args: unknown[]) => void) & {
+  callMethod?: (...args: unknown[]) => void;
+  queue: unknown[][];
+  push: FbqStub;
+  loaded: boolean;
+  version: string;
+};
+
+/**
+ * Meta's base code, ported from the copy-paste snippet so it runs in an effect
+ * after hydration instead of as an inline script (see `appendScript`). Same
+ * stub as the snippet: calls queue until fbevents.js loads and replays them.
+ * The snippet's trailing `fbq('track','PageView')` is left out, because the
+ * page_viewed subscriber owns that, and keeping both double-counts the first
+ * pageview of every session.
+ */
+function installMetaPixel() {
+  if (window.fbq) return;
+  const fbq = function (...args: unknown[]) {
+    if (fbq.callMethod) fbq.callMethod(...args);
+    else fbq.queue.push(args);
+  } as FbqStub;
+  fbq.push = fbq;
+  fbq.loaded = true;
+  fbq.version = '2.0';
+  fbq.queue = [];
+  window.fbq = fbq;
+  if (!window._fbq) window._fbq = fbq;
+  appendScript('https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', PIXEL_ID);
 }
 
 /**
@@ -58,7 +92,6 @@ function track(
 }
 
 export function MetaPixel({origin}: {origin: string}) {
-  const nonce = useNonce();
   const {subscribe, register} = useAnalytics();
   const enabled = isPixelHost(origin);
 
@@ -72,6 +105,8 @@ export function MetaPixel({origin}: {origin: string}) {
       ready();
       return;
     }
+
+    installMetaPixel();
 
     subscribe('page_viewed', () => {
       track('track', 'PageView', {});
@@ -134,12 +169,5 @@ export function MetaPixel({origin}: {origin: string}) {
     ready();
   }, [enabled, subscribe, ready]);
 
-  if (!enabled) return null;
-
-  // Meta's loader, minus its trailing `fbq('track','PageView')` — the
-  // page_viewed subscriber above owns that, and keeping both double-counts
-  // the first pageview of every session.
-  const bootstrap = `!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${PIXEL_ID}');`;
-
-  return <script nonce={nonce} dangerouslySetInnerHTML={{__html: bootstrap}} />;
+  return null;
 }

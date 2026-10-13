@@ -27,6 +27,25 @@ const PIXEL_HOSTS = ['pawstie.com', 'www.pawstie.com'];
  */
 export const TIKTOK_PIXEL_ID = 'DA1GE03C77UBU14IJ580';
 
+/**
+ * Loads a pixel SDK by APPENDING it to <head>. Only ever call it from an effect,
+ * i.e. after hydration.
+ *
+ * Both vendors' copy-paste snippets instead insert their SDK tag before the
+ * page's first <script>. Rendered into the server HTML, that ran while the
+ * page was still being built, before React took over: React then found a
+ * script it hadn't rendered (on product pages, where it expected the JSON-LD
+ * in <head>), threw hydration errors #418/#423 on every page, and re-rendered
+ * the whole document in the browser. Never render a pixel snippet in JSX
+ * again; port it into an effect.
+ */
+export function appendScript(src: string) {
+  const script = document.createElement('script');
+  script.async = true;
+  script.src = src;
+  document.head.appendChild(script);
+}
+
 export function isPixelHost(origin: string) {
   try {
     return PIXEL_HOSTS.includes(new URL(origin).hostname);
