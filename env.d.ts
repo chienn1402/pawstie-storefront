@@ -36,5 +36,12 @@ declare global {
      * conversions stop counting.
      */
     PRIVATE_TIKTOK_EAPI_TEST_CODE?: string;
+    /**
+     * Judge.me private API token, from the developer/API section of Judge.me's
+     * settings. Optional on the same terms as the pixel tokens: unset turns
+     * product reviews off entirely, so the review section, the stars under the
+     * title and /api/reviews all disappear rather than half-work.
+     */
+    PRIVATE_JUDGEME_API_TOKEN?: string;
   }
 }

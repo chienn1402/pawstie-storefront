@@ -14,6 +14,7 @@ import {ProductForm} from '~/components/ProductForm';
 import {ProductBreadcrumb} from '~/components/ProductBreadcrumb';
 import {ProductInfoTabs} from '~/components/ProductInfoTabs';
 import {RelatedProducts} from '~/components/RelatedProducts';
+import {ProductReviews, ReviewSummaryLink} from '~/components/ProductReviews';
 import {
   isPrintOnDemand,
   ProductPodBadge,
@@ -24,6 +25,7 @@ import {RECOMMENDED_PRODUCT_FRAGMENT} from '~/lib/fragments';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {productJsonLd} from '~/lib/structured-data';
 import {metaDescription} from '~/lib/seo';
+import {numericProductId} from '~/lib/reviews';
 
 export const meta: Route.MetaFunction = ({data, matches}) => {
   const jsonLd = data?.product
@@ -104,11 +106,19 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
 
   if (!product?.id) throw new Response(null, {status: 404});
   redirectIfHandleIsLocalized(request, {handle, data: product});
-  return {product};
+
+  // Awaited, not streamed: the stars sit under the title, above the fold, and
+  // would shift the page if they arrived late. Usually a cache hit; resolves
+  // null (no section) when Judge.me isn't configured or doesn't answer.
+  const reviewProductId = numericProductId(product.id);
+  const reviews = await context.reviews.forProduct(reviewProductId);
+
+  return {product, reviews, reviewProductId};
 }
 
 export default function Product() {
-  const {product, recommended} = useLoaderData<typeof loader>();
+  const {product, recommended, reviews, reviewProductId} =
+    useLoaderData<typeof loader>();
   const selectedVariant = useOptimisticVariant(
     product.selectedOrFirstAvailableVariant,
     getAdjacentAndFirstAvailableVariants(product),
@@ -146,6 +156,7 @@ export default function Product() {
                   {isPod ? <ProductPodBadge /> : null}
                 </div>
                 <h1 className="mb-0 mt-3 font-heading text-4xl font-semibold leading-[0.95] tracking-[-0.05em] text-[#004817] sm:text-5xl">{title}</h1>
+                {reviews ? <ReviewSummaryLink summary={reviews.summary} /> : null}
               </div>
               <ProductPrice price={selectedVariant?.price} compareAtPrice={selectedVariant?.compareAtPrice} availableForSale={selectedVariant?.availableForSale} />
               <ProductForm
@@ -163,6 +174,14 @@ export default function Product() {
             sku={selectedVariant?.sku}
             title={title}
           />
+          {reviews && reviewProductId ? (
+            <ProductReviews
+              key={`reviews-${product.id}`}
+              productId={reviewProductId}
+              productTitle={title}
+              data={reviews}
+            />
+          ) : null}
         </div>
       </div>
       <RelatedProducts products={recommended} />

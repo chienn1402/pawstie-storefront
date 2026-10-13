@@ -72,7 +72,7 @@ Three things to keep in mind when touching this:
 - **Never put a public `Cache-Control` on an HTML route.** Prices now vary by geo header and cookie, so a shared cache would serve one market's prices to the other — invisibly, like a CSP regression. `scripts/market-detection.test.mjs` enforces this and carries the audited exception list.
 - Storefront **sub-request** caching (`CacheLong` etc.) is safe as-is: `$country` is part of the query variables and therefore of the cache key.
 
-`app/lib/i18n.ts`, `app/lib/safe-redirect.ts` and `app/lib/hero.ts` are deliberately free of runtime imports and of the `~/` alias, so `npm test` can load them through Node's native type stripping and exercise the real functions. Keep them that way.
+`app/lib/i18n.ts`, `app/lib/safe-redirect.ts`, `app/lib/hero.ts` and `app/lib/reviews.ts` are deliberately free of runtime imports and of the `~/` alias, so `npm test` can load them through Node's native type stripping and exercise the real functions. Keep them that way.
 
 ### root.tsx
 Loads header/footer data and shop analytics, wraps everything in `PageLayout`, and sets `shouldRevalidate` to skip root-loader revalidation on sub-navigation (perf optimization) except on mutations. It also exposes `origin` (from the request URL) in loader data — canonical URLs and Product JSON-LD derive from it, so there's no hardcoded production domain in the code.
@@ -105,10 +105,20 @@ Products flagged for personalization drive an extra checkout step. The flow:
 3. `ProductForm` gates add-to-cart behind a nameplate form and attaches cart line attributes: `Pet name`, `Phone number`, and `_pod`.
 4. `CartLineItem` renders line attributes as "Personalization", **filtering out any key starting with `_`** — that underscore prefix is the convention for internal, non-displayed attributes.
 
+## Product reviews (Judge.me)
+
+Reviews come from Judge.me and are read **server-side**: there's no Judge.me widget script and no CSP change. The whole feature is gated on the `PRIVATE_JUDGEME_API_TOKEN` Oxygen secret. Without it, product pages render with no review UI and `/api/reviews` returns 404.
+
+- `app/lib/reviews.server.ts` (`context.reviews`, wired in `app/lib/context.ts`) fetches every store review in one store-wide `withCache` entry (10 min fresh, 1 day stale-while-revalidate) and filters by Shopify product id. Judge.me's raw `/reviews` endpoint only filters by its own product id, so per-product requests aren't possible without an extra lookup.
+- Judge.me's raw API returns **unpublished reviews, emails, IPs and unsanitized text**. `toProductReview()` in `app/lib/reviews.ts` is the only door to the page: it keeps only `curated: "ok"` and non-hidden reviews, and shortens names to "First L.". React renders the text as text. Don't add `dangerouslySetInnerHTML` to review content, and don't cache or return raw review objects.
+- The product page awaits reviews in `loadCriticalData`, because the stars sit under the title. A Judge.me failure or timeout (2.5s) resolves `null`, which only hides the section.
+- `ProductReviews.tsx`: the summary under the H1 and the section after the info tabs. With zero reviews it shows only a "Have this one already?" prompt, never "0 reviews". A link ending in `#write-review` opens the form. The form posts to `/api/reviews`, which validates it, checks a honeypot field, and creates a Judge.me web review that waits in Judge.me's moderation queue.
+- Review photos aren't shown yet, because their image host would need a CSP `imgSrc` entry. `productJsonLd()` still omits `aggregateRating`. Add it from real review data, never from a hardcoded number.
+
 ## SEO
 
 - `app/lib/seo.ts` — `metaDescription()` clips Shopify body text to a ~155-char sentence.
-- `app/lib/structured-data.ts` — `productJsonLd()`. It deliberately omits `aggregateRating` and `priceValidUntil` (no review source; a stale date reads as an expired offer) and returns `null` rather than a partial object. Read the doc comment before changing it — the omissions are answers to Search Console errors, not oversights.
+- `app/lib/structured-data.ts` — `productJsonLd()`. It deliberately omits `aggregateRating` and `priceValidUntil` (ratings must come from real reviews, see the Judge.me section; a stale date reads as an expired offer) and returns `null` rather than a partial object. Read the doc comment before changing it — the omissions are answers to Search Console errors, not oversights.
 - Canonical URLs come from the root loader's `origin`; `robots.txt` and the sitemap routes are custom.
 
 ## Critical conventions
