@@ -473,10 +473,26 @@ export type HeroProductsQueryVariables = StorefrontAPI.Exact<{
   country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
   language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
   featuredHandle: StorefrontAPI.Scalars['String']['input'];
+  leadHandle: StorefrontAPI.Scalars['String']['input'];
 }>;
 
 export type HeroProductsQuery = {
   featured?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Product, 'id' | 'title' | 'handle'> & {
+      featuredImage?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.Image, 'id' | 'url' | 'altText' | 'width' | 'height'>
+      >;
+      selectedOrFirstAvailableVariant?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.ProductVariant, 'availableForSale'> & {
+          price: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
+          compareAtPrice?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>
+          >;
+        }
+      >;
+    }
+  >;
+  lead?: StorefrontAPI.Maybe<
     Pick<StorefrontAPI.Product, 'id' | 'title' | 'handle'> & {
       featuredImage?: StorefrontAPI.Maybe<
         Pick<StorefrontAPI.Image, 'id' | 'url' | 'altText' | 'width' | 'height'>
@@ -1749,7 +1765,7 @@ interface GeneratedQueryTypes {
     return: RecommendedProductsQuery;
     variables: RecommendedProductsQueryVariables;
   };
-  '#graphql\n  fragment HeroProduct on Product {\n    id\n    title\n    handle\n    featuredImage {\n      id\n      url\n      altText\n      width\n      height\n    }\n    selectedOrFirstAvailableVariant(\n      selectedOptions: []\n      ignoreUnknownOptions: true\n      caseInsensitiveMatch: true\n    ) {\n      availableForSale\n      price {\n        amount\n        currencyCode\n      }\n      compareAtPrice {\n        amount\n        currencyCode\n      }\n    }\n  }\n  query HeroProducts(\n    $country: CountryCode\n    $language: LanguageCode\n    $featuredHandle: String!\n  ) @inContext(country: $country, language: $language) {\n    featured: product(handle: $featuredHandle) {\n      ...HeroProduct\n    }\n    products(first: 8, sortKey: BEST_SELLING) {\n      nodes {\n        ...HeroProduct\n      }\n    }\n  }\n': {
+  '#graphql\n  fragment HeroProduct on Product {\n    id\n    title\n    handle\n    featuredImage {\n      id\n      url\n      altText\n      width\n      height\n    }\n    selectedOrFirstAvailableVariant(\n      selectedOptions: []\n      ignoreUnknownOptions: true\n      caseInsensitiveMatch: true\n    ) {\n      availableForSale\n      price {\n        amount\n        currencyCode\n      }\n      compareAtPrice {\n        amount\n        currencyCode\n      }\n    }\n  }\n  query HeroProducts(\n    $country: CountryCode\n    $language: LanguageCode\n    $featuredHandle: String!\n    $leadHandle: String!\n  ) @inContext(country: $country, language: $language) {\n    featured: product(handle: $featuredHandle) {\n      ...HeroProduct\n    }\n    lead: product(handle: $leadHandle) {\n      ...HeroProduct\n    }\n    products(first: 8, sortKey: BEST_SELLING) {\n      nodes {\n        ...HeroProduct\n      }\n    }\n  }\n': {
     return: HeroProductsQuery;
     variables: HeroProductsQueryVariables;
   };

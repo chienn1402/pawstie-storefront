@@ -37,16 +37,19 @@ export async function loader(args: Route.LoaderArgs) {
  * lands on — the hero renders a fallback card from an empty list instead.
  *
  * `?hero=<handle>` puts that product first, so an ad can link to the home page
- * and still open on the product it was showing. Unknown handles are ignored.
+ * and still open on the product it was showing. Without one — or with a handle
+ * that matches nothing — the story opens on `HERO_LEAD_HANDLE` instead.
  */
 async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const featuredHandle =
     new URL(request.url).searchParams.get('hero')?.trim().slice(0, 255) ?? '';
 
   const heroSlides = await context.storefront
-    .query(HERO_PRODUCTS_QUERY, {variables: {featuredHandle}})
-    .then(({featured, products}) =>
-      toHeroSlides(withFeaturedFirst(featured, products.nodes)),
+    .query(HERO_PRODUCTS_QUERY, {
+      variables: {featuredHandle, leadHandle: HERO_LEAD_HANDLE},
+    })
+    .then(({featured, lead, products}) =>
+      toHeroSlides(withFeaturedFirst(featured ?? lead, products.nodes)),
     )
     .catch((error: Error) => {
       console.error(error);
@@ -105,13 +108,22 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
 ` as const;
 
 /**
+ * The story's opening slide when no ad names one: The Signature Genuine
+ * Leather AirTag Collar, chosen by the shop owner. If it is renamed, sold out
+ * or unpublished, the lookup comes back null (or `toHeroSlides` drops it) and
+ * the story simply opens on the top best seller.
+ */
+const HERO_LEAD_HANDLE = 'location-tracker-first-layer-leather-dog-pet-collar';
+
+/**
  * The hero's story card. Best sellers first — `toHeroSlides` then drops
  * anything sold out or without a photo, and interleaves by routine so the
  * headline word actually rotates. Eight in, at most seven out: one spare for a
  * product that gets filtered.
  *
- * `featured` is the `?hero=` product. An empty handle matches nothing and
- * comes back null, so one query serves both cases.
+ * `featured` is the `?hero=` product and `lead` the default opener; the loader
+ * puts whichever resolves first (featured wins) at the front. An empty handle
+ * matches nothing and comes back null, so one query serves every case.
  */
 const HERO_PRODUCTS_QUERY = `#graphql
   fragment HeroProduct on Product {
@@ -145,8 +157,12 @@ const HERO_PRODUCTS_QUERY = `#graphql
     $country: CountryCode
     $language: LanguageCode
     $featuredHandle: String!
+    $leadHandle: String!
   ) @inContext(country: $country, language: $language) {
     featured: product(handle: $featuredHandle) {
+      ...HeroProduct
+    }
+    lead: product(handle: $leadHandle) {
       ...HeroProduct
     }
     products(first: 8, sortKey: BEST_SELLING) {

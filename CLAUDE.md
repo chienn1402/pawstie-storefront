@@ -25,7 +25,7 @@ Pushes to any branch deploy to Oxygen via `.github/workflows/oxygen-deployment-1
 ### Routing
 Storefront-specific routing decisions:
 - **`/shop` (`shop.tsx`) is the catalog page**, not `/collections/all`. `collections.all.tsx` is a bare `301` redirect to `/shop`, and the header nav points at `/shop`. Category chips and sort options are config in `app/lib/shop.ts` — the store has no real category collections, so "categories" are keyword queries run through Storefront product search.
-- **The home hero is a live product story** (`app/components/home/Hero.tsx`, data shaping in `app/lib/hero.ts`): best sellers from Storefront, interleaved by routine so the headline word ("Walks, upgraded.") rotates, with "Up to N% off" computed from real compare-at prices. **`/?hero=<product-handle>` puts that product first** — use it in paid-social ad URLs so the landing screen matches the ad. Unknown handles are ignored.
+- **The home hero is a live product story** (`app/components/home/Hero.tsx`, data shaping in `app/lib/hero.ts`): best sellers from Storefront, interleaved by routine so the headline word ("Walks, upgraded.") rotates, with "Up to N% off" computed from real compare-at prices. **`/?hero=<product-handle>` puts that product first** — use it in paid-social ad URLs so the landing screen matches the ad. Without it (or for an unknown handle) the story opens on `HERO_LEAD_HANDLE` in `_index.tsx` — currently the Signature AirTag Collar.
 - Custom content routes: `about.tsx` (hand-built, not a Shopify page), `blogs.*`, `policies.*`, `[robots.txt].tsx`, `[sitemap.xml].tsx`, `sitemap.$type.$page[.xml].tsx`.
 
 ### GraphQL + codegen (two schemas)
