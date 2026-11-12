@@ -4,48 +4,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Shopify **Hydrogen** headless storefront (Hydrogen `2026.4.3`) for **Pawstie**, a pet-products shop, deployed to **Shopify Oxygen** (Cloudflare Workers–style runtime). Built on **React Router 7** (not Remix — see import rule below), Vite, and Tailwind CSS v4.
+Shopify **Hydrogen** headless storefront for **Pawstie**, a pet-products shop, deployed to **Shopify Oxygen** (Cloudflare Workers–style runtime). Built on **React Router 7** (not Remix — see import rule below), Vite, and Tailwind CSS v4.
 
 It started from the Hydrogen "Skeleton" template, but the storefront is now bespoke: home, shop, product, blog, policies, about, and account pages have all been redesigned. `README.md` and `CHANGELOG.md` are still upstream skeleton files — they describe the template, not this shop; don't treat them as documentation of current behavior.
 
 Pushes to any branch deploy to Oxygen via `.github/workflows/oxygen-deployment-1000170383.yml`.
 
-## Commands
-
-```bash
-npm run dev         # Local dev server via Shopify CLI + MiniOxygen, runs codegen in watch mode
-npm run build       # Production build (shopify hydrogen build --codegen)
-npm run preview     # Build then serve the production bundle locally
-npm run lint        # ESLint over the repo
-npm run test        # node:test over scripts/**/*.test.mjs (see below)
-npm run typecheck   # npm test, then react-router typegen && tsc --noEmit
-npm run codegen     # Regenerate GraphQL types + React Router route types
-```
+## Tests and setup
 
 - **There is no test framework** — `npm test` is the built-in `node:test` runner over `scripts/**/*.test.mjs`. `scripts/product-gallery-media.test.mjs` is a *source-contract* test: it reads `products.$handle.tsx`, `ProductGallery.tsx`, `structured-data.ts`, and `entry.server.tsx` as text and asserts on their contents (query fields, CSP directives). Editing those files can break it without any behavioral regression. Don't assume broader test coverage exists; confirm with the user before adding a runner or a second framework.
 - It runs in two places automatically: a `pretypecheck` hook (so `npm run typecheck` covers it locally) and a CI step in the Oxygen workflow **before** the deploy — a red test blocks the deploy. That gate exists because a CSP regression is invisible in production: beacons and media are silently blocked, nothing 500s.
 - **Watch quotation marks in the CSP comments.** `getCspDirectiveSources` scrapes *every* quoted string out of a directive's array block, comments included, so quoting a URL or an error message inside `entry.server.tsx`'s CSP block reads as an extra source and fails the test.
-- Node `^22 || ^24` required.
 - `.env` holds Shopify storefront credentials and `SESSION_SECRET` (required — context creation throws without it). The Customer Account API (`/account`) needs a public dev domain; see the README step for setup.
 
 ## Architecture
-
-### Request flow
-`server.ts` is the Oxygen worker entrypoint. Each request:
-1. `createHydrogenRouterContext` (`app/lib/context.ts`) builds the Hydrogen context — Storefront client, Customer Account client, cart handler, session, and cache — and passes it to React Router as the load context.
-2. `createRequestHandler` delegates routing/rendering to React Router.
-3. On a `404`, `storefrontRedirect` checks Shopify-managed URL redirects before returning.
-4. Pending session changes are committed via `Set-Cookie` after the response.
-
-### Loaders/actions access Shopify via context
-In routes, reach Shopify through the loader/action context, e.g. `context.storefront.query(...)`, `context.customerAccount`, and `context.cart`. To add custom clients (CMS, reviews, Admin API), populate `additionalContext` in `app/lib/context.ts` — entries become available as both `context.propertyName` and `context.get(...)`.
 
 ### Content Security Policy
 `app/entry.server.tsx` calls `createContentSecurityPolicy` with **hand-tuned directives** beyond the defaults: `mediaSrc` (Shopify CDN + store domain, for hosted product video), `frameSrc` (YouTube + Vimeo embeds), and `scriptSrc` (Shopify + the unpkg `model-viewer` bundle). Any new external media, embed, or script host must be added here or it will be blocked in production — and `scripts/product-gallery-media.test.mjs` asserts these directives, so update the test alongside.
 
 ### Routing
-File-based via `@react-router/fs-routes` `flatRoutes()`, wrapped in Hydrogen's `hydrogenRoutes()` in `app/routes.ts`. Route files live in `app/routes/` using flat-route dotted naming (e.g. `products.$handle.tsx`, `account.orders.$id.tsx`, `[sitemap.xml].tsx`). Add manual routes to the array in `app/routes.ts`.
-
 Storefront-specific routing decisions:
 - **`/shop` (`shop.tsx`) is the catalog page**, not `/collections/all`. `collections.all.tsx` is a bare `301` redirect to `/shop`, and the header nav points at `/shop`. Category chips and sort options are config in `app/lib/shop.ts` — the store has no real category collections, so "categories" are keyword queries run through Storefront product search.
 - **The home hero is a live product story** (`app/components/home/Hero.tsx`, data shaping in `app/lib/hero.ts`): best sellers from Storefront, interleaved by routine so the headline word ("Walks, upgraded.") rotates, with "Up to N% off" computed from real compare-at prices. **`/?hero=<product-handle>` puts that product first** — use it in paid-social ad URLs so the landing screen matches the ad. Unknown handles are ignored.
@@ -60,9 +37,6 @@ These `*.generated.d.ts` files are build artifacts — never edit them by hand; 
 
 Product fragments are duplicated across `app/lib/fragments.ts`, `app/routes/products.$handle.tsx`, and `app/routes/collections.$handle.tsx`. A field added for a product card (e.g. the POD metafield below) usually has to be added in all three — the files carry "keep in sync" comments saying so.
 
-### Session
-`AppSession` (`app/lib/session.ts`) is a cookie-based `HydrogenSession`. Mutating methods (`set`/`unset`) flip `isPending`, which `server.ts` uses to decide when to commit the cookie.
-
 ### Markets and currency
 The shop has **two** Shopify markets: United States (USD, the base currency) and Canada (CAD). `app/lib/i18n.ts` resolves which one a request belongs to, in this order: an explicit shopper choice in the session → the `oxygen-buyer-country` header (Oxygen only; never set in local dev) → `US`. Anything outside `{US, CA}` resolves to `US`. `app/lib/context.ts` feeds the result to `storefront.i18n`, and every `@inContext` query follows from there. `CountrySelector` posts to `app/routes/country.tsx` to override detection; it sits in the header's CTA cluster on desktop and in the mobile menu aside below `lg`.
 
@@ -75,7 +49,7 @@ Three things to keep in mind when touching this:
 `app/lib/i18n.ts`, `app/lib/safe-redirect.ts`, `app/lib/hero.ts` and `app/lib/reviews.ts` are deliberately free of runtime imports and of the `~/` alias, so `npm test` can load them through Node's native type stripping and exercise the real functions. Keep them that way.
 
 ### root.tsx
-Loads header/footer data and shop analytics, wraps everything in `PageLayout`, and sets `shouldRevalidate` to skip root-loader revalidation on sub-navigation (perf optimization) except on mutations. It also exposes `origin` (from the request URL) in loader data — canonical URLs and Product JSON-LD derive from it, so there's no hardcoded production domain in the code.
+The root loader exposes `origin` (from the request URL) in loader data — canonical URLs and Product JSON-LD derive from it, so there's no hardcoded production domain in the code.
 
 ## Styling
 
@@ -92,28 +66,16 @@ Three stylesheets, all linked from `root.tsx`, with distinct roles. Know which o
 
 ## UI components
 
-- `app/components/` is flat for shared/product/cart pieces, with `home/` and `shop/` subfolders for page-specific sections.
-- `cn()` from `~/lib/utils` (clsx + tailwind-merge) is the class-merging helper.
 - **shadcn is installed but barely used.** `components.json` targets the `base-nova` style on `@base-ui/react` (not Radix), aliased to `~/components/ui`. In practice `app/components/ui/` holds exactly two files: `button.tsx` (scaffolded by shadcn, **currently imported by nothing**) and `Modal.tsx` (hand-written, used by `account.addresses.tsx`). Don't assume a component system exists — most UI is hand-rolled Tailwind.
 - Icons are hand-authored SVGs in `app/components/icons.tsx`. `lucide-react` is installed but used in a single file (`ProductForm.tsx`); prefer `icons.tsx` for new icons unless matching that file.
 
 ## Print-on-demand personalization
 
-Products flagged for personalization drive an extra checkout step. The flow:
-1. The Storefront queries alias a metafield as `printOnDemand: metafield(namespace: "custom", key: "print_on_demand")` — present in `app/lib/fragments.ts`, `products.$handle.tsx`, and `collections.$handle.tsx`.
-2. `isPrintOnDemand()` in `app/components/ProductPodBadge.tsx` reads it (string `'true'`), and `ProductPodBadge` renders the badge on cards and the PDP.
-3. `ProductForm` gates add-to-cart behind a nameplate form and attaches cart line attributes: `Pet name`, `Phone number`, and `_pod`.
-4. `CartLineItem` renders line attributes as "Personalization", **filtering out any key starting with `_`** — that underscore prefix is the convention for internal, non-displayed attributes.
+Products with the `custom.print_on_demand` metafield gate add-to-cart behind a nameplate form; the full flow is in the `print-on-demand` skill. Cart line attribute keys starting with `_` (e.g. `_pod`) are internal: `CartLineItem` hides them from shoppers, so never give a shopper-facing attribute that prefix.
 
 ## Product reviews (Judge.me)
 
-Reviews come from Judge.me and are read **server-side**: there's no Judge.me widget script and no CSP change. The whole feature is gated on the `PRIVATE_JUDGEME_API_TOKEN` Oxygen secret. Without it, product pages render with no review UI and `/api/reviews` returns 404.
-
-- `app/lib/reviews.server.ts` (`context.reviews`, wired in `app/lib/context.ts`) fetches every store review in one store-wide `withCache` entry (10 min fresh, 1 day stale-while-revalidate) and filters by Shopify product id. Judge.me's raw `/reviews` endpoint only filters by its own product id, so per-product requests aren't possible without an extra lookup.
-- Judge.me's raw API returns **unpublished reviews, emails, IPs and unsanitized text**. `toProductReview()` in `app/lib/reviews.ts` is the only door to the page: it keeps only `curated: "ok"` and non-hidden reviews, and shortens names to "First L.". React renders the text as text. Don't add `dangerouslySetInnerHTML` to review content, and don't cache or return raw review objects.
-- The product page awaits reviews in `loadCriticalData`, because the stars sit under the title. A Judge.me failure or timeout (2.5s) resolves `null`, which only hides the section.
-- `ProductReviews.tsx`: the summary under the H1 and the section after the info tabs. With zero reviews it shows only a "Have this one already?" prompt, never "0 reviews". A link ending in `#write-review` opens the form. The form posts to `/api/reviews`, which validates it, checks a honeypot field, and creates a Judge.me web review that waits in Judge.me's moderation queue.
-- Review photos aren't shown yet, because their image host would need a CSP `imgSrc` entry. `productJsonLd()` still omits `aggregateRating`. Add it from real review data, never from a hardcoded number.
+Read server-side, gated on the `PRIVATE_JUDGEME_API_TOKEN` Oxygen secret; the full design is in the `judgeme-reviews` skill — load it before changing the feature. Judge.me's raw API returns **unpublished reviews, emails, IPs and unsanitized text**, so `toProductReview()` in `app/lib/reviews.ts` is the only door to the page. Never add `dangerouslySetInnerHTML` to review content, never cache or return raw review objects, and never add `aggregateRating` from anything but real review data.
 
 ## SEO
 
@@ -125,7 +87,6 @@ Reviews come from Judge.me and are read **server-side**: there's no Judge.me wid
 
 - **React Router, not Remix.** Import routing hooks/components from `react-router` (e.g. `useLoaderData`, `Link`, `Form`). Never import from `@remix-run/*`, and **never** from `react-router-dom` — note that `react-router-dom` *is* an installed dependency, so a wrong import resolves and type-checks cleanly instead of failing loudly. Nothing in `app/` imports it today; keep it that way. See `.cursor/rules/hydrogen-react-router.mdc` for the full Remix→React Router package mapping.
 - **Never render a third-party snippet that touches the DOM.** React 18 hydrates the whole document, so any inline script that inserts nodes while the page is being parsed breaks hydration on every page (#418, then #423 and a full client re-render). Vendor pixel snippets do exactly that: they insert their SDK tag before the first `<script>`, which on product pages is the JSON-LD in `<head>`. `MetaPixel.tsx` and `TikTokPixel.tsx` port the snippets into effects and load SDKs with `appendScript()` from `app/lib/pixels.ts`. Do the same for any new tag.
-- **Path alias:** `~/*` → `app/*`.
 - `build.assetsInlineLimit: 0` in `vite.config.ts` is intentional — keeps assets un-inlined so a strict CSP works. Don't change without reason.
 
 ## Reference docs
